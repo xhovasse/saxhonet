@@ -65,6 +65,12 @@
             });
         })
         .then(function (result) {
+            // Toujours mettre a jour le CSRF token si present
+            if (result.body.csrf_token) {
+                var csrfInput = form.querySelector('[name="csrf_token"]');
+                if (csrfInput) csrfInput.value = result.body.csrf_token;
+            }
+
             if (result.body.success) {
                 // Show success message, hide form
                 if (formWrapper) formWrapper.style.display = 'none';

@@ -122,6 +122,7 @@ function send_email(string $to, string $subject, string $body, bool $isHtml = tr
 
 /**
  * Envoi SMTP basique (sans dependance externe)
+ * Avec logging detaille a chaque etape pour le debug
  */
 function send_email_smtp(string $to, string $subject, string $body, bool $isHtml = true): bool
 {
@@ -130,77 +131,183 @@ function send_email_smtp(string $to, string $subject, string $body, bool $isHtml
         $useSSL = (SMTP_PORT == 465);
         $host = ($useSSL ? 'ssl://' : '') . SMTP_HOST;
 
-        $socket = fsockopen($host, SMTP_PORT, $errno, $errstr, 10);
+        $context = stream_context_create([
+            'ssl' => [
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+                'allow_self_signed' => true,
+            ]
+        ]);
+
+        $socket = stream_socket_client(
+            "$host:" . SMTP_PORT,
+            $errno, $errstr, 15,
+            STREAM_CLIENT_CONNECT,
+            $context
+        );
+
         if (!$socket) {
-            error_log("SMTP connection failed: $errstr ($errno)");
+            error_log("SMTP: connection failed to $host:" . SMTP_PORT . " — $errstr ($errno)");
             return false;
         }
+
+        // Timeout de lecture
+        stream_set_timeout($socket, 10);
 
         $hostname = parse_url(SITE_URL, PHP_URL_HOST) ?: 'localhost';
 
         // Lire le banner
-        $read = fgets($socket, 512);
-
-        fputs($socket, "EHLO $hostname\r\n");
-        // Lire toutes les lignes de reponse EHLO (multi-lignes)
-        while ($line = fgets($socket, 512)) {
-            if (isset($line[3]) && $line[3] === ' ') break;
-        }
-
-        // STARTTLS uniquement si pas SSL direct
-        if (!$useSSL) {
-            fputs($socket, "STARTTLS\r\n");
-            $read = fgets($socket, 512);
-            stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
-
-            fputs($socket, "EHLO $hostname\r\n");
-            while ($line = fgets($socket, 512)) {
-                if (isset($line[3]) && $line[3] === ' ') break;
-            }
-        }
-
-        // AUTH LOGIN
-        fputs($socket, "AUTH LOGIN\r\n");
-        $read = fgets($socket, 512);
-        fputs($socket, base64_encode(SMTP_USER) . "\r\n");
-        $read = fgets($socket, 512);
-        fputs($socket, base64_encode(SMTP_PASS) . "\r\n");
-        $read = fgets($socket, 512);
-
-        if (!str_starts_with(trim($read), '235')) {
-            error_log("SMTP auth failed: $read");
+        $banner = smtp_read($socket);
+        if (!smtp_ok($banner, '220')) {
+            error_log("SMTP: bad banner: $banner");
             fclose($socket);
             return false;
         }
 
-        fputs($socket, "MAIL FROM:<" . SMTP_FROM . ">\r\n");
-        $read = fgets($socket, 512);
-        fputs($socket, "RCPT TO:<$to>\r\n");
-        $read = fgets($socket, 512);
-        fputs($socket, "DATA\r\n");
-        $read = fgets($socket, 512);
+        // EHLO
+        smtp_send($socket, "EHLO $hostname");
+        $ehlo = smtp_read_multi($socket);
 
+        // STARTTLS uniquement si pas SSL direct
+        if (!$useSSL) {
+            smtp_send($socket, "STARTTLS");
+            $tls = smtp_read($socket);
+            if (!smtp_ok($tls, '220')) {
+                error_log("SMTP: STARTTLS failed: $tls");
+                fclose($socket);
+                return false;
+            }
+            stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLSv1_2_CLIENT);
+
+            smtp_send($socket, "EHLO $hostname");
+            smtp_read_multi($socket);
+        }
+
+        // AUTH LOGIN
+        smtp_send($socket, "AUTH LOGIN");
+        $auth1 = smtp_read($socket);
+        if (!smtp_ok($auth1, '334')) {
+            error_log("SMTP: AUTH LOGIN rejected: $auth1");
+            fclose($socket);
+            return false;
+        }
+
+        smtp_send($socket, base64_encode(SMTP_USER));
+        $auth2 = smtp_read($socket);
+        if (!smtp_ok($auth2, '334')) {
+            error_log("SMTP: username rejected: $auth2");
+            fclose($socket);
+            return false;
+        }
+
+        smtp_send($socket, base64_encode(SMTP_PASS));
+        $auth3 = smtp_read($socket);
+        if (!smtp_ok($auth3, '235')) {
+            error_log("SMTP: auth failed (wrong password?): $auth3");
+            fclose($socket);
+            return false;
+        }
+
+        // MAIL FROM
+        smtp_send($socket, "MAIL FROM:<" . SMTP_FROM . ">");
+        $from = smtp_read($socket);
+        if (!smtp_ok($from, '250')) {
+            error_log("SMTP: MAIL FROM rejected: $from");
+            fclose($socket);
+            return false;
+        }
+
+        // RCPT TO
+        smtp_send($socket, "RCPT TO:<$to>");
+        $rcpt = smtp_read($socket);
+        if (!smtp_ok($rcpt, '250')) {
+            error_log("SMTP: RCPT TO rejected: $rcpt");
+            fclose($socket);
+            return false;
+        }
+
+        // DATA
+        smtp_send($socket, "DATA");
+        $data = smtp_read($socket);
+        if (!smtp_ok($data, '354')) {
+            error_log("SMTP: DATA rejected: $data");
+            fclose($socket);
+            return false;
+        }
+
+        // Construire le message
         $contentType = $isHtml ? 'text/html' : 'text/plain';
         $message = "From: " . SMTP_FROM_NAME . " <" . SMTP_FROM . ">\r\n";
         $message .= "To: <$to>\r\n";
         $message .= "Subject: =?UTF-8?B?" . base64_encode($subject) . "?=\r\n";
+        $message .= "Date: " . date('r') . "\r\n";
+        $message .= "Message-ID: <" . uniqid('saxho-', true) . "@$hostname>\r\n";
         $message .= "MIME-Version: 1.0\r\n";
         $message .= "Content-Type: $contentType; charset=UTF-8\r\n";
         $message .= "Content-Transfer-Encoding: base64\r\n";
         $message .= "\r\n";
-        $message .= chunk_split(base64_encode($body)) . "\r\n.\r\n";
+        $message .= chunk_split(base64_encode($body));
+        $message .= "\r\n.\r\n";
 
         fputs($socket, $message);
-        $read = fgets($socket, 512);
+        $result = smtp_read($socket);
 
-        fputs($socket, "QUIT\r\n");
+        smtp_send($socket, "QUIT");
         fclose($socket);
 
-        return str_starts_with(trim($read), '250');
-    } catch (\Exception $e) {
-        error_log("SMTP error: " . $e->getMessage());
+        $success = smtp_ok($result, '250');
+        if (!$success) {
+            error_log("SMTP: message not accepted: $result");
+        }
+        return $success;
+
+    } catch (\Throwable $e) {
+        error_log("SMTP error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
         return false;
     }
+}
+
+/**
+ * Envoyer une commande SMTP
+ */
+function smtp_send($socket, string $command): void
+{
+    fputs($socket, $command . "\r\n");
+}
+
+/**
+ * Lire une ligne de reponse SMTP
+ */
+function smtp_read($socket): string
+{
+    $response = '';
+    while ($line = fgets($socket, 512)) {
+        $response .= $line;
+        // Derniere ligne : code + espace (pas de tiret)
+        if (isset($line[3]) && $line[3] !== '-') break;
+    }
+    return trim($response);
+}
+
+/**
+ * Lire une reponse multi-lignes SMTP (EHLO)
+ */
+function smtp_read_multi($socket): string
+{
+    $response = '';
+    while ($line = fgets($socket, 512)) {
+        $response .= $line;
+        if (isset($line[3]) && $line[3] === ' ') break;
+    }
+    return trim($response);
+}
+
+/**
+ * Verifier si une reponse SMTP commence par le code attendu
+ */
+function smtp_ok(string $response, string $code): bool
+{
+    return str_starts_with($response, $code);
 }
 
 /**

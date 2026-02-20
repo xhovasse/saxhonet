@@ -40,7 +40,7 @@ $stmt->execute([$ip]);
 $recentCount = (int) $stmt->fetchColumn();
 
 if ($recentCount >= 3) {
-    json_response(['error' => t('contact.error_rate_limit')], 429);
+    json_response(['error' => t('contact.error_rate_limit'), CSRF_TOKEN_NAME => csrf_token()], 429);
 }
 
 // Input validation
@@ -73,7 +73,7 @@ if ($message === '') {
 }
 
 if (!empty($errors)) {
-    json_response(['error' => 'Validation failed', 'errors' => $errors], 422);
+    json_response(['error' => 'Validation failed', 'errors' => $errors, CSRF_TOKEN_NAME => csrf_token()], 422);
 }
 
 // Sanitize lengths
@@ -91,24 +91,34 @@ try {
     $stmt->execute([$name, $email, $company, $subject, $message, $ip]);
 } catch (\PDOException $e) {
     error_log('Contact insert failed: ' . $e->getMessage());
-    json_response(['error' => t('contact.error')], 500);
+    json_response(['error' => t('contact.error'), CSRF_TOKEN_NAME => csrf_token()], 500);
 }
 
 // Send notification email to admin
 $subjectLabel = t('contact.subjects.' . $subject);
 $emailSubject = "[Saxho.net] Nouveau message: $subjectLabel";
-$emailBody = "<h2>Nouveau message depuis le site</h2>"
-    . "<p><strong>Nom :</strong> " . e($name) . "</p>"
-    . "<p><strong>Email :</strong> " . e($email) . "</p>"
+
+// Utiliser le template email Saxho
+$emailContent = "<p><strong>Nom :</strong> " . e($name) . "</p>"
+    . "<p><strong>Email :</strong> <a href=\"mailto:" . e($email) . "\">" . e($email) . "</a></p>"
     . ($company ? "<p><strong>Entreprise :</strong> " . e($company) . "</p>" : '')
     . "<p><strong>Sujet :</strong> " . e($subjectLabel) . "</p>"
-    . "<p><strong>Message :</strong></p>"
+    . "<hr style=\"border:none;border-top:1px solid #eee;margin:16px 0;\">"
     . "<p>" . nl2br(e($message)) . "</p>"
-    . "<hr><p><small>IP: $ip &mdash; " . date('d/m/Y H:i:s') . "</small></p>";
+    . "<hr style=\"border:none;border-top:1px solid #eee;margin:16px 0;\">"
+    . "<p style=\"font-size:12px;color:#888;\">IP: $ip &mdash; " . date('d/m/Y H:i:s') . "</p>";
+
+$emailBody = email_template('Nouveau message de contact', $emailContent);
 
 $emailSent = send_email(ADMIN_EMAIL, $emailSubject, $emailBody);
 if (!$emailSent) {
-    error_log('Contact notification email failed for message from: ' . $email);
+    error_log('Contact notification email FAILED for message from: ' . $email . ' — check SMTP logs above');
+} else {
+    error_log('Contact notification email sent successfully to ' . ADMIN_EMAIL);
 }
 
-json_response(['success' => true, 'message' => t('contact.success')]);
+json_response([
+    'success' => true,
+    'message' => t('contact.success'),
+    CSRF_TOKEN_NAME => csrf_token()
+]);

@@ -187,6 +187,37 @@
     gap: var(--sp-md);
 }
 
+/* Header auth */
+.header__user {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-sm);
+}
+
+.header__username {
+    font-size: var(--fs-sm);
+    font-weight: var(--fw-medium);
+    color: rgba(255, 255, 255, 0.8);
+    white-space: nowrap;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.site-header.header--light .header__username {
+    color: var(--c-dark);
+}
+
+.header__logout-form {
+    display: inline;
+}
+
+.header__auth-buttons {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-xs);
+}
+
 /* Language switcher */
 .lang-switcher {
     display: flex;

@@ -117,6 +117,57 @@ function destroy_session(): void
 }
 
 /**
+ * Demarrer une session partielle (credentials OK, MFA en attente)
+ * L'utilisateur n'est PAS considere comme connecte (auth_complete = false)
+ */
+function start_login_session(array $user): void
+{
+    session_regenerate_id(true);
+    $_SESSION['user_id'] = $user['id'];
+    $_SESSION['user_role'] = $user['role'];
+    $_SESSION['user_email'] = $user['email'];
+    $_SESSION['user_name'] = $user['first_name'] . ' ' . $user['last_name'];
+    $_SESSION['auth_complete'] = false;
+    $_SESSION['mfa_pending'] = true;
+    $_SESSION['last_activity'] = time();
+}
+
+/**
+ * Completer l'authentification apres MFA
+ */
+function complete_mfa_session(): void
+{
+    $_SESSION['auth_complete'] = true;
+    unset($_SESSION['mfa_pending']);
+    $_SESSION['last_activity'] = time();
+
+    // Mettre a jour le dernier login
+    $db = getDB();
+    $stmt = $db->prepare('UPDATE users SET last_login = NOW(), login_attempts = 0 WHERE id = ?');
+    $stmt->execute([$_SESSION['user_id']]);
+}
+
+/**
+ * Verifier si une MFA est en attente
+ */
+function is_mfa_pending(): bool
+{
+    return !empty($_SESSION['user_id'])
+        && !empty($_SESSION['mfa_pending'])
+        && empty($_SESSION['auth_complete']);
+}
+
+/**
+ * Exiger que la MFA soit en attente (sinon rediriger)
+ */
+function require_mfa_pending(): void
+{
+    if (!is_mfa_pending()) {
+        redirect(SITE_URL . '/login');
+    }
+}
+
+/**
  * Exiger une connexion (rediriger sinon)
  */
 function require_login(): void

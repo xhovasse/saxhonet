@@ -69,6 +69,7 @@
     }
 
     .header__user,
+    .header__auth-buttons,
     .header__actions > .btn {
         display: none;
     }

@@ -126,29 +126,52 @@ function send_email(string $to, string $subject, string $body, bool $isHtml = tr
 function send_email_smtp(string $to, string $subject, string $body, bool $isHtml = true): bool
 {
     try {
-        $socket = fsockopen(SMTP_HOST, SMTP_PORT, $errno, $errstr, 10);
+        // Port 465 = SSL direct, port 587 = STARTTLS
+        $useSSL = (SMTP_PORT == 465);
+        $host = ($useSSL ? 'ssl://' : '') . SMTP_HOST;
+
+        $socket = fsockopen($host, SMTP_PORT, $errno, $errstr, 10);
         if (!$socket) {
             error_log("SMTP connection failed: $errstr ($errno)");
             return false;
         }
 
-        $read = fgets($socket, 512);
-        fputs($socket, "EHLO " . parse_url(SITE_URL, PHP_URL_HOST) . "\r\n");
+        $hostname = parse_url(SITE_URL, PHP_URL_HOST) ?: 'localhost';
+
+        // Lire le banner
         $read = fgets($socket, 512);
 
-        fputs($socket, "STARTTLS\r\n");
-        $read = fgets($socket, 512);
-        stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+        fputs($socket, "EHLO $hostname\r\n");
+        // Lire toutes les lignes de reponse EHLO (multi-lignes)
+        while ($line = fgets($socket, 512)) {
+            if (isset($line[3]) && $line[3] === ' ') break;
+        }
 
-        fputs($socket, "EHLO " . parse_url(SITE_URL, PHP_URL_HOST) . "\r\n");
-        $read = fgets($socket, 512);
+        // STARTTLS uniquement si pas SSL direct
+        if (!$useSSL) {
+            fputs($socket, "STARTTLS\r\n");
+            $read = fgets($socket, 512);
+            stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
 
+            fputs($socket, "EHLO $hostname\r\n");
+            while ($line = fgets($socket, 512)) {
+                if (isset($line[3]) && $line[3] === ' ') break;
+            }
+        }
+
+        // AUTH LOGIN
         fputs($socket, "AUTH LOGIN\r\n");
         $read = fgets($socket, 512);
         fputs($socket, base64_encode(SMTP_USER) . "\r\n");
         $read = fgets($socket, 512);
         fputs($socket, base64_encode(SMTP_PASS) . "\r\n");
         $read = fgets($socket, 512);
+
+        if (!str_starts_with(trim($read), '235')) {
+            error_log("SMTP auth failed: $read");
+            fclose($socket);
+            return false;
+        }
 
         fputs($socket, "MAIL FROM:<" . SMTP_FROM . ">\r\n");
         $read = fgets($socket, 512);
@@ -160,11 +183,12 @@ function send_email_smtp(string $to, string $subject, string $body, bool $isHtml
         $contentType = $isHtml ? 'text/html' : 'text/plain';
         $message = "From: " . SMTP_FROM_NAME . " <" . SMTP_FROM . ">\r\n";
         $message .= "To: <$to>\r\n";
-        $message .= "Subject: $subject\r\n";
+        $message .= "Subject: =?UTF-8?B?" . base64_encode($subject) . "?=\r\n";
         $message .= "MIME-Version: 1.0\r\n";
         $message .= "Content-Type: $contentType; charset=UTF-8\r\n";
+        $message .= "Content-Transfer-Encoding: base64\r\n";
         $message .= "\r\n";
-        $message .= $body . "\r\n.\r\n";
+        $message .= chunk_split(base64_encode($body)) . "\r\n.\r\n";
 
         fputs($socket, $message);
         $read = fgets($socket, 512);
@@ -172,11 +196,42 @@ function send_email_smtp(string $to, string $subject, string $body, bool $isHtml
         fputs($socket, "QUIT\r\n");
         fclose($socket);
 
-        return true;
+        return str_starts_with(trim($read), '250');
     } catch (\Exception $e) {
         error_log("SMTP error: " . $e->getMessage());
         return false;
     }
+}
+
+/**
+ * Generer le HTML d'un email transactionnel Saxho
+ */
+function email_template(string $title, string $content, string $buttonUrl = '', string $buttonText = ''): string
+{
+    $button = '';
+    if ($buttonUrl && $buttonText) {
+        $button = '<div style="text-align:center;margin:32px 0;">
+            <a href="' . e($buttonUrl) . '" style="display:inline-block;padding:14px 32px;background:#1B3A9E;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600;font-size:16px;">' . e($buttonText) . '</a>
+        </div>';
+    }
+
+    return '<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"></head>
+    <body style="margin:0;padding:0;background:#F8F7F4;font-family:Arial,sans-serif;">
+        <div style="max-width:560px;margin:40px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
+            <div style="background:#0D0D1A;padding:24px 32px;text-align:center;">
+                <span style="font-size:24px;font-weight:600;color:#ffffff;letter-spacing:1px;">saxh<span style="color:#A63D6B;">o</span></span>
+            </div>
+            <div style="padding:40px 32px;">
+                <h1 style="margin:0 0 24px;font-size:22px;color:#0D0D1A;">' . $title . '</h1>
+                <div style="font-size:15px;line-height:1.7;color:#333333;">' . $content . '</div>
+                ' . $button . '
+            </div>
+            <div style="background:#F8F7F4;padding:20px 32px;text-align:center;font-size:12px;color:#888888;">
+                SAXHO &mdash; De l\'id&eacute;e au succ&egrave;s<br>
+                <a href="' . SITE_URL . '" style="color:#1B3A9E;text-decoration:none;">' . SITE_URL . '</a>
+            </div>
+        </div>
+    </body></html>';
 }
 
 /**

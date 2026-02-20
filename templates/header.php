@@ -46,10 +46,18 @@
             <!-- Auth -->
             <?php if (is_logged_in()): ?>
             <div class="header__user">
+                <span class="header__username"><?= e($_SESSION['user_name'] ?? '') ?></span>
                 <a href="<?= SITE_URL ?>/profile" class="btn btn--sm btn--outline"><?= e(t('nav.profile')) ?></a>
+                <form action="<?= SITE_URL ?>/api/auth/logout" method="POST" class="header__logout-form">
+                    <?= csrf_field() ?>
+                    <button type="submit" class="btn btn--sm btn--ghost"><?= e(t('nav.logout')) ?></button>
+                </form>
             </div>
             <?php else: ?>
-            <a href="<?= SITE_URL ?>/login" class="btn btn--sm btn--primary"><?= e(t('nav.login')) ?></a>
+            <div class="header__auth-buttons">
+                <a href="<?= SITE_URL ?>/login" class="btn btn--sm btn--outline"><?= e(t('nav.login')) ?></a>
+                <a href="<?= SITE_URL ?>/register" class="btn btn--sm btn--primary"><?= e(t('nav.register')) ?></a>
+            </div>
             <?php endif; ?>
 
             <!-- Burger mobile -->

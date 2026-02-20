@@ -10,6 +10,7 @@ require_once __DIR__ . '/_app/includes/db.php';
 require_once __DIR__ . '/_app/includes/i18n.php';
 require_once __DIR__ . '/_app/includes/functions.php';
 require_once __DIR__ . '/_app/includes/auth.php';
+require_once __DIR__ . '/_app/includes/totp.php';
 require_once __DIR__ . '/_app/includes/router.php';
 
 // Initialiser la session
@@ -94,14 +95,17 @@ $pageContent = ob_get_clean() ?: '';
 
     <?php include __DIR__ . '/templates/footer.php'; ?>
 
-    <script src="<?= SITE_URL ?>/assets/js/app.js?v=1.4"></script>
-    <script src="<?= SITE_URL ?>/assets/js/animations.js?v=1.4"></script>
+    <script src="<?= SITE_URL ?>/assets/js/app.js?v=1.5"></script>
+    <script src="<?= SITE_URL ?>/assets/js/animations.js?v=1.5"></script>
     <?php if ($currentSlug === '' || $currentSlug === 'home'): ?>
-    <script src="<?= SITE_URL ?>/assets/js/typed.js?v=1.4"></script>
-    <script src="<?= SITE_URL ?>/assets/js/neural.js?v=1.4"></script>
+    <script src="<?= SITE_URL ?>/assets/js/typed.js?v=1.5"></script>
+    <script src="<?= SITE_URL ?>/assets/js/neural.js?v=1.5"></script>
+    <?php endif; ?>
+    <?php if ($currentSlug === 'mfa-setup'): ?>
+    <script src="<?= SITE_URL ?>/assets/js/vendor/qrcode.min.js"></script>
     <?php endif; ?>
     <?php if (!empty($pageJs)): ?>
-    <script src="<?= SITE_URL ?>/assets/js/<?= $pageJs ?>?v=1.4"></script>
+    <script src="<?= SITE_URL ?>/assets/js/<?= $pageJs ?>?v=1.5"></script>
     <?php endif; ?>
 </body>
 </html>

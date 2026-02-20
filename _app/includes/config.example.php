@@ -40,13 +40,13 @@ define('CSRF_TOKEN_NAME', 'csrf_token');
 // MFA
 define('MFA_ISSUER', 'Saxho');
 
-// Email
-define('USE_SMTP', false);
-define('SMTP_HOST', '');
-define('SMTP_PORT', 587);
-define('SMTP_USER', '');
-define('SMTP_PASS', '');
-define('SMTP_FROM', 'noreply@saxho.net');
+// Email (SMTP Hostinger — SSL port 465)
+define('USE_SMTP', true);
+define('SMTP_HOST', 'smtp.hostinger.com');
+define('SMTP_PORT', 465);
+define('SMTP_USER', 'contact@mail.saxho.net');
+define('SMTP_PASS', ''); // A REMPLIR
+define('SMTP_FROM', 'contact@mail.saxho.net');
 define('SMTP_FROM_NAME', 'Saxho');
 
 // Upload

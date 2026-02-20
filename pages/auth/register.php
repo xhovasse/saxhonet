@@ -192,6 +192,7 @@ $pageDescription = t('auth.register');
                     <div class="form-group">
                         <label class="form-checkbox">
                             <input type="checkbox" name="accept_terms" value="1" required>
+                            <span class="form-checkbox__box"></span>
                             <span class="form-checkbox__label">
                                 <?= e(t('auth.accept_terms')) ?>
                                 <a href="<?= SITE_URL ?>/legal" target="_blank" rel="noopener"><?= e(t('footer.legal')) ?></a>

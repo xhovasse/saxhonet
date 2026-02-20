@@ -84,6 +84,7 @@
     letter-spacing: var(--ls-wide);
     text-transform: uppercase;
     animation: scroll-bounce 2s ease-in-out infinite;
+    z-index: 2;
 }
 
 .scroll-indicator__arrow {
@@ -257,6 +258,18 @@
 
     .btn--pulse {
         animation: none;
+    }
+
+    /* Desactiver l'aurora et le gradient titre */
+    .hero::before,
+    .hero::after {
+        animation: none;
+    }
+
+    .hero__title {
+        animation: none;
+        -webkit-text-fill-color: var(--c-white);
+        background: none;
     }
 
     [data-parallax] {

@@ -3,8 +3,13 @@
  * Saxho.net — Page Services
  */
 $pageCss = 'services.css';
+$pageJs = 'flow-field.js';
 $pageDescription = t('services.page_subtitle');
 ?>
+
+<!-- Flow Field Canvas Background -->
+<div class="services-page" id="services-page">
+<canvas class="services-page__canvas" id="flow-canvas" aria-hidden="true"></canvas>
 
 <!-- ==========================================
      HERO — Services
@@ -113,3 +118,5 @@ $pageDescription = t('services.page_subtitle');
         <a href="<?= SITE_URL ?>/contact" class="btn btn--primary btn--lg btn--pulse"><?= e(t('services.cta')) ?></a>
     </div>
 </section>
+
+</div><!-- /.services-page -->

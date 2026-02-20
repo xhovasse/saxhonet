@@ -27,8 +27,8 @@
         waveSpeed: 1.2,
         waveMaxRadius: 300,
         waveInterval: 180,
-        waveLineWidth: 1.2,
-        waveBaseOpacity: 0.14,
+        waveLineWidth: 1.5,
+        waveBaseOpacity: 0.18,
 
         // 3 couleurs en alternance
         waveColors: [
@@ -40,7 +40,7 @@
         // Ondes ambiantes
         ambientInterval: 2500,
         ambientMaxRadius: 220,
-        ambientBaseOpacity: 0.06,
+        ambientBaseOpacity: 0.10,
         ambientSpeed: 0.8
     };
 

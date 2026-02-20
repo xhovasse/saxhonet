@@ -78,7 +78,8 @@
     transition: background-color var(--transition-normal), box-shadow var(--transition-normal);
 }
 
-.site-header.is-scrolled {
+.site-header.is-scrolled,
+.site-header.header--light {
     background-color: rgba(248, 247, 244, 0.95);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
@@ -86,7 +87,9 @@
 }
 
 .site-header.is-scrolled .nav__link,
-.site-header.is-scrolled .logo__text {
+.site-header.is-scrolled .logo__text,
+.site-header.header--light .nav__link,
+.site-header.header--light .logo__text {
     color: var(--c-dark);
 }
 
@@ -161,7 +164,9 @@
 }
 
 .site-header.is-scrolled .nav__link:hover,
-.site-header.is-scrolled .nav__link--active {
+.site-header.is-scrolled .nav__link--active,
+.site-header.header--light .nav__link:hover,
+.site-header.header--light .nav__link--active {
     color: var(--c-primary);
 }
 
@@ -170,7 +175,8 @@
     width: 100%;
 }
 
-.site-header.is-scrolled .nav__link::after {
+.site-header.is-scrolled .nav__link::after,
+.site-header.header--light .nav__link::after {
     background-color: var(--c-primary);
 }
 
@@ -202,12 +208,15 @@
     color: var(--c-white);
 }
 
-.site-header.is-scrolled .lang-switcher__link {
+.site-header.is-scrolled .lang-switcher__link,
+.site-header.header--light .lang-switcher__link {
     color: var(--c-muted);
 }
 
 .site-header.is-scrolled .lang-switcher__link:hover,
-.site-header.is-scrolled .lang-switcher__link--active {
+.site-header.is-scrolled .lang-switcher__link--active,
+.site-header.header--light .lang-switcher__link:hover,
+.site-header.header--light .lang-switcher__link--active {
     color: var(--c-dark);
 }
 
@@ -215,7 +224,8 @@
     color: rgba(255, 255, 255, 0.3);
 }
 
-.site-header.is-scrolled .lang-switcher__sep {
+.site-header.is-scrolled .lang-switcher__sep,
+.site-header.header--light .lang-switcher__sep {
     color: var(--c-muted);
 }
 
@@ -236,7 +246,8 @@
     transition: transform var(--transition-normal), opacity var(--transition-fast);
 }
 
-.site-header.is-scrolled .burger__line {
+.site-header.is-scrolled .burger__line,
+.site-header.header--light .burger__line {
     background-color: var(--c-dark);
 }
 
@@ -250,6 +261,11 @@
 
 .header__burger.is-open .burger__line:nth-child(3) {
     transform: translateY(-7px) rotate(-45deg);
+}
+
+/* --- Main content (pages interieures avec offset header) --- */
+.main--inner {
+    padding-top: var(--header-height);
 }
 
 /* --- Footer --- */

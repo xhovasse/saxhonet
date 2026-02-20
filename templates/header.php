@@ -1,4 +1,4 @@
-<header class="site-header" id="site-header">
+<header class="site-header<?= ($currentSlug !== '' && $currentSlug !== 'home') ? ' header--light' : '' ?>" id="site-header">
     <div class="container header__inner">
         <!-- Logo -->
         <a href="<?= SITE_URL ?>/" class="header__logo" aria-label="<?= e(SITE_NAME) ?> — <?= e(t('site.tagline')) ?>">

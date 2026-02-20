@@ -60,18 +60,64 @@
         color: var(--c-white);
     }
 
-    .lang-switcher {
+    /* Cacher lang/auth par defaut sur mobile */
+    .lang-switcher,
+    .header__user,
+    .header__auth-buttons {
         display: none;
+    }
+
+    /* Quand menu ouvert : afficher lang + auth dans l'overlay */
+    .header__nav.is-open ~ .header__actions {
+        position: fixed;
+        bottom: var(--sp-3xl);
+        left: 0;
+        right: 0;
+        z-index: calc(var(--z-header) + 2);
+        flex-direction: column;
+        align-items: center;
+        gap: var(--sp-lg);
     }
 
     .header__nav.is-open ~ .header__actions .lang-switcher {
         display: flex;
     }
 
-    .header__user,
-    .header__auth-buttons,
-    .header__actions > .btn {
-        display: none;
+    .header__nav.is-open ~ .header__actions .lang-switcher__link {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: var(--fs-small);
+    }
+
+    .header__nav.is-open ~ .header__actions .lang-switcher__link:hover,
+    .header__nav.is-open ~ .header__actions .lang-switcher__link--active {
+        color: var(--c-white);
+    }
+
+    .header__nav.is-open ~ .header__actions .lang-switcher__sep {
+        color: rgba(255, 255, 255, 0.3);
+    }
+
+    .header__nav.is-open ~ .header__actions .header__auth-buttons {
+        display: flex;
+        gap: var(--sp-sm);
+    }
+
+    .header__nav.is-open ~ .header__actions .header__user {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--sp-sm);
+    }
+
+    .header__nav.is-open ~ .header__actions .header__username {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    /* Burger reste en haut a droite */
+    .header__nav.is-open ~ .header__actions .header__burger {
+        position: fixed;
+        top: var(--sp-md);
+        right: var(--container-padding);
     }
 
     /* Page Hero (inner pages) */
@@ -275,6 +321,65 @@
     .nav__link {
         font-size: var(--fs-h3);
         color: var(--c-white);
+    }
+
+    /* Cacher lang/auth par defaut sur tablet */
+    .lang-switcher,
+    .header__user,
+    .header__auth-buttons {
+        display: none;
+    }
+
+    /* Quand menu ouvert : afficher lang + auth */
+    .header__nav.is-open ~ .header__actions {
+        position: fixed;
+        bottom: var(--sp-3xl);
+        left: 0;
+        right: 0;
+        z-index: calc(var(--z-header) + 2);
+        flex-direction: column;
+        align-items: center;
+        gap: var(--sp-lg);
+    }
+
+    .header__nav.is-open ~ .header__actions .lang-switcher {
+        display: flex;
+    }
+
+    .header__nav.is-open ~ .header__actions .lang-switcher__link {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: var(--fs-small);
+    }
+
+    .header__nav.is-open ~ .header__actions .lang-switcher__link:hover,
+    .header__nav.is-open ~ .header__actions .lang-switcher__link--active {
+        color: var(--c-white);
+    }
+
+    .header__nav.is-open ~ .header__actions .lang-switcher__sep {
+        color: rgba(255, 255, 255, 0.3);
+    }
+
+    .header__nav.is-open ~ .header__actions .header__auth-buttons {
+        display: flex;
+        gap: var(--sp-sm);
+    }
+
+    .header__nav.is-open ~ .header__actions .header__user {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: var(--sp-sm);
+    }
+
+    .header__nav.is-open ~ .header__actions .header__username {
+        color: rgba(255, 255, 255, 0.7);
+    }
+
+    .header__nav.is-open ~ .header__actions .header__burger {
+        position: fixed;
+        top: var(--sp-md);
+        right: var(--container-padding);
     }
 
     /* Hero */

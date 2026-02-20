@@ -282,6 +282,11 @@
     background-color: var(--c-dark);
 }
 
+/* Quand le menu est ouvert, burger toujours blanc (fond noir overlay) */
+.header__burger.is-open .burger__line {
+    background-color: var(--c-white);
+}
+
 .header__burger.is-open .burger__line:nth-child(1) {
     transform: translateY(7px) rotate(45deg);
 }

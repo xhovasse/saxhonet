@@ -28,19 +28,18 @@
         waveMaxRadius: 300,
         waveInterval: 180,
         waveLineWidth: 1.5,
-        waveBaseOpacity: 0.18,
+        waveBaseOpacity: 0.20,
 
-        // 3 couleurs en alternance
+        // 2 couleurs en alternance (bien visibles sur fond clair)
         waveColors: [
             { r: 27,  g: 58,  b: 158 },  // Bleu profond (--c-primary)
-            { r: 58,  g: 125, b: 255 },  // Bleu clair   (--c-primary-light)
             { r: 166, g: 61,  b: 107 }   // Rose berry   (--c-accent)
         ],
 
         // Ondes ambiantes
         ambientInterval: 2500,
         ambientMaxRadius: 220,
-        ambientBaseOpacity: 0.10,
+        ambientBaseOpacity: 0.12,
         ambientSpeed: 0.8
     };
 

@@ -18,11 +18,11 @@ define('SITE_TAGLINE', 'De l\'idee au succes');
 define('ADMIN_EMAIL', 'contact@saxho.net');
 
 // Chemins
-define('ROOT_PATH', dirname(__DIR__));
-define('PUBLIC_PATH', ROOT_PATH . '/public');
-define('INCLUDES_PATH', ROOT_PATH . '/includes');
-define('LANG_PATH', ROOT_PATH . '/lang');
-define('UPLOAD_PATH', PUBLIC_PATH . '/assets/img/uploads');
+define('ROOT_PATH', dirname(__DIR__, 2));
+define('PUBLIC_PATH', ROOT_PATH);
+define('INCLUDES_PATH', ROOT_PATH . '/_app/includes');
+define('LANG_PATH', ROOT_PATH . '/_app/lang');
+define('UPLOAD_PATH', ROOT_PATH . '/assets/img/uploads');
 define('UPLOAD_URL', SITE_URL . '/assets/img/uploads');
 
 // Langue

@@ -5,12 +5,12 @@
  */
 
 // Charger l'infrastructure
-require_once __DIR__ . '/../includes/config.php';
-require_once __DIR__ . '/../includes/db.php';
-require_once __DIR__ . '/../includes/i18n.php';
-require_once __DIR__ . '/../includes/functions.php';
-require_once __DIR__ . '/../includes/auth.php';
-require_once __DIR__ . '/../includes/router.php';
+require_once __DIR__ . '/_app/includes/config.php';
+require_once __DIR__ . '/_app/includes/db.php';
+require_once __DIR__ . '/_app/includes/i18n.php';
+require_once __DIR__ . '/_app/includes/functions.php';
+require_once __DIR__ . '/_app/includes/auth.php';
+require_once __DIR__ . '/_app/includes/router.php';
 
 // Initialiser la session
 init_session();

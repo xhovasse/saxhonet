@@ -1,5 +1,5 @@
 # Configuration (contient les secrets)
-includes/config.php
+_app/includes/config.php
 
 # OS
 .DS_Store
@@ -12,8 +12,8 @@ Thumbs.db
 *.swo
 
 # Uploads utilisateurs
-public/assets/img/uploads/*
-!public/assets/img/uploads/.htaccess
+assets/img/uploads/*
+!assets/img/uploads/.htaccess
 
 # Logs
 *.log
@@ -23,6 +23,6 @@ error_log
 .claude/
 
 # Fichiers de debug temporaires
-public/test-*.php
-public/test-*.html
-public/create-htaccess.php
+test-*.php
+test-*.html
+create-htaccess.php

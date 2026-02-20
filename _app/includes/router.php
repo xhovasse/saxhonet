@@ -35,17 +35,17 @@ function get_routes(): array
         'privacy'     => ['page' => 'privacy.php',        'title' => 'Politique de confidentialite'],
 
         // API (retournent du JSON, pas de layout)
-        'api/contact'     => ['page' => '../api/contact.php',     'api' => true],
-        'api/interest'    => ['page' => '../api/interest.php',    'api' => true],
-        'api/auth/register'      => ['page' => '../api/auth/register.php',      'api' => true],
-        'api/auth/login'         => ['page' => '../api/auth/login.php',         'api' => true],
-        'api/auth/logout'        => ['page' => '../api/auth/logout.php',        'api' => true],
-        'api/auth/verify-email'  => ['page' => '../api/auth/verify-email.php',  'api' => true],
-        'api/auth/forgot-password' => ['page' => '../api/auth/forgot-password.php', 'api' => true],
-        'api/auth/reset-password'  => ['page' => '../api/auth/reset-password.php',  'api' => true],
-        'api/auth/mfa-setup'     => ['page' => '../api/auth/mfa-setup.php',     'api' => true],
-        'api/auth/mfa-verify'    => ['page' => '../api/auth/mfa-verify.php',    'api' => true],
-        'api/auth/profile'       => ['page' => '../api/auth/profile.php',       'api' => true],
+        'api/contact'     => ['page' => 'api/contact.php',     'api' => true],
+        'api/interest'    => ['page' => 'api/interest.php',    'api' => true],
+        'api/auth/register'      => ['page' => 'api/auth/register.php',      'api' => true],
+        'api/auth/login'         => ['page' => 'api/auth/login.php',         'api' => true],
+        'api/auth/logout'        => ['page' => 'api/auth/logout.php',        'api' => true],
+        'api/auth/verify-email'  => ['page' => 'api/auth/verify-email.php',  'api' => true],
+        'api/auth/forgot-password' => ['page' => 'api/auth/forgot-password.php', 'api' => true],
+        'api/auth/reset-password'  => ['page' => 'api/auth/reset-password.php',  'api' => true],
+        'api/auth/mfa-setup'     => ['page' => 'api/auth/mfa-setup.php',     'api' => true],
+        'api/auth/mfa-verify'    => ['page' => 'api/auth/mfa-verify.php',    'api' => true],
+        'api/auth/profile'       => ['page' => 'api/auth/profile.php',       'api' => true],
     ];
 }
 

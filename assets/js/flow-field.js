@@ -28,18 +28,20 @@
         waveMaxRadius: 300,
         waveInterval: 180,
         waveLineWidth: 1.2,
-        waveColor: { r: 27, g: 58, b: 158 },
-        waveBaseOpacity: 0.12,
+        waveBaseOpacity: 0.14,
+
+        // 3 couleurs en alternance
+        waveColors: [
+            { r: 27,  g: 58,  b: 158 },  // Bleu profond (--c-primary)
+            { r: 58,  g: 125, b: 255 },  // Bleu clair   (--c-primary-light)
+            { r: 166, g: 61,  b: 107 }   // Rose berry   (--c-accent)
+        ],
 
         // Ondes ambiantes
         ambientInterval: 2500,
         ambientMaxRadius: 220,
-        ambientBaseOpacity: 0.05,
-        ambientSpeed: 0.8,
-
-        // Couleur secondaire (rare)
-        waveColorAlt: { r: 166, g: 61, b: 107 },
-        altChance: 0.08
+        ambientBaseOpacity: 0.06,
+        ambientSpeed: 0.8
     };
 
     // --- State ---
@@ -48,6 +50,7 @@
     var lastWaveTime = 0;
     var lastMouseX = -1000;
     var lastMouseY = -1000;
+    var colorIndex = 0;
 
     // --- Resize ---
     function resize() {
@@ -61,14 +64,16 @@
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
 
+    // --- Couleur suivante (alternance cyclique) ---
+    function nextColor() {
+        var c = CONFIG.waveColors[colorIndex];
+        colorIndex = (colorIndex + 1) % CONFIG.waveColors.length;
+        return c;
+    }
+
     // --- Creer une onde ---
     function createWave(x, y, isAmbient) {
         if (waves.length >= CONFIG.maxWaves) return;
-
-        var color = CONFIG.waveColor;
-        if (!isAmbient && Math.random() < CONFIG.altChance) {
-            color = CONFIG.waveColorAlt;
-        }
 
         waves.push({
             x: x,
@@ -77,7 +82,7 @@
             maxRadius: isAmbient ? CONFIG.ambientMaxRadius : CONFIG.waveMaxRadius,
             baseOpacity: isAmbient ? CONFIG.ambientBaseOpacity : CONFIG.waveBaseOpacity,
             speed: isAmbient ? CONFIG.ambientSpeed : CONFIG.waveSpeed,
-            color: color
+            color: nextColor()
         });
     }
 

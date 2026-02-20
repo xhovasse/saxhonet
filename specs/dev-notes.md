@@ -44,7 +44,7 @@ Sans cache busting, les modifications CSS/JS ne sont pas visibles apres deploiem
 2. Incrementer la version dans `index.php` (5 occurrences de `?v=`)
 3. Commit + deploy
 
-**Version actuelle** : `?v=1.2`
+**Version actuelle** : `?v=1.3`
 
 **Astuce** : Rechercher `?v=1.` dans les deux fichiers pour trouver toutes les occurrences.
 

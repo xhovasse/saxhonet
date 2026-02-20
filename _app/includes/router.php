@@ -35,8 +35,9 @@ function get_routes(): array
         'privacy'     => ['page' => 'privacy.php',        'title' => 'Politique de confidentialite'],
 
         // API (retournent du JSON, pas de layout)
-        'api/contact'     => ['page' => 'api/contact.php',     'api' => true],
-        'api/interest'    => ['page' => 'api/interest.php',    'api' => true],
+        'api/contact'      => ['page' => 'api/contact.php',      'api' => true],
+        'api/blog-comment' => ['page' => 'api/blog-comment.php', 'api' => true],
+        'api/interest'     => ['page' => 'api/interest.php',    'api' => true],
         'api/auth/register'      => ['page' => 'api/auth/register.php',      'api' => true],
         'api/auth/login'         => ['page' => 'api/auth/login.php',         'api' => true],
         'api/auth/logout'        => ['page' => 'api/auth/logout.php',        'api' => true],

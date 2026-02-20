@@ -179,4 +179,19 @@ CREATE TABLE IF NOT EXISTS `contact_messages` (
     INDEX `idx_created` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- -------------------------------------------
+-- Table : blog_comments
+-- -------------------------------------------
+CREATE TABLE IF NOT EXISTS `blog_comments` (
+    `id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `post_id` INT UNSIGNED NOT NULL,
+    `user_id` INT UNSIGNED NOT NULL,
+    `content` TEXT NOT NULL,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    INDEX `idx_comment_post` (`post_id`),
+    INDEX `idx_comment_user` (`user_id`),
+    CONSTRAINT `fk_comment_post` FOREIGN KEY (`post_id`) REFERENCES `blog_posts` (`id`) ON DELETE CASCADE,
+    CONSTRAINT `fk_comment_user` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 SET FOREIGN_KEY_CHECKS = 1;

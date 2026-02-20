@@ -354,3 +354,59 @@
     color: var(--c-white);
     margin-bottom: var(--sp-xl);
 }
+
+/* --- Home Responsive Overrides ---
+   Ces regles sont ici (et non dans responsive.css) car home.css est charge
+   APRES responsive.css via $pageCss, donc les media queries de responsive.css
+   seraient ecrasees par les declarations sans media query ci-dessus.
+   ============================================ */
+
+@media (max-width: 767px) {
+    .paradox__grid {
+        grid-template-columns: 1fr;
+        gap: var(--sp-md);
+    }
+
+    .paradox__card {
+        padding: var(--sp-lg);
+    }
+
+    .paradox__card-title {
+        font-size: var(--fs-body-lg);
+    }
+
+    .resolution__services {
+        grid-template-columns: 1fr;
+        gap: var(--sp-md);
+    }
+
+    .portfolio-preview__grid {
+        grid-template-columns: 1fr;
+        gap: var(--sp-md);
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    .paradox__grid {
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 100%;
+        gap: var(--sp-md);
+    }
+
+    .paradox__card-title {
+        font-size: var(--fs-body);
+    }
+
+    .paradox__card-text {
+        font-size: var(--fs-xs);
+    }
+
+    .resolution__services {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--sp-md);
+    }
+
+    .portfolio-preview__grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

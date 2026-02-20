@@ -53,11 +53,15 @@ if ($activeCatId !== null) {
     $params[] = $activeCatId;
 }
 $sql .= ' ORDER BY p.published_at DESC LIMIT ? OFFSET ?';
-$params[] = $perPage;
-$params[] = $offset;
 
 $stmt = $db->prepare($sql);
-$stmt->execute($params);
+$paramIndex = 1;
+foreach ($params as $p) {
+    $stmt->bindValue($paramIndex++, $p, PDO::PARAM_INT);
+}
+$stmt->bindValue($paramIndex++, $perPage, PDO::PARAM_INT);
+$stmt->bindValue($paramIndex, $offset, PDO::PARAM_INT);
+$stmt->execute();
 $articles = $stmt->fetchAll();
 ?>
 

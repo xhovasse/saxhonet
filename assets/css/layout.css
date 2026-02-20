@@ -87,7 +87,9 @@
 }
 
 .site-header.is-scrolled .nav__link,
-.site-header.header--light .nav__link {
+.site-header.is-scrolled .logo__text,
+.site-header.header--light .nav__link,
+.site-header.header--light .logo__text {
     color: var(--c-dark);
 }
 
@@ -102,35 +104,23 @@
 .header__logo {
     text-decoration: none;
     z-index: calc(var(--z-header) + 1);
-    display: flex;
-    align-items: center;
 }
 
-.logo__img {
-    height: 32px;
-    width: auto;
-    display: block;
+.logo__text {
+    font-family: 'Outfit', var(--ff-display);
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: var(--c-white);
+    letter-spacing: -0.01em;
+    transition: color var(--transition-normal);
 }
 
-/* Header : blanc par defaut (fond sombre hero), noir quand scrolled/light */
-.logo__img--dark {
-    display: none;
+.logo__text--light {
+    color: var(--c-white);
 }
 
-.site-header.is-scrolled .logo__img--white,
-.site-header.header--light .logo__img--white {
-    display: none;
-}
-
-.site-header.is-scrolled .logo__img--dark,
-.site-header.header--light .logo__img--dark {
-    display: block;
-}
-
-/* Footer : logo blanc, un peu plus petit */
-.logo__img--footer {
-    height: 28px;
-    margin-bottom: var(--sp-sm);
+.logo__accent {
+    color: var(--c-accent);
 }
 
 /* Navigation */
@@ -292,8 +282,8 @@
     margin-bottom: var(--sp-2xl);
 }
 
-.footer__brand .logo__img {
-    height: 28px;
+.footer__brand .logo__text {
+    font-size: 1.5rem;
     margin-bottom: var(--sp-sm);
     display: block;
 }

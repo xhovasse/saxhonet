@@ -3,7 +3,7 @@
         <div class="footer__grid">
             <!-- Colonne 1 : Logo + tagline -->
             <div class="footer__brand">
-                <img src="<?= SITE_URL ?>/assets/img/logo-blanc.png" alt="<?= e(SITE_NAME) ?>" class="logo__img logo__img--footer">
+                <span class="logo__text logo__text--light">saxh<span class="logo__accent">o</span></span>
                 <p class="footer__tagline"><?= e(t('footer.tagline')) ?></p>
             </div>
 

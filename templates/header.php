@@ -2,8 +2,7 @@
     <div class="container header__inner">
         <!-- Logo -->
         <a href="<?= SITE_URL ?>/" class="header__logo" aria-label="<?= e(SITE_NAME) ?> — <?= e(t('site.tagline')) ?>">
-            <img src="<?= SITE_URL ?>/assets/img/logo-blanc.png" alt="<?= e(SITE_NAME) ?>" class="logo__img logo__img--white">
-            <img src="<?= SITE_URL ?>/assets/img/logo-noir.png" alt="<?= e(SITE_NAME) ?>" class="logo__img logo__img--dark">
+            <span class="logo__text">saxh<span class="logo__accent">o</span></span>
         </a>
 
         <!-- Navigation principale -->

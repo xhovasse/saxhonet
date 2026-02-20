@@ -113,9 +113,6 @@
     color: var(--c-white);
     letter-spacing: -0.01em;
     transition: color var(--transition-normal);
-    display: inline-flex;
-    align-items: flex-end;
-    line-height: 1;
 }
 
 .logo__text--light {
@@ -124,16 +121,6 @@
 
 .logo__accent {
     color: var(--c-accent);
-}
-
-/* Logo SVG ampoule */
-.logo__bulb {
-    width: 1.1em;
-    height: 1.35em;
-    margin-left: -0.05em;
-    margin-bottom: -0.08em;
-    vertical-align: baseline;
-    flex-shrink: 0;
 }
 
 /* Navigation */

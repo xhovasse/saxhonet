@@ -2,6 +2,12 @@
    Saxho.net — Blog (listing + article + comments)
    ============================================ */
 
+/* --- Badge accent (ecosysteme category) --- */
+.badge--accent {
+    background-color: rgba(166, 61, 107, 0.1);
+    color: var(--c-accent);
+}
+
 /* --- Category Filters --- */
 .blog-filters {
     display: flex;
@@ -42,24 +48,186 @@
     margin-bottom: var(--sp-3xl);
 }
 
-/* --- Blog Card --- */
+/* ============================================
+   Blog Cards — Enhanced
+   ============================================ */
+
 .blog-card {
     display: flex;
     flex-direction: column;
+    border: 1px solid transparent;
+    transition: transform var(--transition-normal),
+                box-shadow var(--transition-normal),
+                border-color var(--transition-normal);
 }
 
+.blog-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-xl);
+}
+
+/* --- Category hover glow --- */
+.blog-card[data-category="innovation"]:hover {
+    border-color: rgba(27, 58, 158, 0.3);
+    box-shadow: var(--shadow-xl), 0 0 20px rgba(27, 58, 158, 0.12);
+}
+
+.blog-card[data-category="methodes"]:hover {
+    border-color: rgba(255, 107, 74, 0.3);
+    box-shadow: var(--shadow-xl), 0 0 20px rgba(255, 107, 74, 0.12);
+}
+
+.blog-card[data-category="retours-experience"]:hover {
+    border-color: rgba(16, 185, 129, 0.3);
+    box-shadow: var(--shadow-xl), 0 0 20px rgba(16, 185, 129, 0.12);
+}
+
+.blog-card[data-category="ecosysteme"]:hover {
+    border-color: rgba(166, 61, 107, 0.3);
+    box-shadow: var(--shadow-xl), 0 0 20px rgba(166, 61, 107, 0.12);
+}
+
+/* --- Cover image --- */
+.blog-card__image {
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+}
+
+/* --- Placeholder with category illustration --- */
 .blog-card__placeholder {
     width: 100%;
     aspect-ratio: 16 / 10;
-    background: linear-gradient(135deg, var(--c-surface) 0%, var(--c-dark) 100%);
     border-radius: var(--radius-md) var(--radius-md) 0 0;
-    opacity: 0.15;
+    position: relative;
+    overflow: hidden;
+    /* Default gradient (fallback) */
+    background: linear-gradient(135deg, var(--c-primary) 0%, var(--c-accent) 100%);
 }
 
-.blog-card__image {
-    border-radius: var(--radius-md) var(--radius-md) 0 0;
+/* Category-specific gradients */
+.blog-card[data-category="innovation"] .blog-card__placeholder {
+    background: linear-gradient(135deg, #1B3A9E 0%, #3A7DFF 40%, #A63D6B 100%);
 }
 
+.blog-card[data-category="methodes"] .blog-card__placeholder {
+    background: linear-gradient(135deg, #FF6B4A 0%, #F5A623 100%);
+}
+
+.blog-card[data-category="retours-experience"] .blog-card__placeholder {
+    background: linear-gradient(135deg, #10B981 0%, #0EA5E9 100%);
+}
+
+.blog-card[data-category="ecosysteme"] .blog-card__placeholder {
+    background: linear-gradient(135deg, #A63D6B 0%, #6366F1 100%);
+}
+
+/* --- Geometric shapes per category --- */
+
+/* Innovation: concentric circles */
+.blog-card[data-category="innovation"] .blog-card__placeholder::before {
+    content: '';
+    position: absolute;
+    width: 100px;
+    height: 100px;
+    top: 50%;
+    left: 60%;
+    transform: translate(-50%, -50%);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+}
+
+.blog-card[data-category="innovation"] .blog-card__placeholder::after {
+    content: '';
+    position: absolute;
+    width: 170px;
+    height: 170px;
+    top: 50%;
+    left: 60%;
+    transform: translate(-50%, -50%);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 50%;
+}
+
+/* Methodes: rotated squares */
+.blog-card[data-category="methodes"] .blog-card__placeholder::before {
+    content: '';
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    top: 50%;
+    left: 60%;
+    transform: translate(-50%, -50%) rotate(15deg);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+}
+
+.blog-card[data-category="methodes"] .blog-card__placeholder::after {
+    content: '';
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    top: 38%;
+    left: 68%;
+    transform: rotate(30deg);
+    border: 1.5px solid rgba(255, 255, 255, 0.10);
+}
+
+/* Retours experience: chevron + path */
+.blog-card[data-category="retours-experience"] .blog-card__placeholder::before {
+    content: '';
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    top: 45%;
+    left: 60%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    border-top: 2px solid rgba(255, 255, 255, 0.2);
+    border-right: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.blog-card[data-category="retours-experience"] .blog-card__placeholder::after {
+    content: '';
+    position: absolute;
+    width: 90px;
+    height: 2px;
+    top: 55%;
+    left: 35%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(-25deg);
+}
+
+/* Ecosysteme: constellation dots */
+.blog-card[data-category="ecosysteme"] .blog-card__placeholder::before {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    top: 40%;
+    left: 55%;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    box-shadow:
+        30px -20px 0 rgba(255, 255, 255, 0.15),
+        -25px 15px 0 rgba(255, 255, 255, 0.12),
+        40px 25px 0 rgba(255, 255, 255, 0.10),
+        -10px -30px 0 rgba(255, 255, 255, 0.08);
+}
+
+.blog-card[data-category="ecosysteme"] .blog-card__placeholder::after {
+    content: '';
+    position: absolute;
+    top: 40%;
+    left: 55%;
+    width: 70px;
+    height: 50px;
+    background:
+        linear-gradient(45deg, transparent 48%, rgba(255, 255, 255, 0.06) 49%, rgba(255, 255, 255, 0.06) 51%, transparent 52%),
+        linear-gradient(-30deg, transparent 48%, rgba(255, 255, 255, 0.04) 49%, rgba(255, 255, 255, 0.04) 51%, transparent 52%);
+    transform: translate(-10px, -15px);
+}
+
+/* --- Card body --- */
 .blog-card__category {
     margin-bottom: var(--sp-sm);
     display: inline-block;
@@ -80,6 +248,19 @@
     color: var(--c-primary);
 }
 
+/* Category-specific title hover */
+.blog-card[data-category="methodes"] .blog-card__title a:hover {
+    color: var(--c-secondary);
+}
+
+.blog-card[data-category="retours-experience"] .blog-card__title a:hover {
+    color: var(--c-success);
+}
+
+.blog-card[data-category="ecosysteme"] .blog-card__title a:hover {
+    color: var(--c-accent);
+}
+
 .blog-card .card__body {
     flex: 1;
 }
@@ -88,7 +269,6 @@
     font-size: var(--fs-small);
     color: var(--c-medium);
     line-height: var(--lh-relaxed);
-    /* Limit to 3 lines */
     display: -webkit-box;
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
@@ -98,6 +278,25 @@
 .blog-card__footer {
     font-size: var(--fs-xs);
     color: var(--c-muted);
+    border-top: 1px solid var(--c-surface);
+    transition: border-color var(--transition-normal);
+}
+
+/* Category-specific footer border on hover */
+.blog-card[data-category="innovation"]:hover .blog-card__footer {
+    border-top-color: rgba(27, 58, 158, 0.2);
+}
+
+.blog-card[data-category="methodes"]:hover .blog-card__footer {
+    border-top-color: rgba(255, 107, 74, 0.2);
+}
+
+.blog-card[data-category="retours-experience"]:hover .blog-card__footer {
+    border-top-color: rgba(16, 185, 129, 0.2);
+}
+
+.blog-card[data-category="ecosysteme"]:hover .blog-card__footer {
+    border-top-color: rgba(166, 61, 107, 0.2);
 }
 
 /* --- Empty state --- */
@@ -127,6 +326,57 @@
 .page-hero--blog-article {
     min-height: auto;
     padding: var(--sp-3xl) 0 var(--sp-2xl);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Category-specific hero gradients (no cover image) */
+.page-hero--blog-article[data-category="innovation"] {
+    background: linear-gradient(135deg, #0D0D1A 0%, #1B3A9E 60%, #A63D6B 100%);
+}
+
+.page-hero--blog-article[data-category="methodes"] {
+    background: linear-gradient(135deg, #0D0D1A 0%, #FF6B4A 60%, #F5A623 100%);
+}
+
+.page-hero--blog-article[data-category="retours-experience"] {
+    background: linear-gradient(135deg, #0D0D1A 0%, #10B981 60%, #0EA5E9 100%);
+}
+
+.page-hero--blog-article[data-category="ecosysteme"] {
+    background: linear-gradient(135deg, #0D0D1A 0%, #A63D6B 60%, #6366F1 100%);
+}
+
+/* Cover image as hero background */
+.blog-article__hero-image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+}
+
+/* When cover image present: bigger hero + dark overlay */
+.page-hero--blog-article.page-hero--has-cover {
+    min-height: 50vh;
+}
+
+.page-hero--blog-article.page-hero--has-cover::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        180deg,
+        rgba(13, 13, 26, 0.3) 0%,
+        rgba(13, 13, 26, 0.7) 100%
+    );
+    z-index: 1;
+}
+
+.page-hero--blog-article .container {
+    position: relative;
+    z-index: 2;
 }
 
 /* --- Back link --- */
@@ -164,31 +414,68 @@
     color: rgba(255, 255, 255, 0.3);
 }
 
-/* --- Article Content (Prose) --- */
+/* ============================================
+   Article Content (Prose) — Enhanced
+   ============================================ */
+
 .blog-article__content {
     font-size: var(--fs-body-lg);
     line-height: var(--lh-relaxed);
     color: var(--c-dark);
 }
 
+/* Drop cap on first paragraph */
+.blog-article__content > p:first-child::first-letter {
+    float: left;
+    font-family: var(--ff-display);
+    font-size: 3.5em;
+    font-weight: var(--fw-bold);
+    line-height: 0.8;
+    padding-right: 0.08em;
+    padding-top: 0.05em;
+    color: var(--c-primary);
+}
+
+/* Category-specific drop cap color */
+.blog-article-section[data-category="methodes"] .blog-article__content > p:first-child::first-letter {
+    color: var(--c-secondary);
+}
+
+.blog-article-section[data-category="retours-experience"] .blog-article__content > p:first-child::first-letter {
+    color: var(--c-success);
+}
+
+.blog-article-section[data-category="ecosysteme"] .blog-article__content > p:first-child::first-letter {
+    color: var(--c-accent);
+}
+
 .blog-article__content p {
     margin-bottom: var(--sp-lg);
 }
 
+/* h2 with top separator for visual rhythm */
 .blog-article__content h2 {
     font-family: var(--ff-display);
     font-size: var(--fs-h3);
     font-weight: var(--fw-bold);
-    margin-top: var(--sp-2xl);
+    margin-top: var(--sp-3xl);
     margin-bottom: var(--sp-md);
+    padding-top: var(--sp-xl);
+    border-top: 1px solid var(--c-surface);
     color: var(--c-dark);
+}
+
+.blog-article__content h2:first-child {
+    border-top: none;
+    padding-top: 0;
+    margin-top: 0;
 }
 
 .blog-article__content h3 {
     font-family: var(--ff-display);
     font-size: var(--fs-h4);
     font-weight: var(--fw-semibold);
-    margin-top: var(--sp-xl);
+    margin-top: var(--sp-2xl);
     margin-bottom: var(--sp-sm);
     color: var(--c-dark);
 }
@@ -204,14 +491,30 @@
     line-height: var(--lh-relaxed);
 }
 
+/* Enhanced blockquote */
 .blog-article__content blockquote {
     border-left: 4px solid var(--c-primary-light);
-    padding: var(--sp-md) var(--sp-lg);
-    margin: var(--sp-xl) 0;
-    background-color: var(--c-surface);
-    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: var(--sp-lg) var(--sp-xl);
+    margin: var(--sp-2xl) 0;
+    background: linear-gradient(135deg, rgba(27, 58, 158, 0.04) 0%, rgba(166, 61, 107, 0.04) 100%);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
     font-style: italic;
     color: var(--c-medium);
+    font-size: var(--fs-body-lg);
+    line-height: var(--lh-relaxed);
+    position: relative;
+}
+
+.blog-article__content blockquote::before {
+    content: '\201C';
+    position: absolute;
+    top: -10px;
+    left: 16px;
+    font-family: var(--ff-display);
+    font-size: 4rem;
+    color: var(--c-primary-light);
+    opacity: 0.2;
+    line-height: 1;
 }
 
 .blog-article__content a {
@@ -235,13 +538,42 @@
     color: var(--c-dark);
 }
 
-/* --- Share buttons --- */
+/* Inline code */
+.blog-article__content code {
+    font-family: var(--ff-mono);
+    font-size: 0.9em;
+    background: var(--c-surface);
+    padding: 0.15em 0.4em;
+    border-radius: var(--radius-sm);
+    color: var(--c-accent);
+}
+
+/* Code block */
+.blog-article__content pre {
+    background: var(--c-dark);
+    color: var(--c-white);
+    padding: var(--sp-lg);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    margin: var(--sp-xl) 0;
+}
+
+.blog-article__content pre code {
+    background: none;
+    color: inherit;
+    padding: 0;
+    border-radius: 0;
+}
+
+/* --- Share buttons — Enhanced --- */
 .blog-article__share {
     display: flex;
     align-items: center;
     gap: var(--sp-md);
-    padding: var(--sp-xl) 0;
-    margin-top: var(--sp-xl);
+    padding: var(--sp-lg) var(--sp-xl);
+    margin-top: var(--sp-2xl);
+    background: var(--c-surface);
+    border-radius: var(--radius-md);
 }
 
 .blog-article__share-label {
@@ -377,6 +709,16 @@
 
     .blog-comments__title {
         font-size: var(--fs-h4);
+    }
+
+    /* Drop cap smaller on mobile */
+    .blog-article__content > p:first-child::first-letter {
+        font-size: 2.5em;
+    }
+
+    /* Cover image hero reduced */
+    .page-hero--blog-article.page-hero--has-cover {
+        min-height: 35vh;
     }
 }
 

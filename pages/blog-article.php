@@ -65,7 +65,20 @@ $commentCount = count($comments);
 ?>
 
 <!-- ARTICLE HERO -->
-<section class="page-hero page-hero--blog-article">
+<?php
+    $catSlug     = $article['cat_slug'] ?? '';
+    $heroBadge   = 'badge--primary';
+    if ($catSlug === 'methodes') $heroBadge = 'badge--secondary';
+    elseif ($catSlug === 'retours-experience') $heroBadge = 'badge--success';
+    elseif ($catSlug === 'ecosysteme') $heroBadge = 'badge--accent';
+    $hasCover    = !empty($article['cover_image']);
+?>
+<section class="page-hero page-hero--blog-article<?= $hasCover ? ' page-hero--has-cover' : '' ?>"
+         data-category="<?= e($catSlug) ?>">
+    <?php if ($hasCover): ?>
+    <img src="<?= e(SITE_URL . '/assets/img/uploads/' . $article['cover_image']) ?>"
+         alt="" class="blog-article__hero-image" loading="eager">
+    <?php endif; ?>
     <div class="container">
         <a href="<?= SITE_URL ?>/blog" class="blog-article__back reveal reveal-up">
             &larr; <?= e(t('blog.back_to_blog')) ?>
@@ -73,7 +86,7 @@ $commentCount = count($comments);
 
         <?php if ($catName): ?>
         <div class="reveal reveal-up reveal-delay-1">
-            <span class="badge badge--primary blog-article__category"><?= e($catName) ?></span>
+            <span class="badge <?= $heroBadge ?> blog-article__category"><?= e($catName) ?></span>
         </div>
         <?php endif; ?>
 
@@ -94,7 +107,7 @@ $commentCount = count($comments);
 </section>
 
 <!-- ARTICLE CONTENT -->
-<section class="section blog-article-section">
+<section class="section blog-article-section" data-category="<?= e($catSlug) ?>">
     <div class="container container--narrow">
 
         <!-- Article body (HTML from DB — admin trusted content) -->

@@ -102,8 +102,14 @@ $articles = $stmt->fetchAll();
                 $artTitle = $lang === 'fr' ? $article['title_fr'] : ($article['title_en'] ?? $article['title_fr']);
                 $artExcerpt = $lang === 'fr' ? $article['excerpt_fr'] : ($article['excerpt_en'] ?? $article['excerpt_fr']);
                 $catName = $lang === 'fr' ? $article['cat_name_fr'] : ($article['cat_name_en'] ?? $article['cat_name_fr']);
+                $catSlug = $article['cat_slug'] ?? '';
+                $badgeClass = 'badge--primary';
+                if ($catSlug === 'methodes') $badgeClass = 'badge--secondary';
+                elseif ($catSlug === 'retours-experience') $badgeClass = 'badge--success';
+                elseif ($catSlug === 'ecosysteme') $badgeClass = 'badge--accent';
             ?>
-            <article class="blog-card card reveal reveal-up reveal-delay-<?= min($i + 1, 3) ?>">
+            <article class="blog-card card reveal reveal-up reveal-delay-<?= min($i + 1, 3) ?>"
+                     data-category="<?= e($catSlug) ?>">
                 <?php if (!empty($article['cover_image'])): ?>
                 <img src="<?= e(SITE_URL . '/assets/img/uploads/' . $article['cover_image']) ?>"
                      alt="" class="card__image blog-card__image" loading="lazy">
@@ -112,9 +118,9 @@ $articles = $stmt->fetchAll();
                 <?php endif; ?>
 
                 <div class="card__body">
-                    <?php if ($article['cat_slug']): ?>
-                    <a href="<?= SITE_URL ?>/blog?cat=<?= e($article['cat_slug']) ?>"
-                       class="badge badge--primary blog-card__category">
+                    <?php if ($catSlug): ?>
+                    <a href="<?= SITE_URL ?>/blog?cat=<?= e($catSlug) ?>"
+                       class="badge <?= $badgeClass ?> blog-card__category">
                         <?= e($catName) ?>
                     </a>
                     <?php endif; ?>

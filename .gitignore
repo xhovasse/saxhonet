@@ -18,11 +18,15 @@ assets/img/uploads/*
 # Logs
 *.log
 error_log
+_app/logs/*.log
 
 # Claude
 .claude/
 
-# Fichiers de debug temporaires
-test-*.php
-test-*.html
-create-htaccess.php
+# Fichiers de debug temporaires (racine seulement)
+/test-*.php
+/test-*.html
+/create-htaccess.php
+
+# Garder le script de test SMTP (dans _app/)
+!_app/test-smtp.php

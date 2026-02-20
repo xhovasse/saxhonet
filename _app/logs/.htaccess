@@ -1,0 +1,2 @@
+# Interdire tout acces web aux logs
+Deny from all

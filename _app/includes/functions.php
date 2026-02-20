@@ -4,6 +4,21 @@
  */
 
 /**
+ * Logger applicatif — ecrit dans _app/logs/smtp.log
+ * Visible directement dans le projet (pas besoin des logs systeme Hostinger)
+ */
+function app_log(string $message, string $channel = 'smtp'): void
+{
+    $logDir = ROOT_PATH . '/_app/logs';
+    if (!is_dir($logDir)) {
+        @mkdir($logDir, 0755, true);
+    }
+    $logFile = $logDir . '/' . $channel . '.log';
+    $timestamp = date('Y-m-d H:i:s');
+    @file_put_contents($logFile, "[$timestamp] $message\n", FILE_APPEND | LOCK_EX);
+}
+
+/**
  * Generer un token CSRF et le stocker en session
  */
 function csrf_token(): string
@@ -126,6 +141,9 @@ function send_email(string $to, string $subject, string $body, bool $isHtml = tr
  */
 function send_email_smtp(string $to, string $subject, string $body, bool $isHtml = true): bool
 {
+    app_log("SMTP: === Debut envoi === TO: $to | SUBJECT: $subject");
+    app_log("SMTP: Config: HOST=" . SMTP_HOST . " PORT=" . SMTP_PORT . " USER=" . SMTP_USER . " FROM=" . SMTP_FROM);
+
     try {
         // Port 465 = SSL direct, port 587 = STARTTLS
         $useSSL = (SMTP_PORT == 465);
@@ -147,7 +165,7 @@ function send_email_smtp(string $to, string $subject, string $body, bool $isHtml
         );
 
         if (!$socket) {
-            error_log("SMTP: connection failed to $host:" . SMTP_PORT . " — $errstr ($errno)");
+            app_log("SMTP: connection failed to $host:" . SMTP_PORT . " — $errstr ($errno)");
             return false;
         }
 
@@ -158,8 +176,9 @@ function send_email_smtp(string $to, string $subject, string $body, bool $isHtml
 
         // Lire le banner
         $banner = smtp_read($socket);
+        app_log("SMTP: Banner: $banner");
         if (!smtp_ok($banner, '220')) {
-            error_log("SMTP: bad banner: $banner");
+            app_log("SMTP: ERREUR bad banner");
             fclose($socket);
             return false;
         }
@@ -167,13 +186,14 @@ function send_email_smtp(string $to, string $subject, string $body, bool $isHtml
         // EHLO
         smtp_send($socket, "EHLO $hostname");
         $ehlo = smtp_read_multi($socket);
+        app_log("SMTP: EHLO OK");
 
         // STARTTLS uniquement si pas SSL direct
         if (!$useSSL) {
             smtp_send($socket, "STARTTLS");
             $tls = smtp_read($socket);
             if (!smtp_ok($tls, '220')) {
-                error_log("SMTP: STARTTLS failed: $tls");
+                app_log("SMTP: STARTTLS failed: $tls");
                 fclose($socket);
                 return false;
             }
@@ -187,7 +207,7 @@ function send_email_smtp(string $to, string $subject, string $body, bool $isHtml
         smtp_send($socket, "AUTH LOGIN");
         $auth1 = smtp_read($socket);
         if (!smtp_ok($auth1, '334')) {
-            error_log("SMTP: AUTH LOGIN rejected: $auth1");
+            app_log("SMTP: AUTH LOGIN rejected: $auth1");
             fclose($socket);
             return false;
         }
@@ -195,7 +215,7 @@ function send_email_smtp(string $to, string $subject, string $body, bool $isHtml
         smtp_send($socket, base64_encode(SMTP_USER));
         $auth2 = smtp_read($socket);
         if (!smtp_ok($auth2, '334')) {
-            error_log("SMTP: username rejected: $auth2");
+            app_log("SMTP: username rejected: $auth2");
             fclose($socket);
             return false;
         }
@@ -203,16 +223,17 @@ function send_email_smtp(string $to, string $subject, string $body, bool $isHtml
         smtp_send($socket, base64_encode(SMTP_PASS));
         $auth3 = smtp_read($socket);
         if (!smtp_ok($auth3, '235')) {
-            error_log("SMTP: auth failed (wrong password?): $auth3");
+            app_log("SMTP: ERREUR auth failed (wrong password?): $auth3");
             fclose($socket);
             return false;
         }
+        app_log("SMTP: AUTH OK (235)");
 
         // MAIL FROM
         smtp_send($socket, "MAIL FROM:<" . SMTP_FROM . ">");
         $from = smtp_read($socket);
         if (!smtp_ok($from, '250')) {
-            error_log("SMTP: MAIL FROM rejected: $from");
+            app_log("SMTP: MAIL FROM rejected: $from");
             fclose($socket);
             return false;
         }
@@ -221,7 +242,7 @@ function send_email_smtp(string $to, string $subject, string $body, bool $isHtml
         smtp_send($socket, "RCPT TO:<$to>");
         $rcpt = smtp_read($socket);
         if (!smtp_ok($rcpt, '250')) {
-            error_log("SMTP: RCPT TO rejected: $rcpt");
+            app_log("SMTP: RCPT TO rejected: $rcpt");
             fclose($socket);
             return false;
         }
@@ -230,7 +251,7 @@ function send_email_smtp(string $to, string $subject, string $body, bool $isHtml
         smtp_send($socket, "DATA");
         $data = smtp_read($socket);
         if (!smtp_ok($data, '354')) {
-            error_log("SMTP: DATA rejected: $data");
+            app_log("SMTP: DATA rejected: $data");
             fclose($socket);
             return false;
         }
@@ -257,12 +278,14 @@ function send_email_smtp(string $to, string $subject, string $body, bool $isHtml
 
         $success = smtp_ok($result, '250');
         if (!$success) {
-            error_log("SMTP: message not accepted: $result");
+            app_log("SMTP: ERREUR message not accepted: $result");
+        } else {
+            app_log("SMTP: === Envoi REUSSI === Response: $result");
         }
         return $success;
 
     } catch (\Throwable $e) {
-        error_log("SMTP error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
+        app_log("SMTP error: " . $e->getMessage() . " in " . $e->getFile() . ":" . $e->getLine());
         return false;
     }
 }

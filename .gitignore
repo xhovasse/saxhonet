@@ -1,0 +1,28 @@
+# Configuration (contient les secrets)
+includes/config.php
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Uploads utilisateurs
+public/assets/img/uploads/*
+!public/assets/img/uploads/.htaccess
+
+# Logs
+*.log
+error_log
+
+# Claude
+.claude/
+
+# Fichiers de debug temporaires
+public/test-*.php
+public/test-*.html
+public/create-htaccess.php

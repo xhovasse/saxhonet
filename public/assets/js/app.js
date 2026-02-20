@@ -1,0 +1,94 @@
+/**
+ * Saxho.net — Main Application JS
+ */
+
+(function () {
+    'use strict';
+
+    // --- Header scroll behavior ---
+    const header = document.getElementById('site-header');
+    let lastScrollY = 0;
+
+    function handleHeaderScroll() {
+        const scrollY = window.scrollY;
+        if (scrollY > 50) {
+            header.classList.add('is-scrolled');
+        } else {
+            header.classList.remove('is-scrolled');
+        }
+        lastScrollY = scrollY;
+    }
+
+    window.addEventListener('scroll', handleHeaderScroll, { passive: true });
+    handleHeaderScroll();
+
+    // --- Mobile menu ---
+    const burgerBtn = document.getElementById('burger-btn');
+    const mainNav = document.getElementById('main-nav');
+
+    if (burgerBtn && mainNav) {
+        burgerBtn.addEventListener('click', function () {
+            const isOpen = mainNav.classList.toggle('is-open');
+            burgerBtn.classList.toggle('is-open');
+            burgerBtn.setAttribute('aria-expanded', isOpen);
+            document.body.style.overflow = isOpen ? 'hidden' : '';
+        });
+
+        // Close on link click
+        mainNav.querySelectorAll('.nav__link').forEach(function (link) {
+            link.addEventListener('click', function () {
+                mainNav.classList.remove('is-open');
+                burgerBtn.classList.remove('is-open');
+                burgerBtn.setAttribute('aria-expanded', 'false');
+                document.body.style.overflow = '';
+            });
+        });
+
+        // Close on Escape
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && mainNav.classList.contains('is-open')) {
+                mainNav.classList.remove('is-open');
+                burgerBtn.classList.remove('is-open');
+                burgerBtn.setAttribute('aria-expanded', 'false');
+                document.body.style.overflow = '';
+            }
+        });
+    }
+
+    // --- Flash message auto-dismiss ---
+    document.querySelectorAll('.flash__close').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var flash = this.closest('.flash');
+            flash.style.opacity = '0';
+            flash.style.transform = 'translateX(50px)';
+            setTimeout(function () { flash.remove(); }, 300);
+        });
+    });
+
+    // Auto-dismiss after 5s
+    document.querySelectorAll('.flash').forEach(function (flash) {
+        setTimeout(function () {
+            if (flash.parentNode) {
+                flash.style.opacity = '0';
+                flash.style.transform = 'translateX(50px)';
+                setTimeout(function () { flash.remove(); }, 300);
+            }
+        }, 5000);
+    });
+
+    // --- Smooth scroll for anchor links ---
+    document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
+        anchor.addEventListener('click', function (e) {
+            var targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            var target = document.querySelector(targetId);
+            if (target) {
+                e.preventDefault();
+                var offset = header ? header.offsetHeight : 0;
+                var top = target.getBoundingClientRect().top + window.scrollY - offset;
+                window.scrollTo({ top: top, behavior: 'smooth' });
+            }
+        });
+    });
+
+})();

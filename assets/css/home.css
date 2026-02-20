@@ -14,47 +14,47 @@
     overflow: hidden;
 }
 
-/* --- Aurora Borealis Background --- */
+/* --- Aurora Background (reflets lumineux mobiles) --- */
 .hero::before {
     content: '';
     position: absolute;
-    inset: -50%;
+    inset: -30%;
     background:
-        radial-gradient(ellipse 600px 400px at 20% 50%,
-            rgba(27, 58, 158, 0.25) 0%,
-            transparent 70%),
-        radial-gradient(ellipse 500px 350px at 80% 30%,
-            rgba(255, 107, 74, 0.15) 0%,
-            transparent 70%),
-        radial-gradient(ellipse 400px 500px at 50% 80%,
-            rgba(245, 166, 35, 0.12) 0%,
-            transparent 70%),
-        radial-gradient(ellipse 350px 300px at 70% 70%,
-            rgba(58, 125, 255, 0.18) 0%,
-            transparent 70%);
-    animation: aurora-drift 20s ease-in-out infinite alternate;
+        radial-gradient(ellipse 700px 500px at 15% 50%,
+            rgba(58, 125, 255, 0.35) 0%,
+            transparent 65%),
+        radial-gradient(ellipse 600px 450px at 75% 25%,
+            rgba(200, 140, 255, 0.2) 0%,
+            transparent 65%),
+        radial-gradient(ellipse 500px 600px at 50% 85%,
+            rgba(245, 166, 35, 0.18) 0%,
+            transparent 60%),
+        radial-gradient(ellipse 450px 400px at 85% 65%,
+            rgba(58, 125, 255, 0.22) 0%,
+            transparent 65%);
+    animation: aurora-drift 18s ease-in-out infinite alternate;
     z-index: 0;
-    filter: blur(60px);
+    filter: blur(50px);
     will-change: transform;
 }
 
 .hero::after {
     content: '';
     position: absolute;
-    inset: -50%;
+    inset: -30%;
     background:
-        radial-gradient(ellipse 500px 400px at 60% 40%,
-            rgba(255, 107, 74, 0.12) 0%,
-            transparent 70%),
-        radial-gradient(ellipse 600px 300px at 30% 70%,
-            rgba(58, 125, 255, 0.15) 0%,
-            transparent 70%),
-        radial-gradient(ellipse 350px 450px at 85% 60%,
-            rgba(245, 166, 35, 0.1) 0%,
-            transparent 70%);
-    animation: aurora-drift-2 25s ease-in-out infinite alternate;
+        radial-gradient(ellipse 600px 500px at 65% 35%,
+            rgba(245, 166, 35, 0.18) 0%,
+            transparent 60%),
+        radial-gradient(ellipse 700px 400px at 25% 75%,
+            rgba(100, 160, 255, 0.22) 0%,
+            transparent 65%),
+        radial-gradient(ellipse 450px 550px at 80% 50%,
+            rgba(180, 120, 255, 0.12) 0%,
+            transparent 65%);
+    animation: aurora-drift-2 22s ease-in-out infinite alternate;
     z-index: 0;
-    filter: blur(80px);
+    filter: blur(60px);
     will-change: transform;
 }
 
@@ -63,16 +63,16 @@
         transform: translate(0, 0) rotate(0deg) scale(1);
     }
     25% {
-        transform: translate(5%, -3%) rotate(2deg) scale(1.05);
+        transform: translate(6%, -4%) rotate(2deg) scale(1.06);
     }
     50% {
-        transform: translate(-3%, 5%) rotate(-1deg) scale(0.98);
+        transform: translate(-4%, 6%) rotate(-1.5deg) scale(0.97);
     }
     75% {
-        transform: translate(4%, 2%) rotate(1.5deg) scale(1.03);
+        transform: translate(5%, 3%) rotate(1.5deg) scale(1.04);
     }
     100% {
-        transform: translate(-2%, -4%) rotate(-2deg) scale(1);
+        transform: translate(-3%, -5%) rotate(-2deg) scale(1);
     }
 }
 
@@ -81,22 +81,22 @@
         transform: translate(0, 0) rotate(0deg) scale(1);
     }
     33% {
-        transform: translate(-4%, 3%) rotate(-1.5deg) scale(1.04);
+        transform: translate(-5%, 4%) rotate(-2deg) scale(1.05);
     }
     66% {
-        transform: translate(3%, -5%) rotate(2deg) scale(0.97);
+        transform: translate(4%, -6%) rotate(2deg) scale(0.96);
     }
     100% {
-        transform: translate(-1%, 4%) rotate(-1deg) scale(1.02);
+        transform: translate(-2%, 5%) rotate(-1deg) scale(1.03);
     }
 }
 
-/* Vignette subtile pour centrer le regard */
+/* Vignette douce pour centrer le regard */
 .hero .geo-shapes::before {
     content: '';
-    position: fixed;
+    position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at center, transparent 40%, rgba(13, 13, 26, 0.4) 100%);
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(13, 13, 26, 0.35) 100%);
     pointer-events: none;
     z-index: 0;
 }
@@ -119,22 +119,24 @@
     margin-bottom: var(--sp-xl);
     min-height: 2.4em;
 
-    /* Gradient holographique anime */
+    /* Gradient doux anime : or / blanc nacre / rose poudre */
     background: linear-gradient(
         90deg,
-        var(--c-white) 0%,
-        var(--c-primary-light) 15%,
-        var(--c-white) 30%,
-        var(--c-secondary) 50%,
-        var(--c-white) 70%,
-        var(--c-tertiary) 85%,
-        var(--c-white) 100%
+        #FFFFFF 0%,
+        #E8C87A 12%,
+        #FFFFFF 25%,
+        #E0A8B8 40%,
+        #FFFFFF 55%,
+        #D4AF6A 70%,
+        #FFFFFF 82%,
+        #D9A0B0 95%,
+        #FFFFFF 100%
     );
     background-size: 300% 100%;
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    animation: title-gradient-shift 8s ease-in-out infinite;
+    animation: title-gradient-shift 10s ease-in-out infinite;
 }
 
 @keyframes title-gradient-shift {
@@ -167,7 +169,7 @@
 
 /* Reduire l'opacite des formes geo pour ne pas concurrencer l'aurora */
 .geo-shapes {
-    opacity: 0.4;
+    opacity: 0.3;
 }
 
 /* --- Paradox Section --- */

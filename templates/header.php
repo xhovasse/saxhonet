@@ -26,6 +26,11 @@
                 <li class="nav__item">
                     <a href="<?= SITE_URL ?>/contact" class="nav__link<?= $currentSlug === 'contact' ? ' nav__link--active' : '' ?>"><?= e(t('nav.contact')) ?></a>
                 </li>
+                <?php if (is_admin()): ?>
+                <li class="nav__item">
+                    <a href="<?= SITE_URL ?>/admin" class="nav__link<?= str_starts_with($currentSlug, 'admin') ? ' nav__link--active' : '' ?>">Admin</a>
+                </li>
+                <?php endif; ?>
             </ul>
         </nav>
 

@@ -34,6 +34,13 @@ function get_routes(): array
         'legal'       => ['page' => 'legal.php',          'title' => 'Mentions legales'],
         'privacy'     => ['page' => 'privacy.php',        'title' => 'Politique de confidentialite'],
 
+        // Admin
+        'admin'             => ['page' => 'admin/dashboard.php',   'title' => 'admin.dashboard'],
+        'admin/blog'        => ['page' => 'admin/blog-list.php',   'title' => 'admin.blog_list'],
+        'admin/blog/create' => ['page' => 'admin/blog-form.php',   'title' => 'admin.blog_create'],
+        'admin/blog/edit'   => ['page' => 'admin/blog-form.php',   'title' => 'admin.blog_edit'],
+        'admin/categories'  => ['page' => 'admin/categories.php',  'title' => 'admin.categories'],
+
         // API (retournent du JSON, pas de layout)
         'api/contact'      => ['page' => 'api/contact.php',      'api' => true],
         'api/blog-comment' => ['page' => 'api/blog-comment.php', 'api' => true],
@@ -47,6 +54,12 @@ function get_routes(): array
         'api/auth/mfa-setup'     => ['page' => 'api/auth/mfa-setup.php',     'api' => true],
         'api/auth/mfa-verify'    => ['page' => 'api/auth/mfa-verify.php',    'api' => true],
         'api/auth/profile'       => ['page' => 'api/auth/profile.php',       'api' => true],
+        'api/admin/blog-save'      => ['page' => 'api/admin/blog-save.php',      'api' => true],
+        'api/admin/blog-delete'    => ['page' => 'api/admin/blog-delete.php',    'api' => true],
+        'api/admin/blog-publish'   => ['page' => 'api/admin/blog-publish.php',   'api' => true],
+        'api/admin/category-save'  => ['page' => 'api/admin/category-save.php',  'api' => true],
+        'api/admin/category-delete'=> ['page' => 'api/admin/category-delete.php','api' => true],
+        'api/admin/upload'         => ['page' => 'api/admin/upload.php',         'api' => true],
     ];
 }
 

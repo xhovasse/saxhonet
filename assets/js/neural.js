@@ -18,7 +18,10 @@
     var ctx = canvas.getContext('2d');
     var nodes = [];
     var pulses = [];
-    var mouse = { x: -1000, y: -1000 };
+    var mouse = { x: -1000, y: -1000, moving: false };
+    var lastMousePulse = 0;       // Timestamp du dernier pulse souris
+    var mouseSpeed = 0;           // Vitesse de deplacement souris
+    var lastMousePos = { x: -1000, y: -1000 };
     var raf;
     var dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap a 2x pour perf
 
@@ -32,10 +35,16 @@
         lineBaseOpacity: 0.15,   // Lignes bien visibles par defaut
         lineMouseOpacity: 0.4,   // Lignes pres de la souris
         lineWidth: 0.8,          // Epaisseur ligne de base
-        pulseInterval: 800,      // Pulses plus frequents
+        pulseInterval: 800,      // Pulses periodiques (fond)
         pulseSpeed: 1.8,         // Vitesse de propagation
         pulseCascadeChance: 0.6, // Chance qu'un pulse rebondisse a l'arrivee
         maxCascadeDepth: 4,      // Profondeur max de cascade
+        // --- Mouse pulse config ---
+        mousePulseThrottle: 120, // ms entre chaque salve souris
+        mousePulseRadius: 250,   // Rayon de declenchement souris
+        mousePulseCount: 3,      // Pulses max par salve
+        mouseCascadeChance: 0.85,// Cascade plus forte pres de la souris
+        mouseCascadeDepth: 6,    // Profondeur cascade souris
         pulseGlowRadius: 18,     // Taille du halo lumineux
         pulseTrailLength: 0.25,  // Longueur de la trainee
         pulseLineWidth: 2.5,     // Epaisseur du pulse
@@ -89,9 +98,11 @@
     }
 
     // --- Create Pulse (avec cascade possible) ---
-    function createPulse(fromIdx, excludeIdx, depth) {
+    // mouseBoosted = true → cascade plus forte, profondeur etendue
+    function createPulse(fromIdx, excludeIdx, depth, mouseBoosted) {
         depth = depth || 0;
-        if (depth > CONFIG.maxCascadeDepth) return;
+        var maxDepth = mouseBoosted ? CONFIG.mouseCascadeDepth : CONFIG.maxCascadeDepth;
+        if (depth > maxDepth) return;
         if (!nodes[fromIdx]) return;
 
         var neighbors = getNeighbors(fromIdx);
@@ -113,14 +124,48 @@
             color: colorObj,
             speed: CONFIG.pulseSpeed + Math.random() * 0.8,
             depth: depth,
-            cascaded: false
+            cascaded: false,
+            mouseBoosted: !!mouseBoosted
         });
     }
 
-    // --- Lancer un pulse initial ---
+    // --- Lancer un pulse initial (periodique, fond) ---
     function launchPulse() {
         var sourceIdx = Math.floor(Math.random() * nodes.length);
-        createPulse(sourceIdx, undefined, 0);
+        createPulse(sourceIdx, undefined, 0, false);
+    }
+
+    // --- Trouver les nodes proches de la souris ---
+    function getNodesNearMouse() {
+        var near = [];
+        var r = CONFIG.mousePulseRadius;
+        var rSq = r * r;
+        for (var i = 0; i < nodes.length; i++) {
+            var dx = nodes[i].x - mouse.x;
+            var dy = nodes[i].y - mouse.y;
+            var distSq = dx * dx + dy * dy;
+            if (distSq < rSq) {
+                near.push({ idx: i, distSq: distSq });
+            }
+        }
+        // Trier par proximite
+        near.sort(function (a, b) { return a.distSq - b.distSq; });
+        return near;
+    }
+
+    // --- Lancer des pulses depuis la souris ---
+    function launchMousePulses() {
+        var nearNodes = getNodesNearMouse();
+        if (nearNodes.length === 0) return;
+
+        // Plus la souris bouge vite, plus on lance de pulses (1 a mousePulseCount)
+        var speedFactor = Math.min(1, mouseSpeed / 8); // normalise sur ~8px/frame
+        var count = Math.max(1, Math.round(CONFIG.mousePulseCount * speedFactor));
+        count = Math.min(count, nearNodes.length);
+
+        for (var i = 0; i < count; i++) {
+            createPulse(nearNodes[i].idx, undefined, 0, true);
+        }
     }
 
     // --- Update ---
@@ -140,6 +185,13 @@
             if (n.y > h + 10) { n.y = h + 10; n.vy *= -1; }
         }
 
+        // Mouse pulse trigger (throttle)
+        var now = Date.now();
+        if (mouse.x > 0 && mouse.y > 0 && mouseSpeed > 1.5 && now - lastMousePulse > CONFIG.mousePulseThrottle) {
+            launchMousePulses();
+            lastMousePulse = now;
+        }
+
         // Update pulses + cascade
         for (var p = pulses.length - 1; p >= 0; p--) {
             var pulse = pulses[p];
@@ -147,9 +199,10 @@
 
             // Quand le pulse arrive a destination, cascade
             if (pulse.progress >= 1) {
-                if (!pulse.cascaded && Math.random() < CONFIG.pulseCascadeChance) {
+                var cascadeChance = pulse.mouseBoosted ? CONFIG.mouseCascadeChance : CONFIG.pulseCascadeChance;
+                if (!pulse.cascaded && Math.random() < cascadeChance) {
                     pulse.cascaded = true;
-                    createPulse(pulse.toIdx, pulse.fromIdx, pulse.depth + 1);
+                    createPulse(pulse.toIdx, pulse.fromIdx, pulse.depth + 1, pulse.mouseBoosted);
                 }
                 pulses.splice(p, 1);
             }
@@ -285,16 +338,30 @@
         raf = requestAnimationFrame(animate);
     }
 
-    // --- Mouse tracking ---
+    // --- Mouse tracking (avec calcul de vitesse) ---
     canvas.parentElement.addEventListener('mousemove', function (e) {
         var rect = canvas.getBoundingClientRect();
-        mouse.x = e.clientX - rect.left;
-        mouse.y = e.clientY - rect.top;
+        var newX = e.clientX - rect.left;
+        var newY = e.clientY - rect.top;
+
+        // Calculer la vitesse de deplacement
+        if (lastMousePos.x > 0) {
+            var dx = newX - lastMousePos.x;
+            var dy = newY - lastMousePos.y;
+            mouseSpeed = Math.sqrt(dx * dx + dy * dy);
+        }
+        lastMousePos.x = newX;
+        lastMousePos.y = newY;
+        mouse.x = newX;
+        mouse.y = newY;
     });
 
     canvas.parentElement.addEventListener('mouseleave', function () {
         mouse.x = -1000;
         mouse.y = -1000;
+        lastMousePos.x = -1000;
+        lastMousePos.y = -1000;
+        mouseSpeed = 0;
     });
 
     // --- Init ---

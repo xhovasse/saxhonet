@@ -46,7 +46,7 @@
     font-weight: var(--fw-bold);
     line-height: var(--lh-tight);
     margin-bottom: var(--sp-xl);
-    min-height: 2.4em;
+    min-height: 2.2em;
 
     /* Gradient doux anime : or / blanc nacre / rose poudre */
     background: linear-gradient(

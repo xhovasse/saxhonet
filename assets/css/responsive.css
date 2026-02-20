@@ -2,6 +2,23 @@
    Saxho.net — Responsive (Mobile-first)
    ============================================ */
 
+/* --- Tres petit ecran (< 360px) --- */
+@media (max-width: 360px) {
+    .btn {
+        white-space: normal;
+        text-align: center;
+    }
+
+    .btn--lg {
+        padding: var(--sp-sm) var(--sp-lg);
+        font-size: var(--fs-small);
+    }
+
+    .hero__title {
+        font-size: clamp(1.5rem, 8vw, 2rem);
+    }
+}
+
 /* --- Mobile (< 768px) --- */
 @media (max-width: 767px) {
     :root {
@@ -59,11 +76,12 @@
     /* Hero */
     .hero {
         min-height: 90vh;
-        padding: var(--sp-3xl) 0;
+        padding: var(--sp-2xl) 0;
     }
 
     .hero__title {
         font-size: clamp(1.75rem, 7vw, 2.5rem);
+        min-height: auto;
     }
 
     .hero__subtitle {
@@ -75,19 +93,45 @@
     }
 
     /* Paradox */
+    .paradox {
+        padding: var(--sp-2xl) 0;
+    }
+
+    .paradox__title {
+        font-size: var(--fs-h3);
+        margin-bottom: var(--sp-xl);
+    }
+
     .paradox__grid {
         grid-template-columns: 1fr;
         gap: var(--sp-md);
     }
 
-    .paradox__title {
-        font-size: var(--fs-h3);
+    .paradox__card {
+        padding: var(--sp-lg);
+    }
+
+    .paradox__card-title {
+        font-size: var(--fs-body-lg);
     }
 
     /* Resolution */
+    .resolution {
+        padding: var(--sp-2xl) 0;
+    }
+
+    .resolution__title {
+        font-size: var(--fs-h2);
+    }
+
+    .resolution__subtitle {
+        font-size: var(--fs-body);
+    }
+
     .resolution__services {
         grid-template-columns: 1fr;
         gap: var(--sp-md);
+        margin-bottom: var(--sp-xl);
     }
 
     .service-card {
@@ -110,15 +154,54 @@
         display: none;
     }
 
+    .service-card__title {
+        font-size: var(--fs-body);
+    }
+
+    .resolution__cta {
+        margin-top: var(--sp-md);
+    }
+
+    .btn--lg {
+        padding: var(--sp-sm) var(--sp-xl);
+    }
+
     /* Portfolio preview */
+    .portfolio-preview {
+        padding: var(--sp-2xl) 0;
+    }
+
     .portfolio-preview__grid {
         grid-template-columns: 1fr;
+        gap: var(--sp-md);
+    }
+
+    .project-card--blurred {
+        min-height: 200px;
     }
 
     /* Ecosystem */
+    .ecosystem {
+        padding: var(--sp-xl) 0;
+    }
+
     .ecosystem__inner {
         flex-direction: column;
         gap: var(--sp-lg);
+    }
+
+    .ecosystem__text {
+        font-size: var(--fs-small);
+    }
+
+    /* Final CTA */
+    .final-cta {
+        padding: var(--sp-2xl) 0;
+    }
+
+    .final-cta__title {
+        font-size: var(--fs-h3);
+        margin-bottom: var(--sp-lg);
     }
 
     /* Footer */
@@ -133,6 +216,11 @@
         text-align: center;
     }
 
+    .footer__legal {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
     /* Grid utilities */
     .grid--2,
     .grid--3,
@@ -144,6 +232,7 @@
 
 /* --- Tablet (768px - 1023px) --- */
 @media (min-width: 768px) and (max-width: 1023px) {
+    /* Header */
     .header__burger {
         display: flex;
     }
@@ -177,23 +266,57 @@
         color: var(--c-white);
     }
 
+    /* Hero */
+    .hero__title {
+        font-size: clamp(2rem, 5vw, 3rem);
+        min-height: auto;
+    }
+
+    /* Sections — padding reduit */
+    .paradox {
+        padding: var(--sp-3xl) 0;
+    }
+
+    .resolution {
+        padding: var(--sp-3xl) 0;
+    }
+
+    .portfolio-preview {
+        padding: var(--sp-3xl) 0;
+    }
+
+    .final-cta {
+        padding: var(--sp-3xl) 0;
+    }
+
     /* Paradox */
     .paradox__grid {
         grid-template-columns: 1fr;
         max-width: 600px;
+        gap: var(--sp-md);
     }
 
-    /* Resolution */
+    /* Resolution — 3 colonnes + 2 centrees */
     .resolution__services {
         grid-template-columns: repeat(3, 1fr);
+        gap: var(--sp-md);
     }
 
+    /* Centrer les 2 dernieres cartes service sous les 3 premieres */
     .resolution__services .service-card:nth-child(4),
     .resolution__services .service-card:nth-child(5) {
         grid-column: span 1;
     }
 
-    /* Portfolio preview */
+    /* Wrapper pour centrer : les items 4 et 5 dans une grille 3 colonnes
+       → item 4 en colonne 1, item 5 en colonne 2, => decale a droite
+       Mieux : on utilise justify-items center sur toute la grille
+       et on met les 2 derniers en position explicite */
+    .resolution__services {
+        justify-items: center;
+    }
+
+    /* Portfolio preview — 2 colonnes */
     .portfolio-preview__grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -218,6 +341,10 @@
 
 /* --- Desktop small (1024px - 1439px) --- */
 @media (min-width: 1024px) and (max-width: 1439px) {
+    .paradox {
+        padding: var(--sp-4xl) 0;
+    }
+
     .resolution__services {
         grid-template-columns: repeat(5, 1fr);
         gap: var(--sp-md);

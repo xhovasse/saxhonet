@@ -28,6 +28,7 @@
     <link rel="icon" type="image/x-icon" href="<?= SITE_URL ?>/assets/img/favicon.ico">
 
     <!-- Fonts (self-hosted) -->
+    <link rel="preload" href="<?= SITE_URL ?>/assets/fonts/Outfit-Variable.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="<?= SITE_URL ?>/assets/fonts/SpaceGrotesk-Variable.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="<?= SITE_URL ?>/assets/fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin>
 
@@ -59,6 +60,12 @@
             font-family: 'JetBrains Mono';
             src: url('<?= SITE_URL ?>/assets/fonts/JetBrainsMono-Regular.woff2') format('woff2');
             font-weight: 400;
+            font-display: swap;
+        }
+        @font-face {
+            font-family: 'Outfit';
+            src: url('<?= SITE_URL ?>/assets/fonts/Outfit-Variable.woff2') format('woff2');
+            font-weight: 100 900;
             font-display: swap;
         }
     </style>

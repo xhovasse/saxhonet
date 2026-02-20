@@ -107,11 +107,11 @@
 }
 
 .logo__text {
-    font-family: var(--ff-display);
+    font-family: 'Outfit', var(--ff-display);
     font-size: 1.75rem;
-    font-weight: var(--fw-bold);
+    font-weight: 600;
     color: var(--c-white);
-    letter-spacing: var(--ls-tight);
+    letter-spacing: -0.01em;
     transition: color var(--transition-normal);
 }
 
@@ -120,7 +120,7 @@
 }
 
 .logo__accent {
-    color: var(--c-secondary);
+    color: var(--c-accent);
 }
 
 /* Navigation */

@@ -3,7 +3,7 @@
         <div class="footer__grid">
             <!-- Colonne 1 : Logo + tagline -->
             <div class="footer__brand">
-                <span class="logo__text logo__text--light">S<span class="logo__accent">axho</span></span>
+                <span class="logo__text logo__text--light">saxh<span class="logo__accent">o</span></span>
                 <p class="footer__tagline"><?= e(t('footer.tagline')) ?></p>
             </div>
 

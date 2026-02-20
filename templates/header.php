@@ -2,7 +2,7 @@
     <div class="container header__inner">
         <!-- Logo -->
         <a href="<?= SITE_URL ?>/" class="header__logo" aria-label="<?= e(SITE_NAME) ?> — <?= e(t('site.tagline')) ?>">
-            <span class="logo__text">S<span class="logo__accent">axho</span></span>
+            <span class="logo__text">saxh<span class="logo__accent">o</span></span>
         </a>
 
         <!-- Navigation principale -->

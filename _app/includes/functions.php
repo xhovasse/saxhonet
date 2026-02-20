@@ -184,7 +184,23 @@ function send_email_smtp(string $to, string $subject, string $body, bool $isHtml
  */
 function slugify(string $text): string
 {
-    $text = transliterator_transliterate('Any-Latin; Latin-ASCII; Lower()', $text);
+    // Utiliser intl si disponible, sinon fallback manuel
+    if (function_exists('transliterator_transliterate')) {
+        $text = transliterator_transliterate('Any-Latin; Latin-ASCII; Lower()', $text);
+    } else {
+        $text = mb_strtolower($text, 'UTF-8');
+        // Remplacements courants pour le francais
+        $accents = [
+            'à'=>'a','â'=>'a','ä'=>'a','á'=>'a','ã'=>'a',
+            'è'=>'e','ê'=>'e','ë'=>'e','é'=>'e',
+            'ì'=>'i','î'=>'i','ï'=>'i','í'=>'i',
+            'ò'=>'o','ô'=>'o','ö'=>'o','ó'=>'o','õ'=>'o',
+            'ù'=>'u','û'=>'u','ü'=>'u','ú'=>'u',
+            'ÿ'=>'y','ý'=>'y','ñ'=>'n','ç'=>'c',
+            'œ'=>'oe','æ'=>'ae',
+        ];
+        $text = strtr($text, $accents);
+    }
     $text = preg_replace('/[^a-z0-9]+/', '-', $text);
     return trim($text, '-');
 }

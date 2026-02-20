@@ -37,7 +37,7 @@
                 <a href="?lang=<?= $l ?>" class="lang-switcher__link<?= $l === $lang ? ' lang-switcher__link--active' : '' ?>" aria-label="<?= $l === 'fr' ? 'Francais' : 'English' ?>">
                     <?= strtoupper($l) ?>
                 </a>
-                <?php if ($l !== end(SUPPORTED_LANGS)): ?>
+                <?php $supportedLangs = SUPPORTED_LANGS; if ($l !== end($supportedLangs)): ?>
                 <span class="lang-switcher__sep">|</span>
                 <?php endif; ?>
                 <?php endforeach; ?>

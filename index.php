@@ -4,6 +4,11 @@
  * Toutes les requêtes passent par ce fichier
  */
 
+// TEMPORAIRE : forcer affichage erreurs pour debug deploiement
+// A RETIRER une fois le site fonctionnel
+error_reporting(E_ALL);
+ini_set('display_errors', '1');
+
 // Charger l'infrastructure
 require_once __DIR__ . '/_app/includes/config.php';
 require_once __DIR__ . '/_app/includes/db.php';
@@ -63,13 +68,42 @@ if (!file_exists($pageFile)) {
 // (ces variables sont definies dans les fichiers de pages)
 $pageCss = '';
 $pageJs = '';
+$pageContent = '';
+
+// Utiliser un error handler pour capturer les erreurs fatales dans le buffer
+$_pageRenderError = null;
+set_error_handler(function($errno, $errstr, $errfile, $errline) use (&$_pageRenderError) {
+    $_pageRenderError = "PHP Error [$errno]: $errstr in $errfile on line $errline";
+    return false; // Laisser aussi le handler par defaut s'en occuper
+});
+
 ob_start();
-if (file_exists($pageFile)) {
-    include $pageFile;
-} else {
-    echo '<div class="container" style="padding: 100px 0; text-align: center;"><h1>Page en construction</h1></div>';
+try {
+    if (file_exists($pageFile)) {
+        include $pageFile;
+    } else {
+        echo '<div class="container" style="padding: 100px 0; text-align: center;"><h1>Page en construction</h1></div>';
+    }
+} catch (\Throwable $e) {
+    $_pageRenderError = 'Exception: ' . $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine();
 }
-$pageContent = ob_get_clean();
+$pageContent = ob_get_clean() ?: '';
+restore_error_handler();
+
+// Si le contenu est vide et qu'il y a eu une erreur, afficher un message utile
+if (empty(trim($pageContent)) && $_pageRenderError) {
+    $pageContent = '<div class="container" style="padding:100px 20px;text-align:center;">'
+        . '<h1 style="color:#EF4444;">Erreur de rendu</h1>'
+        . '<p>' . htmlspecialchars($_pageRenderError) . '</p>'
+        . '</div>';
+} elseif (empty(trim($pageContent))) {
+    $pageContent = '<div class="container" style="padding:100px 20px;text-align:center;">'
+        . '<h1>Contenu vide</h1>'
+        . '<p>Le fichier page a ete trouve mais n\'a rien produit.</p>'
+        . '<p>Fichier : ' . htmlspecialchars($pageFile) . '</p>'
+        . '<p>Existe : ' . (file_exists($pageFile) ? 'OUI' : 'NON') . '</p>'
+        . '</div>';
+}
 ?>
 <!DOCTYPE html>
 <html lang="<?= e($lang) ?>">

@@ -35,7 +35,7 @@ $company         = trim($input['company'] ?? '');
 $jobTitle        = trim($input['job_title'] ?? '');
 $phone           = trim($input['phone'] ?? '');
 $country         = trim($input['country'] ?? '');
-$terms           = !empty($input['terms']);
+$terms           = !empty($input['accept_terms']);
 
 // Validation
 $errors = [];
@@ -65,7 +65,7 @@ if ($firstName === '' || $lastName === '') {
 
 // Terms
 if (!$terms) {
-    $errors['terms'] = t('auth.error_terms');
+    $errors['accept_terms'] = t('auth.error_terms');
 }
 
 // Check email uniqueness (only if email is valid so far)

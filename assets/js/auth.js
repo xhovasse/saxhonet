@@ -272,7 +272,7 @@
             var email = form.querySelector('[name="email"]').value.trim();
             var password = form.querySelector('[name="password"]').value;
             var passwordConfirm = form.querySelector('[name="password_confirm"]').value;
-            var terms = form.querySelector('[name="terms"]');
+            var terms = form.querySelector('[name="accept_terms"]');
 
             var hasError = false;
 
@@ -297,7 +297,7 @@
                 hasError = true;
             }
             if (terms && !terms.checked) {
-                showFieldError(form, 'terms', form.dataset.errorTerms || 'Obligatoire');
+                showFieldError(form, 'accept_terms', form.dataset.errorTerms || 'Obligatoire');
                 hasError = true;
             }
 

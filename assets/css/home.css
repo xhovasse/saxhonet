@@ -14,91 +14,20 @@
     overflow: hidden;
 }
 
-/* --- Aurora Background (reflets lumineux mobiles) --- */
-.hero::before {
-    content: '';
+/* --- Neural Network Canvas --- */
+.hero__neural {
     position: absolute;
-    inset: -30%;
-    background:
-        radial-gradient(ellipse 700px 500px at 15% 50%,
-            rgba(58, 125, 255, 0.35) 0%,
-            transparent 65%),
-        radial-gradient(ellipse 600px 450px at 75% 25%,
-            rgba(200, 140, 255, 0.2) 0%,
-            transparent 65%),
-        radial-gradient(ellipse 500px 600px at 50% 85%,
-            rgba(245, 166, 35, 0.18) 0%,
-            transparent 60%),
-        radial-gradient(ellipse 450px 400px at 85% 65%,
-            rgba(58, 125, 255, 0.22) 0%,
-            transparent 65%);
-    animation: aurora-drift 18s ease-in-out infinite alternate;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
     z-index: 0;
-    filter: blur(50px);
-    will-change: transform;
-}
-
-.hero::after {
-    content: '';
-    position: absolute;
-    inset: -30%;
-    background:
-        radial-gradient(ellipse 600px 500px at 65% 35%,
-            rgba(245, 166, 35, 0.18) 0%,
-            transparent 60%),
-        radial-gradient(ellipse 700px 400px at 25% 75%,
-            rgba(100, 160, 255, 0.22) 0%,
-            transparent 65%),
-        radial-gradient(ellipse 450px 550px at 80% 50%,
-            rgba(180, 120, 255, 0.12) 0%,
-            transparent 65%);
-    animation: aurora-drift-2 22s ease-in-out infinite alternate;
-    z-index: 0;
-    filter: blur(60px);
-    will-change: transform;
-}
-
-@keyframes aurora-drift {
-    0% {
-        transform: translate(0, 0) rotate(0deg) scale(1);
-    }
-    25% {
-        transform: translate(6%, -4%) rotate(2deg) scale(1.06);
-    }
-    50% {
-        transform: translate(-4%, 6%) rotate(-1.5deg) scale(0.97);
-    }
-    75% {
-        transform: translate(5%, 3%) rotate(1.5deg) scale(1.04);
-    }
-    100% {
-        transform: translate(-3%, -5%) rotate(-2deg) scale(1);
-    }
-}
-
-@keyframes aurora-drift-2 {
-    0% {
-        transform: translate(0, 0) rotate(0deg) scale(1);
-    }
-    33% {
-        transform: translate(-5%, 4%) rotate(-2deg) scale(1.05);
-    }
-    66% {
-        transform: translate(4%, -6%) rotate(2deg) scale(0.96);
-    }
-    100% {
-        transform: translate(-2%, 5%) rotate(-1deg) scale(1.03);
-    }
-}
-
-/* Vignette douce pour centrer le regard */
-.hero .geo-shapes::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at center, transparent 50%, rgba(13, 13, 26, 0.35) 100%);
     pointer-events: none;
-    z-index: 0;
+}
+
+/* Le hero capte les events souris pour le canvas */
+.hero {
+    cursor: default;
 }
 
 .hero__content {
@@ -165,11 +94,6 @@
 
 @keyframes hero-subtitle-in {
     to { opacity: 1; }
-}
-
-/* Reduire l'opacite des formes geo pour ne pas concurrencer l'aurora */
-.geo-shapes {
-    opacity: 0.3;
 }
 
 /* --- Paradox Section --- */

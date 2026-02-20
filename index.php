@@ -98,6 +98,7 @@ $pageContent = ob_get_clean() ?: '';
     <script src="<?= SITE_URL ?>/assets/js/animations.js?v=1.0"></script>
     <?php if ($currentSlug === '' || $currentSlug === 'home'): ?>
     <script src="<?= SITE_URL ?>/assets/js/typed.js?v=1.0"></script>
+    <script src="<?= SITE_URL ?>/assets/js/neural.js?v=1.0"></script>
     <?php endif; ?>
     <?php if (!empty($pageJs)): ?>
     <script src="<?= SITE_URL ?>/assets/js/<?= $pageJs ?>?v=1.0"></script>

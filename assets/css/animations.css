@@ -260,17 +260,14 @@
         animation: none;
     }
 
-    /* Desactiver l'aurora et le gradient titre */
-    .hero::before,
-    .hero::after {
-        animation: none;
-    }
-
+    /* Desactiver le gradient titre anime */
     .hero__title {
         animation: none;
         -webkit-text-fill-color: var(--c-white);
         background: none;
     }
+
+    /* Le canvas neural se desactive tout seul via JS */
 
     [data-parallax] {
         transform: none !important;

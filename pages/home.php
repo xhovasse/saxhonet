@@ -10,15 +10,8 @@ $pageDescription = t('site.description');
      MOUVEMENT 1 — Le constat universel (Hero)
      ========================================== -->
 <section class="hero" id="hero">
-    <!-- Formes geometriques animees -->
-    <div class="geo-shapes" aria-hidden="true">
-        <div class="geo-shape geo-shape--circle geo-shape--1"></div>
-        <div class="geo-shape geo-shape--square geo-shape--2"></div>
-        <div class="geo-shape geo-shape--triangle geo-shape--3"></div>
-        <div class="geo-shape geo-shape--circle geo-shape--4"></div>
-        <div class="geo-shape geo-shape--circle geo-shape--5"></div>
-        <div class="geo-shape geo-shape--square geo-shape--6"></div>
-    </div>
+    <!-- Reseau neuronal anime -->
+    <canvas class="hero__neural" id="neural-canvas" aria-hidden="true"></canvas>
 
     <div class="hero__content">
         <h1 class="hero__title" id="hero-typed" data-typed-text="<?= e(t('home.hero_title')) ?>">

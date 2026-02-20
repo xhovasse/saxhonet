@@ -289,11 +289,19 @@
         padding: var(--sp-3xl) 0;
     }
 
-    /* Paradox */
+    /* Paradox — 3 colonnes cote a cote sur tablet */
     .paradox__grid {
-        grid-template-columns: 1fr;
-        max-width: 600px;
+        grid-template-columns: repeat(3, 1fr);
+        max-width: 100%;
         gap: var(--sp-md);
+    }
+
+    .paradox__card-title {
+        font-size: var(--fs-body);
+    }
+
+    .paradox__card-text {
+        font-size: var(--fs-xs);
     }
 
     /* Resolution — 3 colonnes + 2 centrees */

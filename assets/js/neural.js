@@ -391,4 +391,53 @@
         cancelAnimationFrame(raf);
     });
 
+    // --- Crepitement neural au survol des cartes Paradox ---
+    // Quand on survole une carte (dilemme/tension/inertie), on declenche
+    // une salve de pulses sur les noeuds du bas du canvas (zone la plus
+    // proche visuellement de la section paradox, juste en-dessous).
+    var paradoxCards = document.querySelectorAll('.paradox__card');
+    var lastCrackleTime = 0;
+    var crackleThrottle = 400; // ms entre chaque salve de crepitement
+
+    function launchEdgeCrackle(cardIndex, cardCount) {
+        var now = Date.now();
+        if (now - lastCrackleTime < crackleThrottle) return;
+        lastCrackleTime = now;
+
+        var w = canvas.width / dpr;
+        var h = canvas.height / dpr;
+
+        // Cibler les noeuds dans le quart inferieur du canvas
+        var yThreshold = h * 0.65;
+        // Centrer horizontalement selon la position de la carte (0, 1, 2)
+        var xCenter = w * (cardIndex + 0.5) / cardCount;
+        var xRadius = w / 3;
+
+        var candidates = [];
+        for (var i = 0; i < nodes.length; i++) {
+            if (nodes[i].y > yThreshold) {
+                var dx = nodes[i].x - xCenter;
+                if (Math.abs(dx) < xRadius) {
+                    // Score : plus proche du centre horizontal + plus bas = meilleur
+                    candidates.push({ idx: i, dist: Math.abs(dx) * 0.5 + (h - nodes[i].y) });
+                }
+            }
+        }
+        candidates.sort(function (a, b) { return a.dist - b.dist; });
+
+        // Lancer 3-5 pulses en cascade intense (mouseBoosted)
+        var count = Math.min(candidates.length, 3 + Math.floor(Math.random() * 3));
+        for (var j = 0; j < count; j++) {
+            createPulse(candidates[j].idx, undefined, 0, true);
+        }
+    }
+
+    if (paradoxCards.length > 0) {
+        paradoxCards.forEach(function (card, index) {
+            card.addEventListener('mouseenter', function () {
+                launchEdgeCrackle(index, paradoxCards.length);
+            });
+        });
+    }
+
 })();

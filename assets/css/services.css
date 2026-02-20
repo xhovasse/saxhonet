@@ -1,0 +1,278 @@
+/* ============================================
+   Saxho.net — Services Page
+   ============================================ */
+
+/* --- Progression Label --- */
+.services-progression__label {
+    font-family: var(--ff-mono);
+    font-size: var(--fs-xs);
+    letter-spacing: var(--ls-wider);
+    text-transform: uppercase;
+    color: var(--c-muted);
+    text-align: center;
+    margin-bottom: var(--sp-xl);
+}
+
+/* --- Staircase (desktop) --- */
+.services-staircase {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: var(--sp-lg);
+    min-height: 200px;
+}
+
+.services-staircase__step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--sp-sm);
+    text-decoration: none;
+    color: var(--c-dark);
+    padding: var(--sp-lg) var(--sp-md);
+    background: var(--c-white);
+    border-radius: var(--radius-md);
+    border: 1px solid transparent;
+    transition: all var(--transition-normal);
+    cursor: pointer;
+    flex: 1;
+    max-width: 180px;
+}
+
+.services-staircase__step:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--c-primary-light);
+}
+
+/* Progressive height — ascending steps */
+.services-staircase__step--1 { padding-top: 20px; }
+.services-staircase__step--2 { padding-top: 40px; }
+.services-staircase__step--3 { padding-top: 60px; }
+.services-staircase__step--4 { padding-top: 80px; }
+.services-staircase__step--5 { padding-top: 100px; }
+
+.services-staircase__num {
+    font-family: var(--ff-mono);
+    font-size: var(--fs-xs);
+    color: var(--c-muted);
+    letter-spacing: var(--ls-wider);
+}
+
+.services-staircase__title {
+    font-family: var(--ff-display);
+    font-size: var(--fs-small);
+    font-weight: var(--fw-semibold);
+    text-align: center;
+    line-height: var(--lh-snug);
+}
+
+/* --- Mobile list (hidden on desktop) --- */
+.services-list-mobile {
+    display: none;
+}
+
+.services-list-mobile__item {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-md);
+    padding: var(--sp-md) var(--sp-lg);
+    text-decoration: none;
+    color: var(--c-dark);
+    background: var(--c-white);
+    border-radius: var(--radius-sm);
+    margin-bottom: var(--sp-sm);
+    transition: all var(--transition-fast);
+    border: 1px solid transparent;
+}
+
+.services-list-mobile__item:hover {
+    border-color: var(--c-primary-light);
+    box-shadow: var(--shadow-sm);
+}
+
+.services-list-mobile__num {
+    font-family: var(--ff-mono);
+    font-size: var(--fs-xs);
+    color: var(--c-muted);
+    letter-spacing: var(--ls-wider);
+    flex-shrink: 0;
+    width: 32px;
+}
+
+.services-list-mobile__title {
+    font-family: var(--ff-display);
+    font-size: var(--fs-body);
+    font-weight: var(--fw-semibold);
+}
+
+/* --- Service Detail Sections --- */
+.service-detail__header {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-lg);
+    margin-bottom: var(--sp-2xl);
+}
+
+.service-detail__icon {
+    flex-shrink: 0;
+}
+
+.service-detail__title-group {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-md);
+    flex-wrap: wrap;
+}
+
+.service-detail__num {
+    font-family: var(--ff-mono);
+    font-size: var(--fs-xs);
+    color: var(--c-muted);
+    letter-spacing: var(--ls-wider);
+}
+
+.service-detail__title {
+    font-family: var(--ff-display);
+    font-size: var(--fs-h2);
+    font-weight: var(--fw-bold);
+    margin: 0;
+}
+
+/* --- Detail Grid (3 blocks) --- */
+.service-detail__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--sp-xl);
+    margin-bottom: var(--sp-xl);
+}
+
+.service-detail__block {
+    padding: var(--sp-lg);
+    background: var(--c-surface);
+    border-radius: var(--radius-md);
+}
+
+.section--surface .service-detail__block {
+    background: var(--c-white);
+}
+
+.service-detail__label {
+    display: block;
+    font-family: var(--ff-mono);
+    font-size: var(--fs-xs);
+    letter-spacing: var(--ls-wider);
+    text-transform: uppercase;
+    color: var(--c-secondary);
+    margin-bottom: var(--sp-sm);
+    font-weight: var(--fw-semibold);
+}
+
+.service-detail__text {
+    font-size: var(--fs-small);
+    color: var(--c-medium);
+    line-height: var(--lh-relaxed);
+}
+
+/* --- S5 open contribution note --- */
+.service-detail__open {
+    text-align: center;
+    font-style: italic;
+    color: var(--c-medium);
+    font-size: var(--fs-body);
+    margin-bottom: var(--sp-xl);
+    padding: var(--sp-md) var(--sp-xl);
+    background: rgba(245, 166, 35, 0.08);
+    border-radius: var(--radius-sm);
+    border-left: 3px solid var(--c-tertiary);
+}
+
+/* --- CTA per service --- */
+.service-detail__cta {
+    text-align: center;
+}
+
+/* --- Final CTA --- */
+.services-cta__title {
+    font-size: var(--fs-h2);
+    color: var(--c-white);
+    margin-bottom: var(--sp-md);
+}
+
+.services-cta__text {
+    font-size: var(--fs-body-lg);
+    color: rgba(255, 255, 255, 0.7);
+    max-width: 600px;
+    margin: 0 auto var(--sp-xl);
+    line-height: var(--lh-relaxed);
+}
+
+/* --- Responsive --- */
+@media (max-width: 767px) {
+    /* Hide staircase, show mobile list */
+    .services-staircase {
+        display: none;
+    }
+
+    .services-list-mobile {
+        display: block;
+    }
+
+    /* Detail grid → single column */
+    .service-detail__grid {
+        grid-template-columns: 1fr;
+        gap: var(--sp-md);
+    }
+
+    .service-detail__header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .service-detail__title-group {
+        justify-content: center;
+    }
+
+    .service-detail__title {
+        font-size: var(--fs-h3);
+    }
+
+    .services-cta__title {
+        font-size: var(--fs-h3);
+    }
+
+    .services-cta__text {
+        font-size: var(--fs-body);
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    /* Staircase → smaller steps */
+    .services-staircase {
+        gap: var(--sp-md);
+    }
+
+    .services-staircase__step {
+        max-width: 150px;
+        padding-left: var(--sp-sm);
+        padding-right: var(--sp-sm);
+    }
+
+    .services-staircase__step--1 { padding-top: 16px; }
+    .services-staircase__step--2 { padding-top: 32px; }
+    .services-staircase__step--3 { padding-top: 48px; }
+    .services-staircase__step--4 { padding-top: 64px; }
+    .services-staircase__step--5 { padding-top: 80px; }
+
+    /* Detail grid → single column centered */
+    .service-detail__grid {
+        grid-template-columns: 1fr;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .service-detail__title {
+        font-size: var(--fs-h3);
+    }
+}

@@ -27,30 +27,41 @@
     const mainNav = document.getElementById('main-nav');
 
     if (burgerBtn && mainNav) {
+        function openMenu() {
+            mainNav.classList.add('is-open');
+            burgerBtn.classList.add('is-open');
+            header.classList.add('nav-is-open');
+            burgerBtn.setAttribute('aria-expanded', 'true');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeMenu() {
+            mainNav.classList.remove('is-open');
+            burgerBtn.classList.remove('is-open');
+            header.classList.remove('nav-is-open');
+            burgerBtn.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        }
+
         burgerBtn.addEventListener('click', function () {
-            const isOpen = mainNav.classList.toggle('is-open');
-            burgerBtn.classList.toggle('is-open');
-            burgerBtn.setAttribute('aria-expanded', isOpen);
-            document.body.style.overflow = isOpen ? 'hidden' : '';
+            if (mainNav.classList.contains('is-open')) {
+                closeMenu();
+            } else {
+                openMenu();
+            }
         });
 
         // Close on link click
         mainNav.querySelectorAll('.nav__link').forEach(function (link) {
             link.addEventListener('click', function () {
-                mainNav.classList.remove('is-open');
-                burgerBtn.classList.remove('is-open');
-                burgerBtn.setAttribute('aria-expanded', 'false');
-                document.body.style.overflow = '';
+                closeMenu();
             });
         });
 
         // Close on Escape
         document.addEventListener('keydown', function (e) {
             if (e.key === 'Escape' && mainNav.classList.contains('is-open')) {
-                mainNav.classList.remove('is-open');
-                burgerBtn.classList.remove('is-open');
-                burgerBtn.setAttribute('aria-expanded', 'false');
-                document.body.style.overflow = '';
+                closeMenu();
             }
         });
     }

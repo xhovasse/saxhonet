@@ -23,6 +23,7 @@
     var mouseSpeed = 0;           // Vitesse de deplacement souris
     var lastMousePos = { x: -1000, y: -1000 };
     var raf;
+    var animTime = 0;  // Temps global pour le scintillement
     var dpr = Math.min(window.devicePixelRatio || 1, 2); // Cap a 2x pour perf
 
     // --- Configuration ---
@@ -35,6 +36,9 @@
         lineBaseOpacity: 0.15,   // Lignes bien visibles par defaut
         lineMouseOpacity: 0.4,   // Lignes pres de la souris
         lineWidth: 0.8,          // Epaisseur ligne de base
+        // --- Scintillement (effet profondeur/voie lactee) ---
+        shimmerAmount: 0.55,     // Amplitude du scintillement (0=aucun, 1=max)
+        shimmerSpeed: 0.3,       // Vitesse du scintillement (cycles lents)
         pulseInterval: 800,      // Pulses periodiques (fond)
         pulseSpeed: 1.8,         // Vitesse de propagation
         pulseCascadeChance: 0.6, // Chance qu'un pulse rebondisse a l'arrivee
@@ -45,9 +49,11 @@
         mousePulseCount: 3,      // Pulses max par salve
         mouseCascadeChance: 0.85,// Cascade plus forte pres de la souris
         mouseCascadeDepth: 6,    // Profondeur cascade souris
-        pulseGlowRadius: 18,     // Taille du halo lumineux
-        pulseTrailLength: 0.25,  // Longueur de la trainee
-        pulseLineWidth: 2.5,     // Epaisseur du pulse
+        // --- Pulse visuel (adouci pour eviter l'effet "space combat") ---
+        pulseGlowRadius: 12,     // Taille du halo lumineux (reduit)
+        pulseTrailLength: 0.15,  // Longueur de la trainee (plus court)
+        pulseLineWidth: 1.8,     // Epaisseur du pulse (plus fin)
+        pulseBrightness: 0.6,    // Intensite globale des pulses (0-1)
         pulseColors: [
             { r: 58, g: 125, b: 255 },   // Bleu electrique
             { r: 166, g: 61, b: 107 },    // Rose framboise (accent logo)
@@ -77,7 +83,10 @@
                 y: Math.random() * h,
                 vx: (Math.random() - 0.5) * CONFIG.nodeSpeed * 2,
                 vy: (Math.random() - 0.5) * CONFIG.nodeSpeed * 2,
-                radius: CONFIG.nodeRadius
+                radius: CONFIG.nodeRadius,
+                // Chaque node a son propre rythme de scintillement
+                shimmerOffset: Math.random() * Math.PI * 2,
+                shimmerFreq: 0.7 + Math.random() * 0.6  // frequence variee
             });
         }
     }
@@ -172,6 +181,7 @@
     function update() {
         var w = canvas.width / dpr;
         var h = canvas.height / dpr;
+        animTime += 0.016; // ~60fps increment
 
         // Move nodes (tres lentement)
         for (var i = 0; i < nodes.length; i++) {
@@ -216,7 +226,7 @@
 
         ctx.clearRect(0, 0, w, h);
 
-        // 1. Draw connections (le reseau visible)
+        // 1. Draw connections (le reseau visible, avec scintillement profondeur)
         for (var i = 0; i < nodes.length; i++) {
             for (var j = i + 1; j < nodes.length; j++) {
                 var dx = nodes[j].x - nodes[i].x;
@@ -228,7 +238,15 @@
                     var dist = Math.sqrt(distSq);
                     var opacity = (1 - dist / CONFIG.connectionDist);
 
-                    // Pres de la souris = plus lumineux
+                    // Scintillement : chaque connexion pulse doucement a son rythme
+                    // On combine les offsets des deux nodes pour un rythme unique par connexion
+                    var shimmerPhase = animTime * CONFIG.shimmerSpeed;
+                    var shimA = Math.sin(shimmerPhase * nodes[i].shimmerFreq + nodes[i].shimmerOffset);
+                    var shimB = Math.sin(shimmerPhase * nodes[j].shimmerFreq + nodes[j].shimmerOffset);
+                    var shimmer = (shimA + shimB) * 0.25; // -0.5 a +0.5
+                    var shimmerMul = 1 + shimmer * CONFIG.shimmerAmount; // ex: 0.725 a 1.275
+
+                    // Pres de la souris = plus lumineux (le scintillement reste)
                     var midX = (nodes[i].x + nodes[j].x) * 0.5;
                     var midY = (nodes[i].y + nodes[j].y) * 0.5;
                     var mDx = midX - mouse.x;
@@ -238,12 +256,15 @@
                     var alpha;
                     if (mDist < CONFIG.mouseDist) {
                         var mInf = 1 - mDist / CONFIG.mouseDist;
-                        alpha = (CONFIG.lineBaseOpacity + mInf * (CONFIG.lineMouseOpacity - CONFIG.lineBaseOpacity)) * opacity;
+                        alpha = (CONFIG.lineBaseOpacity + mInf * (CONFIG.lineMouseOpacity - CONFIG.lineBaseOpacity)) * opacity * shimmerMul;
                         ctx.lineWidth = CONFIG.lineWidth + mInf * 0.8;
                     } else {
-                        alpha = CONFIG.lineBaseOpacity * opacity;
+                        alpha = CONFIG.lineBaseOpacity * opacity * shimmerMul;
                         ctx.lineWidth = CONFIG.lineWidth;
                     }
+
+                    // Clamp alpha entre 0 et 1
+                    alpha = Math.max(0, Math.min(1, alpha));
 
                     ctx.beginPath();
                     ctx.moveTo(nodes[i].x, nodes[i].y);
@@ -266,12 +287,13 @@
             var py = from.y + (to.y - from.y) * pulse.progress;
 
             // Intensite decroit avec la profondeur de cascade
-            var intensity = Math.max(0.4, 1 - pulse.depth * 0.15);
+            // pulseBrightness controle l'intensite globale (plus doux = moins "space combat")
+            var intensity = Math.max(0.3, 1 - pulse.depth * 0.18) * CONFIG.pulseBrightness;
 
-            // Halo lumineux
+            // Halo lumineux (adouci)
             var glow = ctx.createRadialGradient(px, py, 0, px, py, CONFIG.pulseGlowRadius);
-            glow.addColorStop(0, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (0.9 * intensity) + ')');
-            glow.addColorStop(0.4, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (0.3 * intensity) + ')');
+            glow.addColorStop(0, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (0.7 * intensity) + ')');
+            glow.addColorStop(0.5, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (0.15 * intensity) + ')');
             glow.addColorStop(1, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0)');
 
             ctx.beginPath();
@@ -279,15 +301,15 @@
             ctx.fillStyle = glow;
             ctx.fill();
 
-            // Trainee lumineuse
+            // Trainee lumineuse (plus subtile)
             var trailStart = Math.max(0, pulse.progress - CONFIG.pulseTrailLength);
             var sx = from.x + (to.x - from.x) * trailStart;
             var sy = from.y + (to.y - from.y) * trailStart;
 
             var lineGrad = ctx.createLinearGradient(sx, sy, px, py);
             lineGrad.addColorStop(0, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0)');
-            lineGrad.addColorStop(0.6, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (0.5 * intensity) + ')');
-            lineGrad.addColorStop(1, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (0.9 * intensity) + ')');
+            lineGrad.addColorStop(0.6, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (0.35 * intensity) + ')');
+            lineGrad.addColorStop(1, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (0.7 * intensity) + ')');
 
             ctx.beginPath();
             ctx.moveTo(sx, sy);
@@ -296,10 +318,10 @@
             ctx.lineWidth = CONFIG.pulseLineWidth;
             ctx.stroke();
 
-            // Point central brillant
+            // Point central (plus discret, pas blanc pur)
             ctx.beginPath();
-            ctx.arc(px, py, 2.5, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(255, 255, 255, ' + (0.9 * intensity) + ')';
+            ctx.arc(px, py, 2, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(200, 220, 255, ' + (0.7 * intensity) + ')';
             ctx.fill();
         }
 

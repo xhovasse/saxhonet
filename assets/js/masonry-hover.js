@@ -1,7 +1,9 @@
 /**
- * Saxho.net — Masonry Collage Layout Engine
- * Positionnement absolu avec layouts pre-calcules.
- * Au survol, la carte active grandit et les autres se repositionnent.
+ * Saxho.net — Masonry Card Stack Engine
+ * Metaphore : jeu de cartes en eventail.
+ * Les cartes se chevauchent physiquement (z-index), un overlay gradient
+ * assombrit les cartes a l'arriere-plan. Au survol, la carte "monte"
+ * progressivement vers l'avant en grandissant.
  * Mobile : desactive, retour au flux normal.
  */
 
@@ -10,70 +12,67 @@
 
     var MOBILE_BP = 768;
     var BASE_W = 1100;
-    var GAP = 12;
 
     /* =============================================
        LAYOUTS PRE-CALCULES
-       Base 1100px, scale proportionnel au container
+       Base 1100px, scale proportionnel au container.
+       Les cartes inactives se chevauchent — comme un
+       jeu de cartes qu'on est en train de ranger.
        ============================================= */
 
-    /* --- Homepage : cartes avec description --- */
-    /* Imbrication serree, chevauchements legers aux bords */
     var LAYOUTS_HOME = {
-        restHeight: 410,
+        restHeight: 340,
         rest: [
-            { left: 0,   top: 0,   width: 255, height: 195 },
-            { left: 245, top: 20,  width: 310, height: 210 },
-            { left: 548, top: 5,   width: 265, height: 188 },
-            { left: 800, top: 25,  width: 260, height: 200 },
-            { left: 70,  top: 200, width: 340, height: 195 }
+            { left: 20,  top: 15,  width: 240, height: 190 },
+            { left: 210, top: 0,   width: 290, height: 210 },
+            { left: 460, top: 10,  width: 260, height: 195 },
+            { left: 680, top: 5,   width: 250, height: 200 },
+            { left: 100, top: 170, width: 280, height: 165 }
         ],
-        activeHeights: [310, 310, 310, 310, 440],
+        activeHeights: [320, 320, 320, 320, 440],
         active: [
-            /* Card 0 active — grande a gauche, petites imbriquees a droite */
+            /* Card 0 active — grande a gauche, empilage a droite */
             [
-                { left: 0,   top: 0,   width: 500, height: 300 },
-                { left: 488, top: 5,   width: 195, height: 142 },
-                { left: 672, top: 0,   width: 205, height: 148 },
-                { left: 868, top: 8,   width: 195, height: 138 },
-                { left: 500, top: 140, width: 280, height: 148 }
+                { left: 0,   top: 0,   width: 520, height: 310 },
+                { left: 460, top: 15,  width: 195, height: 150 },
+                { left: 610, top: 5,   width: 210, height: 155 },
+                { left: 820, top: 20,  width: 185, height: 145 },
+                { left: 490, top: 155, width: 220, height: 150 }
             ],
-            /* Card 1 active — grande au centre, petites tassees autour */
+            /* Card 1 active — grande centre-gauche, cartes empilees autour */
             [
-                { left: 0,   top: 5,   width: 190, height: 148 },
-                { left: 178, top: 0,   width: 500, height: 300 },
-                { left: 668, top: 8,   width: 200, height: 138 },
-                { left: 858, top: 0,   width: 205, height: 148 },
-                { left: 0,   top: 145, width: 188, height: 148 }
+                { left: 20,  top: 25,  width: 185, height: 150 },
+                { left: 160, top: 0,   width: 520, height: 310 },
+                { left: 630, top: 15,  width: 195, height: 145 },
+                { left: 800, top: 5,   width: 200, height: 150 },
+                { left: 30,  top: 160, width: 180, height: 150 }
             ],
-            /* Card 2 active — grande droite-centre, cluster a gauche */
+            /* Card 2 active — grande au centre, cartes flanquantes */
             [
-                { left: 0,   top: 0,   width: 195, height: 145 },
-                { left: 185, top: 8,   width: 210, height: 148 },
-                { left: 385, top: 0,   width: 500, height: 300 },
-                { left: 875, top: 5,   width: 195, height: 145 },
-                { left: 0,   top: 138, width: 210, height: 152 }
+                { left: 10,  top: 10,  width: 190, height: 150 },
+                { left: 155, top: 20,  width: 200, height: 145 },
+                { left: 310, top: 0,   width: 520, height: 310 },
+                { left: 790, top: 15,  width: 195, height: 148 },
+                { left: 30,  top: 155, width: 195, height: 150 }
             ],
-            /* Card 3 active — grande a droite, petites empilees a gauche */
+            /* Card 3 active — grande a droite, empilage a gauche */
             [
-                { left: 0,   top: 0,   width: 195, height: 140 },
-                { left: 185, top: 8,   width: 205, height: 148 },
-                { left: 382, top: 0,   width: 198, height: 140 },
-                { left: 570, top: 0,   width: 500, height: 300 },
-                { left: 0,   top: 132, width: 210, height: 155 }
+                { left: 5,   top: 10,  width: 185, height: 145 },
+                { left: 150, top: 20,  width: 195, height: 150 },
+                { left: 305, top: 5,   width: 200, height: 148 },
+                { left: 460, top: 0,   width: 520, height: 310 },
+                { left: 20,  top: 150, width: 190, height: 155 }
             ],
-            /* Card 4 active — grande en bas, petites rangee du haut */
+            /* Card 4 active — grande en bas-centre, petites rangee du haut */
             [
-                { left: 0,   top: 0,   width: 185, height: 140 },
-                { left: 175, top: 8,   width: 205, height: 145 },
-                { left: 370, top: 0,   width: 198, height: 140 },
-                { left: 558, top: 6,   width: 195, height: 142 },
-                { left: 155, top: 142, width: 500, height: 288 }
+                { left: 10,  top: 5,   width: 185, height: 140 },
+                { left: 160, top: 15,  width: 195, height: 138 },
+                { left: 320, top: 5,   width: 190, height: 140 },
+                { left: 475, top: 15,  width: 185, height: 138 },
+                { left: 130, top: 145, width: 520, height: 285 }
             ]
         ]
     };
-
-    /* Toutes les mosaiques utilisent le meme layout (LAYOUTS_HOME) */
 
     /* =============================================
        MOTEUR DE LAYOUT
@@ -86,8 +85,9 @@
     }
 
     /* =============================================
-       PROFONDEUR DE CHAMP — niveaux gradues
-       Distance geometrique → blur + scale + opacite
+       EMPILEMENT — 3 plans de profondeur
+       Pas de blur. Z-index pour le masquage physique,
+       overlay gradient sombre pour le recul visuel.
        ============================================= */
 
     function cardCenter(pos) {
@@ -100,36 +100,30 @@
         return Math.sqrt(dx * dx + dy * dy);
     }
 
-    /* Niveaux de profondeur par rang de distance.
-       Plan 0 = carte active (nette, premier plan)
-       Plan 1 = carte la plus proche (leger flou)
-       Plan 2 = cartes intermediaires
-       Plan 3 = carte la plus eloignee (flou maximum) */
+    /* 3 plans : avant (actif), milieu (2 proches), arriere (2 loin) */
     var DEPTH_LEVELS = [
-        /* Plan 0 — Active : nette */
-        { blur: 0,   scale: 1.03, opacity: 1,    brightness: 1,    saturate: 1   },
-        /* Plan 1 — Proche : leger retrait */
-        { blur: 1.0, scale: 0.97, opacity: 0.85, brightness: 0.92, saturate: 0.9 },
-        /* Plan 2 — Moyen : en retrait */
-        { blur: 2.5, scale: 0.93, opacity: 0.65, brightness: 0.80, saturate: 0.7 },
-        /* Plan 3 — Loin : arriere-plan */
-        { blur: 4.0, scale: 0.88, opacity: 0.45, brightness: 0.65, saturate: 0.5 }
+        /* Plan 0 — Avant : carte active, premier plan */
+        { zIndex: 10, overlay: 0,    scale: 1.02 },
+        /* Plan 1 — Milieu : legerement assombri */
+        { zIndex: 5,  overlay: 0.30, scale: 1    },
+        /* Plan 2 — Arriere : nettement assombri */
+        { zIndex: 2,  overlay: 0.55, scale: 1    }
     ];
 
     function applyDepth(cards, layout, activeIndex) {
         if (activeIndex < 0) {
-            /* Repos : tout net, pas de profondeur */
+            /* Repos : tout a plat, pas d'overlay */
             for (var i = 0; i < cards.length; i++) {
+                cards[i].style.zIndex = '';
                 cards[i].style.transform = '';
-                cards[i].style.filter = '';
-                cards[i].style.opacity = '';
+                cards[i].style.setProperty('--depth-overlay', '0');
             }
             return;
         }
 
         var activeC = cardCenter(layout[activeIndex]);
 
-        /* Collecter les indices et distances des cartes inactives */
+        /* Collecter distances des cartes inactives */
         var others = [];
         for (var j = 0; j < cards.length; j++) {
             if (j !== activeIndex) {
@@ -140,38 +134,34 @@
             }
         }
 
-        /* Trier par distance croissante → rang = plan de profondeur */
+        /* Trier par distance croissante */
         others.sort(function (a, b) { return a.dist - b.dist; });
 
-        /* Assigner les plans : rang 0 → plan 1, rang 1-2 → plan 2, rang 3 → plan 3 */
+        /* 2 plus proches → plan 1 (milieu), 2 plus loin → plan 2 (arriere) */
         var planMap = {};
         for (var r = 0; r < others.length; r++) {
-            if (r === 0) {
-                planMap[others[r].index] = 1; /* le plus proche */
-            } else if (r === others.length - 1) {
-                planMap[others[r].index] = 3; /* le plus loin */
-            } else {
-                planMap[others[r].index] = 2; /* intermediaire */
-            }
+            planMap[others[r].index] = (r < 2) ? 1 : 2;
         }
 
-        /* Appliquer les styles par plan */
+        /* Appliquer z-index, overlay et scale */
         for (var k = 0; k < cards.length; k++) {
             var plan = (k === activeIndex) ? 0 : planMap[k];
             var lvl = DEPTH_LEVELS[plan];
 
-            cards[k].style.transform = 'scale(' + lvl.scale.toFixed(3) + ')';
-            cards[k].style.filter =
-                'blur(' + lvl.blur.toFixed(1) + 'px)' +
-                ' brightness(' + lvl.brightness.toFixed(2) + ')' +
-                ' saturate(' + lvl.saturate.toFixed(1) + ')';
-            cards[k].style.opacity = lvl.opacity.toFixed(2);
+            cards[k].style.zIndex = lvl.zIndex;
+            cards[k].style.setProperty('--depth-overlay', lvl.overlay.toFixed(2));
+
+            if (plan === 0) {
+                cards[k].style.transform = 'scale(' + lvl.scale.toFixed(3) + ')';
+            } else {
+                cards[k].style.transform = '';
+            }
         }
     }
 
-    /* Layout complet : positions + profondeur dans le meme frame.
-       Tout change simultanement pour un mouvement de camera unifie —
-       la carte qui avance grandit ET devient nette en meme temps. */
+    /* Layout complet : positions + empilement dans le meme frame.
+       La carte qui avance grandit (width/height) ET passe au-dessus
+       (z-index) en meme temps — comme tirer une carte du jeu. */
     function applyLayout(container, cards, layouts, state, activeIndex) {
         var containerWidth = container.offsetWidth;
         var scale = Math.min(containerWidth / BASE_W, 1);
@@ -197,7 +187,7 @@
             card.style.height = Math.round(pos.height * scale) + 'px';
         }
 
-        /* Profondeur de champ graduee */
+        /* Empilement (z-index + overlay) */
         applyDepth(cards, layout, activeIndex);
     }
 
@@ -211,6 +201,9 @@
             cards[i].style.width = '';
             cards[i].style.height = '';
             cards[i].style.transform = '';
+            cards[i].style.zIndex = '';
+            cards[i].style.setProperty('--depth-overlay', '0');
+            /* Nettoyer les anciennes proprietes qui pourraient trainer */
             cards[i].style.filter = '';
             cards[i].style.opacity = '';
             cards[i].classList.remove('masonry__card--active');
@@ -227,16 +220,15 @@
         var leaveTimer = null;
         var activeIndex = DEFAULT_ACTIVE;
 
-        /* Au chargement : poser l'etat initial "a plat" SANS transition,
-           puis animer vers la profondeur pour une entree visuelle douce */
+        /* Au chargement : poser l'etat initial "a plat" (pas d'overlay),
+           puis animer vers l'empilement pour une entree visuelle douce */
         if (!isMobile() && !prefersReducedMotion) {
-            /* Etape 1 : desactiver les transitions, poser positions + tailles
-               dans l'etat "default active" mais SANS profondeur (tout plat) */
+            /* Etape 1 : poser positions SANS transitions, overlay a 0 */
             for (var m = 0; m < cards.length; m++) {
                 cards[m].style.transition = 'none';
+                cards[m].style.setProperty('--depth-overlay', '0');
             }
             container.classList.add('masonry--has-active');
-            /* Poser positions manuellement (sans applyLayout qui ajouterait la profondeur) */
             var initLayout = layouts.active[activeIndex];
             var initScale = Math.min(container.offsetWidth / BASE_W, 1);
             container.style.height = Math.round(layouts.activeHeights[activeIndex] * initScale) + 'px';
@@ -250,11 +242,11 @@
                 cards[m2].classList.toggle('masonry__card--active', m2 === activeIndex);
             }
 
-            /* Forcer le repaint pour fixer l'etat plat */
+            /* Forcer le repaint */
             container.offsetHeight; /* eslint-disable-line no-unused-expressions */
 
-            /* Etape 2 : reactiver les transitions et appliquer la profondeur.
-               Le navigateur anime blur/scale/brightness de plat → profond */
+            /* Etape 2 : reactiver les transitions et appliquer l'empilement.
+               Les overlays s'animent de 0 → valeur cible (600ms ease via CSS). */
             requestAnimationFrame(function () {
                 for (var n = 0; n < cards.length; n++) {
                     cards[n].style.transition = '';
@@ -266,9 +258,8 @@
             applyLayout(container, cards, layouts, 'rest', -1);
         }
 
-        /* Hover : tout dans le meme frame — positions + tailles + profondeur
-           changent simultanement. Comme toutes les transitions CSS ont la meme
-           duree et courbe, la carte grossit ET devient nette en parallele. */
+        /* Hover : positions + tailles + empilement changent ensemble.
+           La carte survolee "monte" vers l'avant en grandissant. */
         for (var j = 0; j < cards.length; j++) {
             (function (index) {
                 cards[index].addEventListener('mouseenter', function () {
@@ -295,7 +286,7 @@
             })(j);
         }
 
-        /* Resize : recalculer (pas besoin de deferrer, pas d'animation) */
+        /* Resize */
         var resizeTimer;
         window.addEventListener('resize', function () {
             clearTimeout(resizeTimer);

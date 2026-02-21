@@ -199,7 +199,6 @@
         position: static;
         height: auto !important;
         margin-bottom: var(--sp-xl);
-        perspective: none;
     }
 
     .masonry__card {
@@ -209,7 +208,12 @@
         left: auto !important;
         top: auto !important;
         transform: none !important;
-        filter: none !important;
+        z-index: auto !important;
+        --depth-overlay: 0 !important;
+    }
+
+    .masonry__card::after {
+        display: none;
     }
 
     .masonry .service-card {

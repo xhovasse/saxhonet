@@ -385,7 +385,6 @@
         flex-direction: column;
         gap: var(--sp-md);
         height: auto !important;
-        perspective: none;
     }
 
     .masonry__card {
@@ -395,7 +394,12 @@
         left: auto !important;
         top: auto !important;
         transform: none !important;
-        filter: none !important;
+        z-index: auto !important;
+        --depth-overlay: 0 !important;
+    }
+
+    .masonry__card::after {
+        display: none;
     }
 
     /* Description visible sur mobile (pas de hover) */

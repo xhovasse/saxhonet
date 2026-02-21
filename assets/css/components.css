@@ -447,32 +447,56 @@
 .service-card--color-5 { background-color: #FFFBEB; }  /* amber-tinted */
 
 /* --- Masonry collage (positionnement absolu, pilote par JS) --- */
+/* Metaphore : jeu de cartes en eventail. Les cartes se chevauchent
+   physiquement via z-index, un overlay gradient assombrit les cartes
+   a l'arriere-plan. Pas de blur — l'empilement suffit. */
 .masonry {
     position: relative;
     margin-bottom: var(--sp-3xl);
-    perspective: 1200px;
     /* height set dynamically by JS */
 }
 
 .masonry__card {
+    position: relative; /* pour le ::after overlay */
     overflow: hidden;
-    transform: scale(1) translateZ(0);
-    filter: blur(0) brightness(1) saturate(1);
-    /* Toutes les proprietes geometriques + visuelles partagent la meme
-       duree et la meme courbe pour un mouvement de "camera" unifie.
-       Rien ne doit arriver avant ou apres — tout bouge ensemble. */
+    --depth-overlay: 0; /* pilote par JS : 0 = visible, 0.45 = assombri */
     transition:
-        left   1100ms cubic-bezier(0.4, 0, 0.2, 1),
-        top    1100ms cubic-bezier(0.4, 0, 0.2, 1),
-        width  1100ms cubic-bezier(0.4, 0, 0.2, 1),
-        height 1100ms cubic-bezier(0.4, 0, 0.2, 1),
-        transform 1100ms cubic-bezier(0.4, 0, 0.2, 1),
-        filter    1100ms cubic-bezier(0.4, 0, 0.2, 1),
-        opacity   1100ms cubic-bezier(0.4, 0, 0.2, 1),
+        left   900ms cubic-bezier(0.16, 1, 0.3, 1),
+        top    900ms cubic-bezier(0.16, 1, 0.3, 1),
+        width  900ms cubic-bezier(0.16, 1, 0.3, 1),
+        height 900ms cubic-bezier(0.16, 1, 0.3, 1),
+        transform 900ms cubic-bezier(0.16, 1, 0.3, 1),
         box-shadow 400ms ease,
         border-color var(--transition-fast);
     z-index: 1;
-    will-change: left, top, width, height, transform, filter, opacity;
+    will-change: left, top, width, height, transform;
+}
+
+/* Overlay sombre pour les cartes en retrait — gradient directionnel
+   (transparent en haut, sombre en bas) pour un effet de recul/ombre.
+   Preserve les couleurs distinctes des cartes contrairement a brightness(). */
+.masonry__card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+        180deg,
+        rgba(13, 13, 26, 0) 0%,
+        rgba(13, 13, 26, 0.6) 100%
+    );
+    opacity: var(--depth-overlay, 0);
+    transition: opacity 600ms ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Le contenu des cartes doit rester AU-DESSUS de l'overlay */
+.masonry__card .service-card__icon,
+.masonry__card .service-card__title,
+.masonry__card .service-card__text {
+    position: relative;
+    z-index: 2;
 }
 
 /* Icone plus compacte dans le collage */
@@ -505,18 +529,15 @@
     margin-top: var(--sp-sm);
 }
 
-/* --- Profondeur de champ (depth of field) --- */
-/* Le JS (applyDepth) pilote transform, filter et opacity en inline
-   avec des valeurs graduees selon la distance geometrique.
-   Le CSS ne gere que z-index, box-shadow, border-color. */
+/* --- Empilement (z-index + overlay pilotes par JS) --- */
+/* Le JS gere z-index et --depth-overlay en inline.
+   Le CSS ne gere que box-shadow et border-color. */
 .masonry--has-active .masonry__card--active {
-    z-index: 10;
     box-shadow: var(--shadow-xl);
     border-color: var(--c-primary-light);
 }
 
 /* Override le hover translateY(-6px) de .service-card dans le contexte masonry */
-/* Le JS gere transform/filter/opacity — on neutralise le hover par defaut */
 .masonry .service-card:hover {
     transform: none;
     box-shadow: none;

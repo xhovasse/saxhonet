@@ -110,52 +110,99 @@
         { zIndex: 2,  overlay: 0.55, scale: 1    }
     ];
 
-    function applyDepth(cards, layout, activeIndex) {
+    /* Garder trace du z-index courant pour orchestrer les changements */
+    var currentZIndexes = [];
+    var zIndexTimer = null;
+
+    function computeDepthPlan(cards, layout, activeIndex) {
+        if (activeIndex < 0) return null;
+
+        var activeC = cardCenter(layout[activeIndex]);
+        var others = [];
+        for (var j = 0; j < cards.length; j++) {
+            if (j !== activeIndex) {
+                others.push({ index: j, dist: dist(cardCenter(layout[j]), activeC) });
+            }
+        }
+        others.sort(function (a, b) { return a.dist - b.dist; });
+
+        var plans = [];
+        for (var k = 0; k < cards.length; k++) plans[k] = -1;
+        plans[activeIndex] = 0;
+        for (var r = 0; r < others.length; r++) {
+            plans[others[r].index] = (r < 2) ? 1 : 2;
+        }
+        return plans;
+    }
+
+    function applyDepth(cards, layout, activeIndex, immediate) {
         if (activeIndex < 0) {
             /* Repos : tout a plat, pas d'overlay */
+            clearTimeout(zIndexTimer);
             for (var i = 0; i < cards.length; i++) {
                 cards[i].style.zIndex = '';
                 cards[i].style.transform = '';
                 cards[i].style.setProperty('--depth-overlay', '0');
+                currentZIndexes[i] = 1;
             }
             return;
         }
 
-        var activeC = cardCenter(layout[activeIndex]);
+        var plans = computeDepthPlan(cards, layout, activeIndex);
+        if (!plans) return;
 
-        /* Collecter distances des cartes inactives */
-        var others = [];
-        for (var j = 0; j < cards.length; j++) {
-            if (j !== activeIndex) {
-                others.push({
-                    index: j,
-                    dist: dist(cardCenter(layout[j]), activeC)
-                });
-            }
-        }
+        /* Phase 1 — Immediate :
+           - Overlay + scale changent tout de suite (CSS transition les anime)
+           - Les cartes qui DESCENDENT en z-index descendent immediatement
+             (elles disparaissent derriere, ca doit etre instantane)
+           - La carte qui MONTE garde son ancien z-index pour l'instant
+             (elle grandit "derriere" les autres d'abord) */
+        clearTimeout(zIndexTimer);
 
-        /* Trier par distance croissante */
-        others.sort(function (a, b) { return a.dist - b.dist; });
-
-        /* 2 plus proches → plan 1 (milieu), 2 plus loin → plan 2 (arriere) */
-        var planMap = {};
-        for (var r = 0; r < others.length; r++) {
-            planMap[others[r].index] = (r < 2) ? 1 : 2;
-        }
-
-        /* Appliquer z-index, overlay et scale */
         for (var k = 0; k < cards.length; k++) {
-            var plan = (k === activeIndex) ? 0 : planMap[k];
+            var plan = plans[k];
             var lvl = DEPTH_LEVELS[plan];
+            var newZ = lvl.zIndex;
+            var oldZ = currentZIndexes[k] || 1;
 
-            cards[k].style.zIndex = lvl.zIndex;
+            /* Overlay : toujours immediat (le CSS ::after transition l'anime) */
             cards[k].style.setProperty('--depth-overlay', lvl.overlay.toFixed(2));
 
+            /* Scale */
             if (plan === 0) {
                 cards[k].style.transform = 'scale(' + lvl.scale.toFixed(3) + ')';
             } else {
                 cards[k].style.transform = '';
             }
+
+            if (immediate) {
+                /* Mode immediat (init) : tout d'un coup */
+                cards[k].style.zIndex = newZ;
+                currentZIndexes[k] = newZ;
+            } else {
+                /* Cartes qui descendent → z-index baisse immediatement */
+                if (newZ <= oldZ) {
+                    cards[k].style.zIndex = newZ;
+                    currentZIndexes[k] = newZ;
+                }
+                /* Cartes qui montent → on attend (phase 2) */
+            }
+        }
+
+        if (!immediate) {
+            /* Phase 2 — Differee (~350ms) :
+               La carte qui monte passe enfin devant.
+               A ce stade elle a deja grandi de ~40% de sa transition,
+               le passage devant est donc fluide et pas abrupt. */
+            zIndexTimer = setTimeout(function () {
+                for (var m = 0; m < cards.length; m++) {
+                    var targetZ = DEPTH_LEVELS[plans[m]].zIndex;
+                    if (targetZ > (currentZIndexes[m] || 1)) {
+                        cards[m].style.zIndex = targetZ;
+                        currentZIndexes[m] = targetZ;
+                    }
+                }
+            }, 350);
         }
     }
 
@@ -187,8 +234,9 @@
             card.style.height = Math.round(pos.height * scale) + 'px';
         }
 
-        /* Empilement (z-index + overlay) */
-        applyDepth(cards, layout, activeIndex);
+        /* Empilement (z-index + overlay).
+           immediate=false par defaut pour les transitions hover. */
+        applyDepth(cards, layout, activeIndex, false);
     }
 
     function resetToFlow(container, cards) {
@@ -251,7 +299,7 @@
                 for (var n = 0; n < cards.length; n++) {
                     cards[n].style.transition = '';
                 }
-                applyDepth(cards, initLayout, activeIndex);
+                applyDepth(cards, initLayout, activeIndex, true);
             });
 
         } else if (!isMobile()) {

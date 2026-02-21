@@ -33,14 +33,14 @@
     <link rel="preload" href="<?= SITE_URL ?>/assets/fonts/Inter-Variable.woff2" as="font" type="font/woff2" crossorigin>
 
     <!-- CSS -->
-    <link rel="stylesheet" href="<?= SITE_URL ?>/assets/css/variables.css?v=3.6">
-    <link rel="stylesheet" href="<?= SITE_URL ?>/assets/css/reset.css?v=3.6">
-    <link rel="stylesheet" href="<?= SITE_URL ?>/assets/css/layout.css?v=3.6">
-    <link rel="stylesheet" href="<?= SITE_URL ?>/assets/css/components.css?v=3.6">
-    <link rel="stylesheet" href="<?= SITE_URL ?>/assets/css/animations.css?v=3.6">
-    <link rel="stylesheet" href="<?= SITE_URL ?>/assets/css/responsive.css?v=3.6">
+    <link rel="stylesheet" href="<?= SITE_URL ?>/assets/css/variables.css?v=3.7">
+    <link rel="stylesheet" href="<?= SITE_URL ?>/assets/css/reset.css?v=3.7">
+    <link rel="stylesheet" href="<?= SITE_URL ?>/assets/css/layout.css?v=3.7">
+    <link rel="stylesheet" href="<?= SITE_URL ?>/assets/css/components.css?v=3.7">
+    <link rel="stylesheet" href="<?= SITE_URL ?>/assets/css/animations.css?v=3.7">
+    <link rel="stylesheet" href="<?= SITE_URL ?>/assets/css/responsive.css?v=3.7">
     <?php if (!empty($pageCss)): ?>
-    <link rel="stylesheet" href="<?= SITE_URL ?>/assets/css/<?= $pageCss ?>?v=3.6">
+    <link rel="stylesheet" href="<?= SITE_URL ?>/assets/css/<?= $pageCss ?>?v=3.7">
     <?php endif; ?>
 
     <style>

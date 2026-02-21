@@ -18,6 +18,8 @@ $totalCategories = (int)$db->query('SELECT COUNT(*) FROM blog_categories')->fetc
 $totalComments = (int)$db->query('SELECT COUNT(*) FROM blog_comments')->fetchColumn();
 $totalUsers = (int)$db->query('SELECT COUNT(*) FROM users WHERE is_active = 1')->fetchColumn();
 $unreadMessages = (int)$db->query('SELECT COUNT(*) FROM contact_messages WHERE is_read = 0')->fetchColumn();
+$totalProjects = (int)$db->query('SELECT COUNT(*) FROM projects')->fetchColumn();
+$visibleProjects = (int)$db->query('SELECT COUNT(*) FROM projects WHERE is_visible = 1')->fetchColumn();
 
 // Recent articles
 $recentArticles = $db->query(
@@ -33,39 +35,7 @@ $recentArticles = $db->query(
 <!-- Admin Layout -->
 <section class="admin-layout" data-site-url="<?= SITE_URL ?>">
 
-    <!-- Sidebar -->
-    <aside class="admin-sidebar">
-        <p class="admin-sidebar__title">Admin</p>
-        <ul class="admin-sidebar__nav">
-            <li>
-                <a href="<?= SITE_URL ?>/admin" class="admin-sidebar__link admin-sidebar__link--active">
-                    <span class="admin-sidebar__icon">&#x1F4CA;</span>
-                    <?= e(t('admin.dashboard')) ?>
-                </a>
-            </li>
-            <li>
-                <a href="<?= SITE_URL ?>/admin/blog" class="admin-sidebar__link">
-                    <span class="admin-sidebar__icon">&#x1F4DD;</span>
-                    <?= e(t('admin.blog_list')) ?>
-                </a>
-            </li>
-            <li>
-                <a href="<?= SITE_URL ?>/admin/categories" class="admin-sidebar__link">
-                    <span class="admin-sidebar__icon">&#x1F3F7;</span>
-                    <?= e(t('admin.categories')) ?>
-                </a>
-            </li>
-        </ul>
-        <div class="admin-sidebar__sep"></div>
-        <ul class="admin-sidebar__nav">
-            <li>
-                <a href="<?= SITE_URL ?>/" class="admin-sidebar__link">
-                    <span class="admin-sidebar__icon">&#x1F310;</span>
-                    Voir le site
-                </a>
-            </li>
-        </ul>
-    </aside>
+    <?php $currentAdmin = 'dashboard'; include __DIR__ . '/_sidebar.php'; ?>
 
     <!-- Content -->
     <div class="admin-content">
@@ -102,6 +72,14 @@ $recentArticles = $db->query(
             <div class="admin-stat-card">
                 <div class="admin-stat-card__value"><?= $unreadMessages ?></div>
                 <div class="admin-stat-card__label"><?= e(t('admin.stats_messages')) ?></div>
+            </div>
+            <div class="admin-stat-card">
+                <div class="admin-stat-card__value"><?= $totalProjects ?></div>
+                <div class="admin-stat-card__label">Projets</div>
+            </div>
+            <div class="admin-stat-card">
+                <div class="admin-stat-card__value"><?= $visibleProjects ?></div>
+                <div class="admin-stat-card__label">Projets visibles</div>
             </div>
         </div>
 

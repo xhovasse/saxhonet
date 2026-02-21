@@ -40,6 +40,11 @@ function get_routes(): array
         'admin/blog/create' => ['page' => 'admin/blog-form.php',   'title' => 'admin.blog_create'],
         'admin/blog/edit'   => ['page' => 'admin/blog-form.php',   'title' => 'admin.blog_edit'],
         'admin/categories'  => ['page' => 'admin/categories.php',  'title' => 'admin.categories'],
+        'admin/messages'        => ['page' => 'admin/messages.php',      'title' => 'Messages'],
+        'admin/users'           => ['page' => 'admin/users.php',         'title' => 'Utilisateurs'],
+        'admin/projects'        => ['page' => 'admin/projects.php',      'title' => 'Projets'],
+        'admin/projects/create' => ['page' => 'admin/project-form.php',  'title' => 'Nouveau projet'],
+        'admin/projects/edit'   => ['page' => 'admin/project-form.php',  'title' => 'Modifier projet'],
 
         // API (retournent du JSON, pas de layout)
         'api/contact'      => ['page' => 'api/contact.php',      'api' => true],
@@ -60,6 +65,13 @@ function get_routes(): array
         'api/admin/category-save'  => ['page' => 'api/admin/category-save.php',  'api' => true],
         'api/admin/category-delete'=> ['page' => 'api/admin/category-delete.php','api' => true],
         'api/admin/upload'         => ['page' => 'api/admin/upload.php',         'api' => true],
+        'api/admin/message-read'       => ['page' => 'api/admin/message-read.php',       'api' => true],
+        'api/admin/message-delete'     => ['page' => 'api/admin/message-delete.php',     'api' => true],
+        'api/admin/user-toggle-active' => ['page' => 'api/admin/user-toggle-active.php', 'api' => true],
+        'api/admin/user-role'          => ['page' => 'api/admin/user-role.php',          'api' => true],
+        'api/admin/project-save'       => ['page' => 'api/admin/project-save.php',       'api' => true],
+        'api/admin/project-delete'     => ['page' => 'api/admin/project-delete.php',     'api' => true],
+        'api/admin/project-visibility' => ['page' => 'api/admin/project-visibility.php', 'api' => true],
     ];
 }
 

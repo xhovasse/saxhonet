@@ -502,6 +502,374 @@
     }
 
     /* ==========================================
+       MESSAGE DETAIL TOGGLE (expandable rows)
+       ========================================== */
+
+    function initMessageDetailToggle() {
+        document.addEventListener('click', function (e) {
+            var row = e.target.closest('[data-toggle-detail]');
+            if (!row) return;
+
+            var id = row.getAttribute('data-toggle-detail');
+            var detailRow = document.querySelector('[data-detail-for="' + id + '"]');
+            if (!detailRow) return;
+
+            var isVisible = detailRow.style.display !== 'none';
+            detailRow.style.display = isVisible ? 'none' : 'table-row';
+        });
+    }
+
+    /* ==========================================
+       MESSAGE READ TOGGLE
+       ========================================== */
+
+    function initMessageReadToggle() {
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('[data-message-read-id]');
+            if (!btn) return;
+            e.preventDefault();
+
+            var id = btn.getAttribute('data-message-read-id');
+            btn.disabled = true;
+
+            fetch(siteUrl + '/api/admin/message-read', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    csrf_token: csrfToken,
+                    id: id
+                })
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.csrf_token) updateCsrfToken(data.csrf_token);
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.error || 'Error');
+                }
+            })
+            .catch(function () {
+                alert('Network error');
+            })
+            .finally(function () {
+                btn.disabled = false;
+            });
+        });
+    }
+
+    /* ==========================================
+       USER TOGGLE ACTIVE
+       ========================================== */
+
+    function initUserToggleActive() {
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('[data-user-toggle-id]');
+            if (!btn) return;
+            e.preventDefault();
+
+            var id = btn.getAttribute('data-user-toggle-id');
+            btn.disabled = true;
+
+            fetch(siteUrl + '/api/admin/user-toggle-active', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    csrf_token: csrfToken,
+                    id: id
+                })
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.csrf_token) updateCsrfToken(data.csrf_token);
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.error || 'Error');
+                }
+            })
+            .catch(function () {
+                alert('Network error');
+            })
+            .finally(function () {
+                btn.disabled = false;
+            });
+        });
+    }
+
+    /* ==========================================
+       USER ROLE CHANGE
+       ========================================== */
+
+    function initUserRoleChange() {
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('[data-user-role-id]');
+            if (!btn) return;
+            e.preventDefault();
+
+            var id = btn.getAttribute('data-user-role-id');
+            btn.disabled = true;
+
+            fetch(siteUrl + '/api/admin/user-role', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    csrf_token: csrfToken,
+                    id: id
+                })
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.csrf_token) updateCsrfToken(data.csrf_token);
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.error || 'Error');
+                }
+            })
+            .catch(function () {
+                alert('Network error');
+            })
+            .finally(function () {
+                btn.disabled = false;
+            });
+        });
+    }
+
+    /* ==========================================
+       PROJECT VISIBILITY TOGGLE
+       ========================================== */
+
+    function initProjectVisibility() {
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('[data-project-visibility-id]');
+            if (!btn) return;
+            e.preventDefault();
+
+            var id = btn.getAttribute('data-project-visibility-id');
+            btn.disabled = true;
+
+            fetch(siteUrl + '/api/admin/project-visibility', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    csrf_token: csrfToken,
+                    id: id
+                })
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (data) {
+                if (data.csrf_token) updateCsrfToken(data.csrf_token);
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert(data.error || 'Error');
+                }
+            })
+            .catch(function () {
+                alert('Network error');
+            })
+            .finally(function () {
+                btn.disabled = false;
+            });
+        });
+    }
+
+    /* ==========================================
+       PROJECT FORM (CREATE / EDIT)
+       ========================================== */
+
+    function initProjectForm() {
+        var form = document.getElementById('project-form');
+        if (!form) return;
+
+        // Auto-slug from name
+        var nameInput = document.getElementById('project-name-fr');
+        var slugInput = document.getElementById('project-slug');
+        if (nameInput && slugInput) {
+            var slugEdited = slugInput.value.trim() !== '';
+
+            slugInput.addEventListener('input', function () {
+                slugEdited = true;
+            });
+
+            nameInput.addEventListener('input', function () {
+                if (slugEdited) return;
+                slugInput.value = generateSlug(nameInput.value);
+            });
+        }
+
+        // Image upload for project
+        var uploadBtn = document.getElementById('upload-project-image-btn');
+        var fileInput = document.getElementById('project-image-input');
+        var previewContainer = document.getElementById('project-image-preview');
+        var hiddenInput = document.getElementById('project-image');
+
+        if (uploadBtn && fileInput) {
+            uploadBtn.addEventListener('click', function () {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', function () {
+                if (!fileInput.files || !fileInput.files[0]) return;
+                var file = fileInput.files[0];
+
+                var formData = new FormData();
+                formData.append('image', file);
+                formData.append('csrf_token', csrfToken);
+
+                uploadBtn.disabled = true;
+                uploadBtn.textContent = '...';
+
+                fetch(siteUrl + '/api/admin/upload', {
+                    method: 'POST',
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    body: formData
+                })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    if (data.csrf_token) updateCsrfToken(data.csrf_token);
+                    if (data.success) {
+                        hiddenInput.value = data.filename;
+                        previewContainer.innerHTML = '<div class="admin-form__image-preview">'
+                            + '<img src="' + data.url + '" alt="Cover">'
+                            + '<button type="button" class="admin-form__image-remove" title="Supprimer">&times;</button>'
+                            + '</div>';
+                        previewContainer.style.display = 'block';
+                        var removeBtn = previewContainer.querySelector('.admin-form__image-remove');
+                        if (removeBtn) {
+                            removeBtn.addEventListener('click', function () {
+                                hiddenInput.value = '';
+                                previewContainer.innerHTML = '';
+                                previewContainer.style.display = 'none';
+                            });
+                        }
+                    } else {
+                        var errMsg = data.error || (data.errors && Object.values(data.errors)[0]) || 'Upload error';
+                        alert(errMsg);
+                    }
+                })
+                .catch(function () {
+                    alert('Upload error');
+                })
+                .finally(function () {
+                    uploadBtn.disabled = false;
+                    uploadBtn.textContent = uploadBtn.getAttribute('data-label') || 'Upload';
+                    fileInput.value = '';
+                });
+            });
+
+            // Existing image remove
+            if (previewContainer) {
+                var existingRemove = previewContainer.querySelector('.admin-form__image-remove');
+                if (existingRemove) {
+                    existingRemove.addEventListener('click', function () {
+                        hiddenInput.value = '';
+                        previewContainer.innerHTML = '';
+                        previewContainer.style.display = 'none';
+                    });
+                }
+            }
+        }
+
+        // Submit
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            var data = {
+                csrf_token: csrfToken,
+                name_fr: (document.getElementById('project-name-fr') || {}).value || '',
+                name_en: (document.getElementById('project-name-en') || {}).value || '',
+                slug: (document.getElementById('project-slug') || {}).value || '',
+                domain: (document.getElementById('project-domain') || {}).value || '',
+                image: (document.getElementById('project-image') || {}).value || '',
+                pitch_fr: (document.getElementById('project-pitch-fr') || {}).value || '',
+                pitch_en: (document.getElementById('project-pitch-en') || {}).value || '',
+                problem_fr: (document.getElementById('project-problem-fr') || {}).value || '',
+                problem_en: (document.getElementById('project-problem-en') || {}).value || '',
+                solution_fr: (document.getElementById('project-solution-fr') || {}).value || '',
+                solution_en: (document.getElementById('project-solution-en') || {}).value || '',
+                phase: (document.getElementById('project-phase') || {}).value || 'ideation',
+                status: (document.getElementById('project-status') || {}).value || 'open',
+                investment_sought: (document.getElementById('project-investment') || {}).value || '',
+                launch_date: (document.getElementById('project-launch-date') || {}).value || '',
+                display_order: (document.getElementById('project-display-order') || {}).value || '0',
+                is_visible: document.getElementById('project-visible') ? document.getElementById('project-visible').checked : true,
+                skills_sought_fr: (document.getElementById('project-skills-fr') || {}).value || '',
+                skills_sought_en: (document.getElementById('project-skills-en') || {}).value || ''
+            };
+
+            var idInput = document.getElementById('project-id');
+            if (idInput && idInput.value) {
+                data.id = idInput.value;
+            }
+
+            if (!data.name_fr.trim()) {
+                alert(form.getAttribute('data-error-name') || 'Name is required');
+                return;
+            }
+            if (!data.pitch_fr.trim()) {
+                alert(form.getAttribute('data-error-pitch') || 'Pitch is required');
+                return;
+            }
+
+            var submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = submitBtn.getAttribute('data-loading') || '...';
+            }
+
+            fetch(siteUrl + '/api/admin/project-save', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(function (res) { return res.json(); })
+            .then(function (result) {
+                if (result.csrf_token) updateCsrfToken(result.csrf_token);
+                if (result.success) {
+                    if (!data.id && result.id) {
+                        window.location.href = siteUrl + '/admin/projects/edit?id=' + result.id;
+                    } else {
+                        showAlert(form.parentNode, 'success', result.message || 'Saved');
+                        if (result.slug) {
+                            var slugField = document.getElementById('project-slug');
+                            if (slugField) slugField.value = result.slug;
+                        }
+                    }
+                } else {
+                    var msg = result.error || (result.errors ? Object.values(result.errors)[0] : 'Error');
+                    showAlert(form.parentNode, 'error', msg);
+                }
+            })
+            .catch(function () {
+                showAlert(form.parentNode, 'error', 'Network error');
+            })
+            .finally(function () {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = submitBtn.getAttribute('data-text') || 'Save';
+                }
+            });
+        });
+    }
+
+    /* ==========================================
        INIT
        ========================================== */
 
@@ -517,6 +885,12 @@
         initDeleteModal();
         initCategories();
         initAutoExcerpt();
+        initMessageDetailToggle();
+        initMessageReadToggle();
+        initUserToggleActive();
+        initUserRoleChange();
+        initProjectVisibility();
+        initProjectForm();
     }
 
     // Run

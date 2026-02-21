@@ -458,14 +458,17 @@
     overflow: hidden;
     transform: scale(1) translateZ(0);
     filter: blur(0) brightness(1) saturate(1);
+    /* Toutes les proprietes geometriques + visuelles partagent la meme
+       duree et la meme courbe pour un mouvement de "camera" unifie.
+       Rien ne doit arriver avant ou apres — tout bouge ensemble. */
     transition:
-        left var(--transition-masonry),
-        top var(--transition-masonry),
-        width 800ms cubic-bezier(0.16, 1, 0.3, 1),
-        height 800ms cubic-bezier(0.16, 1, 0.3, 1),
-        transform 1000ms cubic-bezier(0.4, 0, 0.2, 1),
-        filter 1200ms cubic-bezier(0.4, 0, 0.2, 1),
-        opacity 1000ms cubic-bezier(0.4, 0, 0.2, 1),
+        left   1100ms cubic-bezier(0.4, 0, 0.2, 1),
+        top    1100ms cubic-bezier(0.4, 0, 0.2, 1),
+        width  1100ms cubic-bezier(0.4, 0, 0.2, 1),
+        height 1100ms cubic-bezier(0.4, 0, 0.2, 1),
+        transform 1100ms cubic-bezier(0.4, 0, 0.2, 1),
+        filter    1100ms cubic-bezier(0.4, 0, 0.2, 1),
+        opacity   1100ms cubic-bezier(0.4, 0, 0.2, 1),
         box-shadow 400ms ease,
         border-color var(--transition-fast);
     z-index: 1;

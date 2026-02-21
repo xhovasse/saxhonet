@@ -169,8 +169,10 @@
         }
     }
 
-    /* Poser les positions (left/top/width/height) sans profondeur */
-    function applyPositions(container, cards, layouts, state, activeIndex) {
+    /* Layout complet : positions + profondeur dans le meme frame.
+       Tout change simultanement pour un mouvement de camera unifie —
+       la carte qui avance grandit ET devient nette en meme temps. */
+    function applyLayout(container, cards, layouts, state, activeIndex) {
         var containerWidth = container.offsetWidth;
         var scale = Math.min(containerWidth / BASE_W, 1);
 
@@ -195,24 +197,8 @@
             card.style.height = Math.round(pos.height * scale) + 'px';
         }
 
-        return layout;
-    }
-
-    /* Layout complet : positions + profondeur dans le meme frame */
-    function applyLayout(container, cards, layouts, state, activeIndex) {
-        var layout = applyPositions(container, cards, layouts, state, activeIndex);
+        /* Profondeur de champ graduee */
         applyDepth(cards, layout, activeIndex);
-    }
-
-    /* Layout avec profondeur differee : positions d'abord, profondeur
-       au frame suivant pour que le navigateur anime la transition */
-    var pendingDepthRAF = 0;
-    function applyLayoutDeferred(container, cards, layouts, state, activeIndex) {
-        var layout = applyPositions(container, cards, layouts, state, activeIndex);
-        cancelAnimationFrame(pendingDepthRAF);
-        pendingDepthRAF = requestAnimationFrame(function () {
-            applyDepth(cards, layout, activeIndex);
-        });
     }
 
     function resetToFlow(container, cards) {
@@ -241,40 +227,48 @@
         var leaveTimer = null;
         var activeIndex = DEFAULT_ACTIVE;
 
-        /* Au chargement : animation d'entree en 2 temps
-           1) Poser les positions SANS transitions, SANS profondeur (etat plat)
-           2) Apres repaint, activer les transitions et animer vers la profondeur */
+        /* Au chargement : poser l'etat initial "a plat" SANS transition,
+           puis animer vers la profondeur pour une entree visuelle douce */
         if (!isMobile() && !prefersReducedMotion) {
-            /* Etape 1 : desactiver les transitions, poser les positions a plat */
+            /* Etape 1 : desactiver les transitions, poser positions + tailles
+               dans l'etat "default active" mais SANS profondeur (tout plat) */
             for (var m = 0; m < cards.length; m++) {
                 cards[m].style.transition = 'none';
             }
             container.classList.add('masonry--has-active');
-            applyPositions(container, cards, layouts, 'active', activeIndex);
-            /* Pas de profondeur — toutes les cartes restent a scale(1), blur(0) */
-
+            /* Poser positions manuellement (sans applyLayout qui ajouterait la profondeur) */
+            var initLayout = layouts.active[activeIndex];
+            var initScale = Math.min(container.offsetWidth / BASE_W, 1);
+            container.style.height = Math.round(layouts.activeHeights[activeIndex] * initScale) + 'px';
             for (var m2 = 0; m2 < cards.length; m2++) {
+                var initPos = initLayout[m2];
+                cards[m2].style.position = 'absolute';
+                cards[m2].style.left = Math.round(initPos.left * initScale) + 'px';
+                cards[m2].style.top = Math.round(initPos.top * initScale) + 'px';
+                cards[m2].style.width = Math.round(initPos.width * initScale) + 'px';
+                cards[m2].style.height = Math.round(initPos.height * initScale) + 'px';
                 cards[m2].classList.toggle('masonry__card--active', m2 === activeIndex);
             }
 
-            /* Forcer le repaint : le navigateur peint l'etat "a plat" */
+            /* Forcer le repaint pour fixer l'etat plat */
             container.offsetHeight; /* eslint-disable-line no-unused-expressions */
 
-            /* Etape 2 : reactiver les transitions et appliquer la profondeur
-               Le navigateur anime de l'etat plat vers l'etat profond */
+            /* Etape 2 : reactiver les transitions et appliquer la profondeur.
+               Le navigateur anime blur/scale/brightness de plat → profond */
             requestAnimationFrame(function () {
                 for (var n = 0; n < cards.length; n++) {
                     cards[n].style.transition = '';
                 }
-                var layout = layouts.active[activeIndex];
-                applyDepth(cards, layout, activeIndex);
+                applyDepth(cards, initLayout, activeIndex);
             });
 
         } else if (!isMobile()) {
             applyLayout(container, cards, layouts, 'rest', -1);
         }
 
-        /* Hover sur chaque carte */
+        /* Hover : tout dans le meme frame — positions + tailles + profondeur
+           changent simultanement. Comme toutes les transitions CSS ont la meme
+           duree et courbe, la carte grossit ET devient nette en parallele. */
         for (var j = 0; j < cards.length; j++) {
             (function (index) {
                 cards[index].addEventListener('mouseenter', function () {
@@ -282,9 +276,7 @@
                     clearTimeout(leaveTimer);
                     activeIndex = index;
                     container.classList.add('masonry--has-active');
-                    /* Positions d'abord, profondeur au frame suivant
-                       pour que le navigateur anime les deux changements */
-                    applyLayoutDeferred(container, cards, layouts, 'active', index);
+                    applyLayout(container, cards, layouts, 'active', index);
                     for (var k = 0; k < cards.length; k++) {
                         cards[k].classList.toggle('masonry__card--active', k === index);
                     }
@@ -294,7 +286,7 @@
                     if (isMobile() || prefersReducedMotion) return;
                     leaveTimer = setTimeout(function () {
                         activeIndex = DEFAULT_ACTIVE;
-                        applyLayoutDeferred(container, cards, layouts, 'active', activeIndex);
+                        applyLayout(container, cards, layouts, 'active', activeIndex);
                         for (var k = 0; k < cards.length; k++) {
                             cards[k].classList.toggle('masonry__card--active', k === activeIndex);
                         }

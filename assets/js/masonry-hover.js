@@ -169,7 +169,8 @@
         }
     }
 
-    function applyLayout(container, cards, layouts, state, activeIndex) {
+    /* Poser les positions (left/top/width/height) sans profondeur */
+    function applyPositions(container, cards, layouts, state, activeIndex) {
         var containerWidth = container.offsetWidth;
         var scale = Math.min(containerWidth / BASE_W, 1);
 
@@ -194,8 +195,24 @@
             card.style.height = Math.round(pos.height * scale) + 'px';
         }
 
-        /* Profondeur de champ graduee */
+        return layout;
+    }
+
+    /* Layout complet : positions + profondeur dans le meme frame */
+    function applyLayout(container, cards, layouts, state, activeIndex) {
+        var layout = applyPositions(container, cards, layouts, state, activeIndex);
         applyDepth(cards, layout, activeIndex);
+    }
+
+    /* Layout avec profondeur differee : positions d'abord, profondeur
+       au frame suivant pour que le navigateur anime la transition */
+    var pendingDepthRAF = 0;
+    function applyLayoutDeferred(container, cards, layouts, state, activeIndex) {
+        var layout = applyPositions(container, cards, layouts, state, activeIndex);
+        cancelAnimationFrame(pendingDepthRAF);
+        pendingDepthRAF = requestAnimationFrame(function () {
+            applyDepth(cards, layout, activeIndex);
+        });
     }
 
     function resetToFlow(container, cards) {
@@ -224,13 +241,35 @@
         var leaveTimer = null;
         var activeIndex = DEFAULT_ACTIVE;
 
-        /* Au chargement : demarrer avec une carte en focus (profondeur active) */
+        /* Au chargement : animation d'entree en 2 temps
+           1) Poser les positions SANS transitions, SANS profondeur (etat plat)
+           2) Apres repaint, activer les transitions et animer vers la profondeur */
         if (!isMobile() && !prefersReducedMotion) {
-            container.classList.add('masonry--has-active');
-            applyLayout(container, cards, layouts, 'active', activeIndex);
+            /* Etape 1 : desactiver les transitions, poser les positions a plat */
             for (var m = 0; m < cards.length; m++) {
-                cards[m].classList.toggle('masonry__card--active', m === activeIndex);
+                cards[m].style.transition = 'none';
             }
+            container.classList.add('masonry--has-active');
+            applyPositions(container, cards, layouts, 'active', activeIndex);
+            /* Pas de profondeur — toutes les cartes restent a scale(1), blur(0) */
+
+            for (var m2 = 0; m2 < cards.length; m2++) {
+                cards[m2].classList.toggle('masonry__card--active', m2 === activeIndex);
+            }
+
+            /* Forcer le repaint : le navigateur peint l'etat "a plat" */
+            container.offsetHeight; /* eslint-disable-line no-unused-expressions */
+
+            /* Etape 2 : reactiver les transitions et appliquer la profondeur
+               Le navigateur anime de l'etat plat vers l'etat profond */
+            requestAnimationFrame(function () {
+                for (var n = 0; n < cards.length; n++) {
+                    cards[n].style.transition = '';
+                }
+                var layout = layouts.active[activeIndex];
+                applyDepth(cards, layout, activeIndex);
+            });
+
         } else if (!isMobile()) {
             applyLayout(container, cards, layouts, 'rest', -1);
         }
@@ -243,7 +282,9 @@
                     clearTimeout(leaveTimer);
                     activeIndex = index;
                     container.classList.add('masonry--has-active');
-                    applyLayout(container, cards, layouts, 'active', index);
+                    /* Positions d'abord, profondeur au frame suivant
+                       pour que le navigateur anime les deux changements */
+                    applyLayoutDeferred(container, cards, layouts, 'active', index);
                     for (var k = 0; k < cards.length; k++) {
                         cards[k].classList.toggle('masonry__card--active', k === index);
                     }
@@ -252,9 +293,8 @@
                 cards[index].addEventListener('mouseleave', function () {
                     if (isMobile() || prefersReducedMotion) return;
                     leaveTimer = setTimeout(function () {
-                        /* Au lieu de revenir au repos, revenir a la carte par defaut */
                         activeIndex = DEFAULT_ACTIVE;
-                        applyLayout(container, cards, layouts, 'active', activeIndex);
+                        applyLayoutDeferred(container, cards, layouts, 'active', activeIndex);
                         for (var k = 0; k < cards.length; k++) {
                             cards[k].classList.toggle('masonry__card--active', k === activeIndex);
                         }
@@ -263,7 +303,7 @@
             })(j);
         }
 
-        /* Resize : recalculer ou reset */
+        /* Resize : recalculer (pas besoin de deferrer, pas d'animation) */
         var resizeTimer;
         window.addEventListener('resize', function () {
             clearTimeout(resizeTimer);
@@ -271,7 +311,6 @@
                 if (isMobile()) {
                     resetToFlow(container, cards);
                 } else {
-                    /* Toujours en mode actif (carte par defaut ou survolee) */
                     applyLayout(container, cards, layouts, 'active', activeIndex);
                 }
             }, 200);

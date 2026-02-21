@@ -67,26 +67,23 @@ $pageDescription = t('site.description');
             <p class="resolution__subtitle"><?= e(t('home.resolution_subtitle')) ?></p>
         </div>
 
-        <div class="resolution__services">
+        <div class="masonry" id="services-masonry">
             <?php
             $services = [
-                ['num' => '01', 'key' => 's1', 'icon' => '&#x1F4A1;', 'class' => '1'],
-                ['num' => '02', 'key' => 's2', 'icon' => '&#x1F91D;', 'class' => '2'],
-                ['num' => '03', 'key' => 's3', 'icon' => '&#x2699;',  'class' => '3'],
-                ['num' => '04', 'key' => 's4', 'icon' => '&#x1F680;', 'class' => '4'],
-                ['num' => '05', 'key' => 's5', 'icon' => '&#x1F331;', 'class' => '5'],
+                ['key' => 's1', 'icon' => '&#x1F4A1;', 'class' => '1'],
+                ['key' => 's2', 'icon' => '&#x1F91D;', 'class' => '2'],
+                ['key' => 's3', 'icon' => '&#x2699;',  'class' => '3'],
+                ['key' => 's4', 'icon' => '&#x1F680;', 'class' => '4'],
+                ['key' => 's5', 'icon' => '&#x1F331;', 'class' => '5'],
             ];
             foreach ($services as $i => $s):
             ?>
-            <div class="service-card tilt-card reveal reveal-up reveal-delay-<?= $i + 1 ?>">
-                <div class="tilt-card__inner">
-                    <span class="service-card__number"><?= $s['num'] ?></span>
-                    <div class="service-card__icon service-card__icon--<?= $s['class'] ?>" aria-hidden="true">
-                        <?= $s['icon'] ?>
-                    </div>
-                    <h3 class="service-card__title"><?= e(t('services.' . $s['key'] . '_title')) ?></h3>
-                    <p class="service-card__text"><?= e(t('services.' . $s['key'] . '_short')) ?></p>
+            <div class="masonry__card service-card reveal reveal-up reveal-delay-<?= $i + 1 ?>">
+                <div class="service-card__icon service-card__icon--<?= $s['class'] ?>" aria-hidden="true">
+                    <?= $s['icon'] ?>
                 </div>
+                <h3 class="service-card__title"><?= e(t('services.' . $s['key'] . '_title')) ?></h3>
+                <p class="service-card__text"><?= e(t('services.' . $s['key'] . '_short')) ?></p>
             </div>
             <?php endforeach; ?>
         </div>

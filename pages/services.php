@@ -22,29 +22,28 @@ $pageDescription = t('services.page_subtitle');
 </section>
 
 <!-- ==========================================
-     ESCALIER DE PROGRESSION
+     MOSAIQUE DE SERVICES
      ========================================== -->
 <section class="section services-progression">
     <div class="container">
-        <p class="services-progression__label reveal reveal-up"><?= e(t('services.progression_label')) ?> &rarr;</p>
+        <p class="services-progression__label reveal reveal-up"><?= e(t('services.progression_label')) ?></p>
 
-        <div class="services-staircase reveal reveal-up">
+        <div class="masonry masonry--nav reveal reveal-up" id="services-masonry-nav">
             <?php
             $services = [
-                ['num' => '01', 'key' => 's1', 'icon' => '&#x1F4A1;', 'class' => '1'],
-                ['num' => '02', 'key' => 's2', 'icon' => '&#x1F91D;', 'class' => '2'],
-                ['num' => '03', 'key' => 's3', 'icon' => '&#x2699;',  'class' => '3'],
-                ['num' => '04', 'key' => 's4', 'icon' => '&#x1F680;', 'class' => '4'],
-                ['num' => '05', 'key' => 's5', 'icon' => '&#x1F331;', 'class' => '5'],
+                ['key' => 's1', 'icon' => '&#x1F4A1;', 'class' => '1'],
+                ['key' => 's2', 'icon' => '&#x1F91D;', 'class' => '2'],
+                ['key' => 's3', 'icon' => '&#x2699;',  'class' => '3'],
+                ['key' => 's4', 'icon' => '&#x1F680;', 'class' => '4'],
+                ['key' => 's5', 'icon' => '&#x1F331;', 'class' => '5'],
             ];
             foreach ($services as $i => $s):
             ?>
-            <a href="#service-<?= $i + 1 ?>" class="services-staircase__step services-staircase__step--<?= $i + 1 ?>">
+            <a href="#service-<?= $i + 1 ?>" class="masonry__card masonry__card--nav">
                 <div class="service-card__icon service-card__icon--<?= $s['class'] ?>" aria-hidden="true">
                     <?= $s['icon'] ?>
                 </div>
-                <span class="services-staircase__num"><?= $s['num'] ?></span>
-                <span class="services-staircase__title"><?= e(t('services.' . $s['key'] . '_title')) ?></span>
+                <span class="masonry__card-title"><?= e(t('services.' . $s['key'] . '_title')) ?></span>
             </a>
             <?php endforeach; ?>
         </div>
@@ -53,7 +52,6 @@ $pageDescription = t('services.page_subtitle');
         <div class="services-list-mobile reveal reveal-up">
             <?php foreach ($services as $i => $s): ?>
             <a href="#service-<?= $i + 1 ?>" class="services-list-mobile__item">
-                <span class="services-list-mobile__num"><?= $s['num'] ?></span>
                 <span class="services-list-mobile__title"><?= e(t('services.' . $s['key'] . '_title')) ?></span>
             </a>
             <?php endforeach; ?>
@@ -72,7 +70,6 @@ $pageDescription = t('services.page_subtitle');
                 <?= $s['icon'] ?>
             </div>
             <div class="service-detail__title-group">
-                <span class="service-detail__num"><?= $s['num'] ?></span>
                 <h2 class="service-detail__title"><?= e(t('services.' . $s['key'] . '_title')) ?></h2>
                 <?php if ($s['key'] === 's4' || $s['key'] === 's5'): ?>
                 <span class="badge badge--<?= $s['key'] === 's4' ? 'secondary' : 'tertiary' ?>">

@@ -34,16 +34,22 @@
     margin-bottom: var(--sp-xl);
 }
 
-/* --- Staircase (desktop) --- */
-.services-staircase {
-    display: flex;
-    align-items: flex-end;
-    justify-content: center;
+/* --- Masonry Navigation (services page) --- */
+.masonry--nav {
+    display: grid;
+    grid-template-columns: repeat(10, 1fr);
+    grid-template-rows: auto auto;
     gap: var(--sp-lg);
-    min-height: 200px;
+    min-height: 180px;
 }
 
-.services-staircase__step {
+.masonry--nav .masonry__card:nth-child(1) { grid-column: 1 / 4; }
+.masonry--nav .masonry__card:nth-child(2) { grid-column: 4 / 8; }
+.masonry--nav .masonry__card:nth-child(3) { grid-column: 8 / 11; }
+.masonry--nav .masonry__card:nth-child(4) { grid-column: 2 / 6; }
+.masonry--nav .masonry__card:nth-child(5) { grid-column: 6 / 10; }
+
+.masonry__card--nav {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -54,33 +60,34 @@
     background: var(--c-white);
     border-radius: var(--radius-md);
     border: 1px solid transparent;
-    transition: all var(--transition-normal);
+    transition: transform var(--transition-spring),
+                opacity var(--transition-normal),
+                box-shadow var(--transition-normal),
+                border-color var(--transition-fast);
     cursor: pointer;
-    flex: 1;
-    max-width: 180px;
+    position: relative;
+    z-index: 1;
+    transform-origin: center center;
 }
 
-.services-staircase__step:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
+.masonry__card--nav:hover {
     border-color: var(--c-primary-light);
 }
 
-/* Progressive height — ascending steps */
-.services-staircase__step--1 { padding-top: 20px; }
-.services-staircase__step--2 { padding-top: 40px; }
-.services-staircase__step--3 { padding-top: 60px; }
-.services-staircase__step--4 { padding-top: 80px; }
-.services-staircase__step--5 { padding-top: 100px; }
-
-.services-staircase__num {
-    font-family: var(--ff-mono);
-    font-size: var(--fs-xs);
-    color: var(--c-muted);
-    letter-spacing: var(--ls-wider);
+/* Hover expansion pour masonry-nav */
+.masonry--nav.masonry--has-active .masonry__card--active {
+    transform: scale(1.12);
+    z-index: 10;
+    box-shadow: var(--shadow-xl);
+    border-color: var(--c-primary-light);
 }
 
-.services-staircase__title {
+.masonry--nav.masonry--has-active .masonry__card:not(.masonry__card--active) {
+    transform: scale(0.95);
+    opacity: 0.75;
+}
+
+.masonry__card-title {
     font-family: var(--ff-display);
     font-size: var(--fs-small);
     font-weight: var(--fw-semibold);
@@ -112,14 +119,7 @@
     box-shadow: var(--shadow-sm);
 }
 
-.services-list-mobile__num {
-    font-family: var(--ff-mono);
-    font-size: var(--fs-xs);
-    color: var(--c-muted);
-    letter-spacing: var(--ls-wider);
-    flex-shrink: 0;
-    width: 32px;
-}
+/* (Service list numbers removed — no hierarchy) */
 
 .services-list-mobile__title {
     font-family: var(--ff-display);
@@ -146,12 +146,7 @@
     flex-wrap: wrap;
 }
 
-.service-detail__num {
-    font-family: var(--ff-mono);
-    font-size: var(--fs-xs);
-    color: var(--c-muted);
-    letter-spacing: var(--ls-wider);
-}
+/* (Service detail numbers removed — no hierarchy) */
 
 .service-detail__title {
     font-family: var(--ff-display);
@@ -230,8 +225,8 @@
 
 /* --- Responsive --- */
 @media (max-width: 767px) {
-    /* Hide staircase, show mobile list */
-    .services-staircase {
+    /* Hide masonry-nav, show mobile list */
+    .masonry--nav {
         display: none;
     }
 
@@ -268,22 +263,26 @@
 }
 
 @media (min-width: 768px) and (max-width: 1023px) {
-    /* Staircase → smaller steps */
-    .services-staircase {
+    /* Masonry-nav → 6 colonnes tablet */
+    .masonry--nav {
+        grid-template-columns: repeat(6, 1fr);
         gap: var(--sp-md);
     }
 
-    .services-staircase__step {
-        max-width: 150px;
-        padding-left: var(--sp-sm);
-        padding-right: var(--sp-sm);
+    .masonry--nav .masonry__card:nth-child(1) { grid-column: 1 / 3; }
+    .masonry--nav .masonry__card:nth-child(2) { grid-column: 3 / 5; }
+    .masonry--nav .masonry__card:nth-child(3) { grid-column: 5 / 7; }
+    .masonry--nav .masonry__card:nth-child(4) { grid-column: 1 / 4; }
+    .masonry--nav .masonry__card:nth-child(5) { grid-column: 4 / 7; }
+
+    .masonry--nav.masonry--has-active .masonry__card--active {
+        transform: scale(1.08);
     }
 
-    .services-staircase__step--1 { padding-top: 16px; }
-    .services-staircase__step--2 { padding-top: 32px; }
-    .services-staircase__step--3 { padding-top: 48px; }
-    .services-staircase__step--4 { padding-top: 64px; }
-    .services-staircase__step--5 { padding-top: 80px; }
+    .masonry--nav.masonry--has-active .masonry__card:not(.masonry__card--active) {
+        transform: scale(0.97);
+        opacity: 0.8;
+    }
 
     /* Detail grid → single column centered */
     .service-detail__grid {

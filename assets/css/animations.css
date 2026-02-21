@@ -10,8 +10,8 @@
 }
 
 .reveal.is-visible {
-    opacity: 1;
-    transform: none !important;
+    opacity: 1 !important;
+    transform: none;
 }
 
 .reveal-fade {
@@ -271,5 +271,22 @@
 
     [data-parallax] {
         transform: none !important;
+    }
+
+    /* Masonry hover : pas de scale, juste bordure */
+    .masonry__card,
+    .masonry__card--nav {
+        transition: none;
+    }
+
+    .masonry--has-active .masonry__card--active {
+        transform: none;
+        box-shadow: var(--shadow-lg);
+        border-color: var(--c-primary-light);
+    }
+
+    .masonry--has-active .masonry__card:not(.masonry__card--active) {
+        transform: none;
+        opacity: 1;
     }
 }

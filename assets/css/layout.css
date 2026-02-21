@@ -93,25 +93,6 @@
     box-shadow: none;
 }
 
-/* Quand menu ouvert : nav links toujours blancs (meme si is-scrolled) */
-.site-header.nav-is-open .nav__link {
-    color: rgba(255, 255, 255, 0.8);
-}
-
-.site-header.nav-is-open .nav__link:hover,
-.site-header.nav-is-open .nav__link--active {
-    color: var(--c-white);
-}
-
-/* Quand menu ouvert : logo et burger toujours blancs */
-.site-header.nav-is-open .logo__text {
-    color: var(--c-white);
-}
-
-.site-header.nav-is-open .burger__line {
-    background-color: var(--c-white);
-}
-
 .site-header.is-scrolled,
 .site-header.header--light {
     background-color: rgba(248, 247, 244, 0.95);
@@ -212,6 +193,42 @@
 .site-header.is-scrolled .nav__link::after,
 .site-header.header--light .nav__link::after {
     background-color: var(--c-primary);
+}
+
+/* Quand menu ouvert : forcer les couleurs blanches meme si is-scrolled/header--light
+   IMPORTANT : ces regles DOIVENT etre APRES les regles is-scrolled ci-dessus
+   pour gagner a specificite egale (cascade CSS) */
+.site-header.nav-is-open .nav__link,
+.site-header.nav-is-open.is-scrolled .nav__link,
+.site-header.nav-is-open.header--light .nav__link {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.site-header.nav-is-open .nav__link:hover,
+.site-header.nav-is-open .nav__link--active,
+.site-header.nav-is-open.is-scrolled .nav__link:hover,
+.site-header.nav-is-open.is-scrolled .nav__link--active,
+.site-header.nav-is-open.header--light .nav__link:hover,
+.site-header.nav-is-open.header--light .nav__link--active {
+    color: var(--c-white);
+}
+
+.site-header.nav-is-open .nav__link::after,
+.site-header.nav-is-open.is-scrolled .nav__link::after,
+.site-header.nav-is-open.header--light .nav__link::after {
+    background-color: var(--c-white);
+}
+
+.site-header.nav-is-open .logo__text,
+.site-header.nav-is-open.is-scrolled .logo__text,
+.site-header.nav-is-open.header--light .logo__text {
+    color: var(--c-white);
+}
+
+.site-header.nav-is-open .burger__line,
+.site-header.nav-is-open.is-scrolled .burger__line,
+.site-header.nav-is-open.header--light .burger__line {
+    background-color: var(--c-white);
 }
 
 /* Header actions */

@@ -87,6 +87,35 @@
         }, 5000);
     });
 
+    // --- User menu dropdown ---
+    const userMenuTrigger = document.getElementById('user-menu-trigger');
+    const userMenuDropdown = document.getElementById('user-menu-dropdown');
+
+    if (userMenuTrigger && userMenuDropdown) {
+        userMenuTrigger.addEventListener('click', function (e) {
+            e.stopPropagation();
+            const isOpen = userMenuDropdown.classList.toggle('is-open');
+            userMenuTrigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        });
+
+        // Click dehors → fermer
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('#user-menu')) {
+                userMenuDropdown.classList.remove('is-open');
+                userMenuTrigger.setAttribute('aria-expanded', 'false');
+            }
+        });
+
+        // Echap → fermer
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && userMenuDropdown.classList.contains('is-open')) {
+                userMenuDropdown.classList.remove('is-open');
+                userMenuTrigger.setAttribute('aria-expanded', 'false');
+                userMenuTrigger.focus();
+            }
+        });
+    }
+
     // --- Smooth scroll for anchor links ---
     document.querySelectorAll('a[href^="#"]').forEach(function (anchor) {
         anchor.addEventListener('click', function (e) {

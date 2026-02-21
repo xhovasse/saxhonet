@@ -50,13 +50,27 @@
 
             <!-- Auth -->
             <?php if (is_logged_in()): ?>
-            <div class="header__user">
-                <span class="header__username"><?= e($_SESSION['user_name'] ?? '') ?></span>
-                <a href="<?= SITE_URL ?>/profile" class="btn btn--sm btn--outline"><?= e(t('nav.profile')) ?></a>
-                <form action="<?= SITE_URL ?>/api/auth/logout" method="POST" class="header__logout-form">
-                    <?= csrf_field() ?>
-                    <button type="submit" class="btn btn--sm btn--ghost"><?= e(t('nav.logout')) ?></button>
-                </form>
+            <div class="user-menu" id="user-menu">
+                <button class="user-menu__trigger" id="user-menu-trigger" aria-expanded="false" aria-haspopup="true" aria-label="<?= e(t('nav.profile')) ?>">
+                    <span class="user-menu__avatar"><?= strtoupper(mb_substr($_SESSION['user_name'] ?? '?', 0, 1)) ?></span>
+                </button>
+                <div class="user-menu__dropdown" id="user-menu-dropdown">
+                    <div class="user-menu__info">
+                        <span class="user-menu__name"><?= e($_SESSION['user_name'] ?? '') ?></span>
+                        <span class="user-menu__email"><?= e($_SESSION['user_email'] ?? '') ?></span>
+                    </div>
+                    <hr class="user-menu__sep">
+                    <a href="<?= SITE_URL ?>/profile" class="user-menu__item">
+                        <?= e(t('nav.profile')) ?>
+                    </a>
+                    <hr class="user-menu__sep">
+                    <form action="<?= SITE_URL ?>/api/auth/logout" method="POST">
+                        <?= csrf_field() ?>
+                        <button type="submit" class="user-menu__item user-menu__item--danger">
+                            <?= e(t('nav.logout')) ?>
+                        </button>
+                    </form>
+                </div>
             </div>
             <?php else: ?>
             <div class="header__auth-buttons">

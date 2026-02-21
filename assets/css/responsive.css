@@ -73,7 +73,7 @@
 
     /* Cacher lang/auth dans header__actions sur mobile */
     .lang-switcher,
-    .header__user,
+    .user-menu,
     .header__auth-buttons {
         display: none;
     }
@@ -113,15 +113,29 @@
         gap: var(--sp-sm);
     }
 
-    .header__nav.is-open ~ .header__actions .header__user {
+    /* User menu : afficher avatar + dropdown inline dans l'overlay mobile */
+    .header__nav.is-open ~ .header__actions .user-menu {
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: var(--sp-sm);
     }
 
-    .header__nav.is-open ~ .header__actions .header__username {
-        color: rgba(255, 255, 255, 0.7);
+    /* Sur mobile overlay, le dropdown est toujours visible (pas de toggle) */
+    .header__nav.is-open ~ .header__actions .user-menu__dropdown {
+        display: block;
+        position: static;
+        min-width: 0;
+        width: 220px;
+        animation: none;
+    }
+
+    .header__nav.is-open ~ .header__actions .user-menu__trigger {
+        border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .header__nav.is-open ~ .header__actions .user-menu__name {
+        color: var(--c-dark);
     }
 
     /* Burger en haut a droite au-dessus de l'overlay */
@@ -342,7 +356,7 @@
 
     /* Cacher lang/auth par defaut sur tablet */
     .lang-switcher,
-    .header__user,
+    .user-menu,
     .header__auth-buttons {
         display: none;
     }
@@ -382,15 +396,24 @@
         gap: var(--sp-sm);
     }
 
-    .header__nav.is-open ~ .header__actions .header__user {
+    /* User menu : avatar + dropdown inline dans l'overlay tablet */
+    .header__nav.is-open ~ .header__actions .user-menu {
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: var(--sp-sm);
     }
 
-    .header__nav.is-open ~ .header__actions .header__username {
-        color: rgba(255, 255, 255, 0.7);
+    .header__nav.is-open ~ .header__actions .user-menu__dropdown {
+        display: block;
+        position: static;
+        min-width: 0;
+        width: 220px;
+        animation: none;
+    }
+
+    .header__nav.is-open ~ .header__actions .user-menu__trigger {
+        border-color: rgba(255, 255, 255, 0.4);
     }
 
     .header__burger {

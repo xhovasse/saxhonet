@@ -44,7 +44,7 @@ Sans cache busting, les modifications CSS/JS ne sont pas visibles apres deploiem
 2. Incrementer la version dans `index.php` (5 occurrences de `?v=`)
 3. Commit + deploy
 
-**Version actuelle** : `?v=1.3`
+**Version actuelle** : `?v=1.8`
 
 **Astuce** : Rechercher `?v=1.` dans les deux fichiers pour trouver toutes les occurrences.
 
@@ -86,6 +86,78 @@ font-family: 'Outfit', var(--ff-display);
 4. Le site est mis a jour
 
 **Pas de CI/CD automatique** — le deploy est manuel via le bouton Hostinger.
+
+### 1.6 config.php — PAS deploye via git
+
+**Probleme critique** : `_app/includes/config.php` est dans `.gitignore` (contient les secrets).
+Il existe **deux versions independantes** :
+
+- **Locale** (dev) : dans le dossier Dropbox, avec les secrets de dev
+- **Serveur** (prod) : sur Hostinger, avec les secrets de production
+
+**Consequence** : Toute modification de config.php (nouvelles constantes, changements de valeurs)
+doit etre faite **a la main** sur le serveur via :
+- Hostinger File Manager (hPanel → Files → File Manager)
+- Chemin serveur : `/home/u473667317/domains/saxho.net/public_html/_app/includes/config.php`
+
+**Piege vecu** : SMTP ne marchait pas en production parce que le `config.php` serveur avait
+`USE_SMTP=false`, `SMTP_HOST` vide, `SMTP_PASS` vide — alors que la version locale etait correcte.
+
+**Bonne pratique** : Quand on ajoute une nouvelle constante dans config.php :
+1. L'ajouter dans le config local
+2. L'ajouter aussi dans `config.example.php` (template sans secrets)
+3. **Rappeler** qu'il faut l'ajouter manuellement sur le serveur
+
+### 1.7 Z-index stacking contexts — menu mobile
+
+**Probleme** : Un element enfant avec `position: fixed` a l'interieur d'un parent avec
+`position: fixed` + `z-index` cree un **stacking context**. L'enfant ne peut pas depasser
+le z-index du parent, meme avec `z-index: 999999`.
+
+**Cas concret** : Le menu hamburger mobile (`.header__nav`) est enfant de `.site-header`
+(z-index: 100). L'overlay du menu ne pouvait pas couvrir le contenu de la page.
+
+**Solution** : Ajouter une classe JS `nav-is-open` sur le parent `.site-header` qui
+eleve son z-index a 200 (var `--z-overlay`). Les enfants utilisent des z-index relatifs :
+- Nav overlay : z-index 1
+- Actions (lang/auth) : z-index 2
+- Burger : z-index 3
+
+**Fichiers concernes** : `layout.css`, `responsive.css`, `app.js`
+
+### 1.8 SMTP — implementation et diagnostic
+
+**Implementation** : `send_email_smtp()` dans `functions.php` utilise des raw sockets
+(`stream_socket_client()`) — pas de dependance PHPMailer/SwiftMailer.
+
+**Config SMTP Hostinger** :
+- Host : `smtp.hostinger.com`
+- Port : `465` (SSL direct, PAS 587/STARTTLS)
+- User : `contact@mail.saxho.net`
+- From : `contact@mail.saxho.net`
+- Destinataire admin : `contact@saxho.net` (compte email distinct)
+- Domaine email Hostinger : `mail.saxho.net`
+
+**Logging** : `app_log()` ecrit dans `_app/logs/smtp.log` (pas dans les logs systeme).
+Chaque etape SMTP est loguee : connexion, banner, EHLO, AUTH, MAIL FROM, RCPT TO, DATA, resultat.
+
+**CSRF et formulaire contact** : `csrf_verify()` detruit le token. Toutes les reponses API
+(succes ET erreur) doivent retourner un nouveau token via `csrf_token()`. Le JS met a jour
+le champ CSRF apres chaque soumission.
+
+### 1.9 SSH depuis macOS
+
+**Probleme** : La commande `ssh` n'est pas dans le PATH par defaut du Terminal sur certains Mac.
+
+**Solution** : Utiliser le chemin complet `/usr/bin/ssh`.
+
+**Connexion Hostinger** :
+```bash
+/usr/bin/ssh -p 65002 u473667317@191.96.63.86
+```
+
+**Alternative** : Creer des endpoints web securises par token pour diagnostiquer a distance
+(ce qu'on a fait pour le SMTP). Toujours supprimer ces endpoints apres usage.
 
 ---
 
@@ -177,7 +249,20 @@ Les PNGs restent dans `assets/img/` pour usage print/reseaux sociaux.
 - **Crackle** : Fonction `launchEdgeCrackle()` dans `neural.js` — declenchee au hover des cartes `.paradox__card`, envoie des pulses sur les noeuds du bas du canvas
 - **Performance** : Canvas redimensionne au resize, animation stoppee si pas visible (IntersectionObserver)
 
-### 3.3 Stagger reveal
+### 3.3 Animation de fond — Flow field (vagues)
+
+**Fichier** : `assets/js/flow-field.js` (charge sur la page Services)
+
+**Couleurs** : 2 couleurs alternees (bleu profond + rose berry). On avait teste 3 couleurs
+(ajout bleu clair #3A7DFF) mais la 3e couleur etait invisible sur fond clair → supprimee.
+
+**Opacites** : `waveBaseOpacity: 0.20`, `ambientBaseOpacity: 0.12` — augmentees depuis les
+valeurs initiales pour meilleure visibilite.
+
+**Principe** : Les vagues n'utilisent PAS l'opacite CSS (qui s'applique sur tout le canvas).
+L'opacite est controlee entierement en JS via `fillStyle` avec rgba.
+
+### 3.4 Stagger reveal
 
 - Delays : 200ms / 450ms / 700ms / 950ms / 1200ms (classes `.reveal-delay-1` a `.reveal-delay-5`)
 - L'ecart de ~250ms entre chaque element rend l'arrivee progressive bien perceptible
@@ -234,3 +319,8 @@ Toutes en woff2, self-hosted dans `assets/fonts/` :
 | `assets/css/responsive.css` | Media queries globales | Quand on ajuste le responsive (attention cascade!) |
 | `_app/lang/fr.json` | Traductions FR | Quand on ajoute du contenu textuel |
 | `_app/lang/en.json` | Traductions EN | Idem en anglais |
+| `_app/includes/functions.php` | CSRF, email SMTP, flash, slugify, app_log | Quand on ajoute des helpers |
+| `api/contact.php` | Endpoint formulaire contact (JSON) | Quand on modifie le traitement contact |
+| `assets/js/flow-field.js` | Animation vagues (services) | Quand on ajuste les vagues |
+| `assets/js/contact-form.js` | Validation + AJAX contact | Quand on modifie le formulaire |
+| `_app/logs/smtp.log` | Log SMTP (gitignore) | Consultable pour debug email |

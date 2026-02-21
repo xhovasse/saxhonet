@@ -74,8 +74,8 @@ Accompagnement pour installer un flux d'innovation continue, integre au fonction
 - **Portfolio a double affichage** : mode floute (visiteur) / mode complet (membre connecte) — inspiration LinkedIn Premium
 - **Expression d'interet** : "Contribuer en competences" ou "Contribuer en investissement" sur chaque projet, avec formulaire pre-rempli → declenche un processus NDA hors plateforme
 - **Back-office (CMS maison)** : administration du contenu, projets, utilisateurs, demandes
-- **Formulaire de contact** : envoi d'email + stockage en base de donnees
-- **Blog** : systeme de publication d'articles avec categories
+- **Formulaire de contact** : envoi d'email SMTP + stockage en base de donnees + CSRF auto-refresh
+- **Blog** : systeme de publication d'articles avec categories, commentaires, partage
 - **Multilingue** : francais + anglais (+ autres langues possibles)
 - **Responsive** : adapte mobile, tablette, desktop
 
@@ -92,6 +92,23 @@ Accompagnement pour installer un flux d'innovation continue, integre au fonction
 | **Deploiement** | `git push` vers GitHub → bouton "Deploy" sur le panel Hostinger |
 | **Gestion des langues** | Systeme i18n maison (fichiers JSON, fonction `t()`) |
 | **Document root** | La racine du projet = document root (pas de dossier `public/`) |
+
+---
+
+## Email & SMTP
+
+| Parametre | Valeur |
+|-----------|--------|
+| **SMTP Host** | `smtp.hostinger.com` |
+| **SMTP Port** | `465` (SSL direct) |
+| **SMTP User** | `contact@mail.saxho.net` |
+| **SMTP From** | `contact@mail.saxho.net` |
+| **Admin email** (destinataire) | `contact@saxho.net` |
+| **Domaine email Hostinger** | `mail.saxho.net` |
+
+**Note** : `contact@mail.saxho.net` et `contact@saxho.net` sont **deux comptes email distincts** sur Hostinger.
+
+**Implementation** : Raw sockets PHP (`stream_socket_client()`) dans `functions.php`, pas de dependance externe. Logging detaille dans `_app/logs/smtp.log` via `app_log()`.
 
 ---
 
@@ -153,22 +170,36 @@ Saxho.net/                              <- Document root (= racine publique Host
 |-- _app/                               <- Backend prive (bloque par .htaccess)
 |   |-- .htaccess                       <- "Deny from all"
 |   |-- includes/
-|   |   |-- config.php                  <- Constantes : DB, SITE_URL, session, MFA, email
+|   |   |-- config.php                  <- Constantes : DB, SITE_URL, session, MFA, SMTP (gitignore)
 |   |   |-- config.example.php          <- Template config (sans secrets)
 |   |   |-- db.php                      <- Connexion PDO
 |   |   |-- auth.php                    <- Helpers authentification
 |   |   |-- i18n.php                    <- Detection langue + chargement traductions
-|   |   |-- functions.php               <- CSRF, flash messages, email, slugify...
+|   |   |-- functions.php               <- CSRF, flash, email SMTP, slugify, app_log...
 |   |   +-- router.php                  <- Definition des routes + resolution URL
-|   +-- lang/
-|       |-- fr.json                     <- Traductions francaises
-|       +-- en.json                     <- Traductions anglaises
+|   |-- lang/
+|   |   |-- fr.json                     <- Traductions francaises
+|   |   +-- en.json                     <- Traductions anglaises
+|   |-- logs/
+|   |   |-- .htaccess                   <- "Deny from all"
+|   |   +-- .gitkeep                    <- Garde le dossier dans git (logs gitignore)
+|   +-- test-smtp.php                   <- Script test SMTP (CLI via SSH)
 |
 |-- pages/                              <- Vues de pages (incluses par index.php)
 |   |-- home.php                        <- Homepage
 |   |-- about.php                       <- A propos
 |   |-- services.php                    <- Services (escalier 5 niveaux)
 |   |-- contact.php                     <- Contact (formulaire + sidebar)
+|   |-- blog.php                        <- Liste articles blog
+|   |-- article.php                     <- Article individuel + commentaires
+|   |-- login.php                       <- Connexion
+|   |-- register.php                    <- Inscription
+|   |-- verify-email.php                <- Verification email
+|   |-- forgot-password.php             <- Mot de passe oublie
+|   |-- reset-password.php              <- Reinitialisation mot de passe
+|   |-- mfa-setup.php                   <- Configuration MFA/TOTP
+|   |-- mfa-verify.php                  <- Verification MFA
+|   |-- profile.php                     <- Profil utilisateur
 |   +-- 404.php                         <- Page erreur
 |
 |-- templates/                          <- Partials de layout
@@ -177,7 +208,16 @@ Saxho.net/                              <- Document root (= racine publique Host
 |   +-- footer.php                      <- Footer 4 colonnes
 |
 |-- api/                                <- Endpoints JSON (sans layout)
-|   +-- contact.php                     <- Traitement formulaire contact
+|   |-- contact.php                     <- Traitement formulaire contact (SMTP + DB)
+|   +-- auth/                           <- Endpoints authentification
+|       |-- register.php                <- Inscription
+|       |-- login.php                   <- Connexion
+|       |-- logout.php                  <- Deconnexion
+|       |-- verify-email.php            <- Verification email
+|       |-- forgot-password.php         <- Demande reset password
+|       |-- reset-password.php          <- Reset password
+|       |-- mfa-setup.php              <- Configuration MFA
+|       +-- mfa-verify.php             <- Verification MFA
 |
 |-- assets/
 |   |-- css/
@@ -190,13 +230,18 @@ Saxho.net/                              <- Document root (= racine publique Host
 |   |   |-- home.css                    <- Styles homepage (+ responsive overrides)
 |   |   |-- about.css                   <- Styles a propos
 |   |   |-- services.css                <- Styles services
-|   |   +-- contact.css                 <- Styles contact
+|   |   |-- contact.css                 <- Styles contact
+|   |   |-- blog.css                    <- Styles blog (liste + article)
+|   |   |-- auth.css                    <- Styles auth (login, register, etc.)
+|   |   +-- admin.css                   <- Styles back-office admin
 |   |-- js/
-|   |   |-- app.js                      <- Core JS (header scroll, burger menu)
+|   |   |-- app.js                      <- Core JS (header scroll, burger menu, nav-is-open)
 |   |   |-- animations.js               <- IntersectionObserver reveal (toutes pages)
 |   |   |-- typed.js                    <- Effet typing hero (home seulement)
 |   |   |-- neural.js                   <- Canvas neural interactif (home seulement)
-|   |   +-- contact-form.js             <- Validation + soumission AJAX (contact)
+|   |   |-- flow-field.js               <- Animation vagues (services)
+|   |   |-- contact-form.js             <- Validation + soumission AJAX + CSRF refresh
+|   |   +-- admin-blog.js               <- JS back-office blog
 |   |-- fonts/
 |   |   |-- SpaceGrotesk-Variable.woff2
 |   |   |-- Inter-Variable.woff2
@@ -206,6 +251,10 @@ Saxho.net/                              <- Document root (= racine publique Host
 |       |-- logo-noir.png               <- Logo ampoule fond clair (print/social)
 |       |-- logo-blanc.png              <- Logo ampoule fond sombre (print/social)
 |       +-- uploads/
+|
+|-- admin/                              <- Back-office (protege par auth admin)
+|   |-- index.php                       <- Dashboard admin
+|   +-- blog.php                        <- Gestion articles blog (CRUD)
 |
 |-- specs/                              <- Specifications
 |   |-- pages.md                        <- Specs detaillees des pages
@@ -228,7 +277,7 @@ Saxho.net/                              <- Document root (= racine publique Host
 - **Code propre** : PHP 8+, BEM pour CSS, IIFE + var pour JS, separation logique/presentation
 - **Responsive** : mobile-first. Breakpoints : 480px / 768px / 1024px / 1440px
 - **Git** : commits clairs, branches par fonctionnalite
-- **Cache busting** : `?v=X.Y` sur tous les CSS/JS. Incrementer apres chaque modification.
+- **Cache busting** : `?v=X.Y` sur tous les CSS/JS. Version actuelle : `?v=1.8`. Incrementer apres chaque modification.
 
 > **IMPORTANT** : Voir `specs/dev-notes.md` pour les pieges connus, conventions detaillees et lecons apprises.
 
@@ -259,6 +308,7 @@ Saxho.net/                              <- Document root (= racine publique Host
 - [x] Page Services (`services.php` + `services.css`) — escalier + details
 - [x] Page Contact (`contact.php` + `contact.css`) — formulaire + sidebar
 - [x] Page 404
+- [x] Animation flow field (vagues) sur Services (`flow-field.js`)
 
 ### Phase 3 — Portfolio _(a faire)_
 - [ ] Page liste portfolio (`portfolio.php` + `portfolio.css`)
@@ -266,27 +316,45 @@ Saxho.net/                              <- Document root (= racine publique Host
 - [ ] Mode floute visiteur / complet membre
 - [ ] Expression d'interet (competences / investissement)
 
-### Phase 4 — Blog _(a faire)_
-- [ ] Page liste articles
-- [ ] Page article individuel
-- [ ] Systeme de categories
+### Phase 4 — Blog
+- [x] Page liste articles (`blog.php` + `blog.css`)
+- [x] Page article individuel (`article.php`)
+- [x] Systeme de categories avec illustrations
+- [x] Commentaires sur articles
+- [x] Boutons de partage social
+- [x] Enrichissement visuel (category cards, hovers, typographie)
 
-### Phase 5 — Auth front-end _(a faire)_
-- [ ] Login, register, verify-email
-- [ ] Forgot/reset password
-- [ ] MFA setup/verify
-- [ ] Page profil
+### Phase 5 — Auth front-end
+- [x] Login (`login.php` + `auth.css`)
+- [x] Register (`register.php`) avec validation
+- [x] Verify-email
+- [x] Forgot/reset password
+- [x] MFA setup/verify (TOTP)
+- [x] Page profil
 
-### Phase 6 — Back-office admin _(a faire)_
-- [ ] Dashboard admin
-- [ ] Gestion projets, articles, utilisateurs, demandes
+### Phase 6 — Back-office admin _(en cours)_
+- [x] Dashboard admin (`admin/index.php` + `admin.css`)
+- [x] Gestion articles blog (`admin/blog.php` + `admin-blog.js`)
+- [ ] Gestion projets
+- [ ] Gestion utilisateurs
+- [ ] Gestion demandes
 
-### Phase 7 — API endpoints _(a faire)_
-- [ ] API auth (register, login, logout, verify, MFA)
+### Phase 7 — API endpoints
+- [x] API auth (register, login, logout, verify, MFA) — `api/auth/`
+- [x] API contact (formulaire) — `api/contact.php`
 - [ ] API interest (expression d'interet)
 - [ ] API profil
 
-### Phase 8 — Finalisation _(a faire)_
+### Phase 8 — Corrections & polish
+- [x] Fix animation vagues : 3 couleurs → 2 (bleu clair invisible sur fond clair)
+- [x] Fix menu hamburger mobile : z-index stacking context (`nav-is-open`)
+- [x] Fix email SMTP : implementation robuste avec logging detaille
+- [x] Fix SMTP config serveur : config.php prod avait valeurs vides
+- [x] Fix SMTP auth : mot de passe ajoute manuellement sur serveur
+- [x] CSRF token auto-refresh sur formulaire contact
+- [x] Systeme de logging applicatif (`app_log()` → `_app/logs/`)
+
+### Phase 9 — Finalisation _(a faire)_
 - [ ] SEO (meta, OG, sitemap, robots.txt)
 - [ ] Performance (minification, images, lazy load)
 - [ ] Tests cross-browser

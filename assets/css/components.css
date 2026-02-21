@@ -446,106 +446,47 @@
 .service-card--color-4 { background-color: #FFF5F2; }  /* orange-tinted */
 .service-card--color-5 { background-color: #FFFBEB; }  /* amber-tinted */
 
-/* --- Masonry collage (positionnement absolu, pilote par JS) --- */
-/* Metaphore : jeu de cartes en eventail. Les cartes se chevauchent
-   physiquement via z-index, un overlay gradient assombrit les cartes
-   a l'arriere-plan. Pas de blur — l'empilement suffit. */
+/* --- Masonry — grille de cartes egales avec hover highlight --- */
+/* 5 cartes de meme taille en grille. Au survol, la carte active
+   est mise en exergue, les autres s'estompent legerement. */
 .masonry {
-    position: relative;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: var(--sp-lg);
     margin-bottom: var(--sp-3xl);
-    /* height set dynamically by JS */
 }
 
 .masonry__card {
-    position: relative; /* pour le ::after overlay */
-    overflow: hidden;
     border-radius: var(--radius-md);
-    --depth-overlay: 0; /* pilote par JS : 0 = visible, 0.55 = assombri */
     transition:
-        left   800ms cubic-bezier(0.25, 1, 0.5, 1),
-        top    800ms cubic-bezier(0.25, 1, 0.5, 1),
-        width  800ms cubic-bezier(0.25, 1, 0.5, 1),
-        height 800ms cubic-bezier(0.25, 1, 0.5, 1),
-        transform 600ms cubic-bezier(0.25, 1, 0.5, 1),
-        box-shadow 400ms ease,
+        transform var(--transition-normal),
+        box-shadow var(--transition-normal),
+        opacity var(--transition-normal),
         border-color var(--transition-fast);
-    z-index: 1;
-    will-change: left, top, width, height, transform;
 }
 
-/* Overlay sombre pour les cartes en retrait — gradient directionnel
-   (transparent en haut, sombre en bas) pour un effet de recul/ombre.
-   Preserve les couleurs distinctes des cartes contrairement a brightness(). */
-.masonry__card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: linear-gradient(
-        180deg,
-        rgba(13, 13, 26, 0) 0%,
-        rgba(13, 13, 26, 0.6) 100%
-    );
-    opacity: var(--depth-overlay, 0);
-    transition: opacity 800ms cubic-bezier(0.25, 1, 0.5, 1);
-    pointer-events: none;
-    z-index: 1;
-}
-
-/* Le contenu des cartes doit rester AU-DESSUS de l'overlay */
-.masonry__card .service-card__icon,
-.masonry__card .service-card__title,
-.masonry__card .service-card__text {
-    position: relative;
-    z-index: 2;
-}
-
-/* Icone plus compacte dans le collage */
-.masonry__card .service-card__icon {
-    width: 48px;
-    height: 48px;
-    font-size: 1.25rem;
-    margin-bottom: var(--sp-sm);
-}
-
-.masonry__card--active .service-card__icon {
-    width: 56px;
-    height: 56px;
-    font-size: 1.4rem;
-}
-
-/* Description cachee au repos, visible quand active */
-.masonry__card .service-card__text {
-    opacity: 0;
-    max-height: 0;
-    overflow: hidden;
-    transition: opacity 600ms ease 200ms,
-                max-height 600ms ease;
-    margin-top: 0;
-}
-
-.masonry__card--active .service-card__text {
-    opacity: 1;
-    max-height: 200px;
-    margin-top: var(--sp-sm);
-}
-
-/* --- Empilement (z-index + overlay pilotes par JS) --- */
-/* Le JS gere z-index et --depth-overlay en inline.
-   Le CSS ne gere que box-shadow et border-color. */
-.masonry--has-active .masonry__card--active {
-    box-shadow: var(--shadow-xl);
-    border-color: var(--c-primary-light);
-}
-
-/* Override le hover translateY(-6px) de .service-card dans le contexte masonry */
+/* Override le hover translateY par defaut de .service-card */
 .masonry .service-card:hover {
-    transform: none;
-    box-shadow: none;
-    border-color: transparent;
+    transform: translateY(-8px);
+    box-shadow: var(--shadow-lg);
 }
 
-.masonry--has-active .masonry__card--active.service-card:hover {
+/* --- Hover highlight : carte active en exergue, les autres s'estompent --- */
+/* Quand le container a la classe --has-hover, les cartes non-actives fanent */
+.masonry--has-hover .masonry__card {
+    opacity: 0.45;
+    transform: scale(0.97);
+}
+
+.masonry--has-hover .masonry__card--active {
+    opacity: 1;
+    transform: translateY(-8px) scale(1.03);
     box-shadow: var(--shadow-xl);
     border-color: var(--c-primary-light);
+}
+
+/* Override .service-card:hover quand highlight actif */
+.masonry--has-hover .masonry__card.service-card:hover {
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: var(--shadow-xl);
 }

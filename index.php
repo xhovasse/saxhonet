@@ -95,19 +95,19 @@ $pageContent = ob_get_clean() ?: '';
 
     <?php include __DIR__ . '/templates/footer.php'; ?>
 
-    <script src="<?= SITE_URL ?>/assets/js/app.js?v=3.7"></script>
-    <script src="<?= SITE_URL ?>/assets/js/animations.js?v=3.7"></script>
-    <script src="<?= SITE_URL ?>/assets/js/masonry-hover.js?v=3.7"></script>
+    <script src="<?= SITE_URL ?>/assets/js/app.js?v=3.8"></script>
+    <script src="<?= SITE_URL ?>/assets/js/animations.js?v=3.8"></script>
+    <script src="<?= SITE_URL ?>/assets/js/masonry-hover.js?v=3.8"></script>
     <?php if ($currentSlug === '' || $currentSlug === 'home'): ?>
-    <script src="<?= SITE_URL ?>/assets/js/typed.js?v=3.7"></script>
-    <script src="<?= SITE_URL ?>/assets/js/neural.js?v=3.7"></script>
-    <script src="<?= SITE_URL ?>/assets/js/bulb-field.js?v=3.7"></script>
+    <script src="<?= SITE_URL ?>/assets/js/typed.js?v=3.8"></script>
+    <script src="<?= SITE_URL ?>/assets/js/neural.js?v=3.8"></script>
+    <script src="<?= SITE_URL ?>/assets/js/bulb-field.js?v=3.8"></script>
     <?php endif; ?>
     <?php if ($currentSlug === 'mfa-setup'): ?>
     <script src="<?= SITE_URL ?>/assets/js/vendor/qrcode.min.js"></script>
     <?php endif; ?>
     <?php if (!empty($pageJs)): ?>
-    <script src="<?= SITE_URL ?>/assets/js/<?= $pageJs ?>?v=3.7"></script>
+    <script src="<?= SITE_URL ?>/assets/js/<?= $pageJs ?>?v=3.8"></script>
     <?php endif; ?>
 </body>
 </html>

@@ -194,26 +194,11 @@
         font-size: var(--fs-body);
     }
 
-    /* Resolution masonry — mobile : reset positionnement absolu + profondeur */
+    /* Resolution masonry — mobile : grille 1 colonne */
     .masonry {
-        position: static;
-        height: auto !important;
+        grid-template-columns: 1fr;
+        gap: var(--sp-md);
         margin-bottom: var(--sp-xl);
-    }
-
-    .masonry__card {
-        position: static !important;
-        width: auto !important;
-        height: auto !important;
-        left: auto !important;
-        top: auto !important;
-        transform: none !important;
-        z-index: auto !important;
-        --depth-overlay: 0 !important;
-    }
-
-    .masonry__card::after {
-        display: none;
     }
 
     .masonry .service-card {
@@ -450,7 +435,11 @@
         font-size: var(--fs-xs);
     }
 
-    /* Masonry : le JS gere le scaling proportionnel sur tablet */
+    /* Masonry : 3 colonnes + 2 en dessous, centrees */
+    .masonry {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--sp-md);
+    }
 
     /* Portfolio preview — 2 colonnes */
     .portfolio-preview__grid {
@@ -481,7 +470,7 @@
         padding: var(--sp-4xl) 0;
     }
 
-    /* Masonry : le JS gere le positionnement absolu */
+    /* Masonry : 5 colonnes par defaut sur desktop (via components.css) */
 }
 
 /* --- Desktop large (1440px+) --- */

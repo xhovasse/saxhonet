@@ -378,41 +378,10 @@
         font-size: var(--fs-body-lg);
     }
 
-    /* Masonry : retour au flux normal sur mobile */
+    /* Masonry : grille 1 colonne sur mobile */
     .masonry {
-        position: static;
-        display: flex;
-        flex-direction: column;
+        grid-template-columns: 1fr;
         gap: var(--sp-md);
-        height: auto !important;
-    }
-
-    .masonry__card {
-        position: static !important;
-        width: auto !important;
-        height: auto !important;
-        left: auto !important;
-        top: auto !important;
-        transform: none !important;
-        z-index: auto !important;
-        --depth-overlay: 0 !important;
-    }
-
-    .masonry__card::after {
-        display: none;
-    }
-
-    /* Description visible sur mobile (pas de hover) */
-    .masonry__card .service-card__text {
-        opacity: 1;
-        max-height: none;
-        margin-top: var(--sp-sm);
-    }
-
-    /* Icone taille normale sur mobile */
-    .masonry__card .service-card__icon {
-        width: 48px;
-        height: 48px;
     }
 
     .portfolio-preview__grid {
@@ -435,8 +404,6 @@
     .paradox__card-text {
         font-size: var(--fs-xs);
     }
-
-    /* Masonry : le JS gere le scaling proportionnel sur tablet */
 
     .portfolio-preview__grid {
         grid-template-columns: repeat(2, 1fr);

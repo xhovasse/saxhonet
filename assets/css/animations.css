@@ -273,9 +273,8 @@
         transform: none !important;
     }
 
-    /* Masonry hover : pas de scale, juste bordure */
-    .masonry__card,
-    .masonry__card--nav {
+    /* Masonry hover : pas de transition, juste bordure */
+    .masonry__card {
         transition: none;
     }
 

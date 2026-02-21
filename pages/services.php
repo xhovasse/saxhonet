@@ -28,7 +28,7 @@ $pageDescription = t('services.page_subtitle');
     <div class="container">
         <p class="services-progression__label reveal reveal-up"><?= e(t('services.progression_label')) ?></p>
 
-        <div class="masonry masonry--nav reveal reveal-up" id="services-masonry-nav">
+        <div class="masonry reveal reveal-up" id="services-masonry">
             <?php
             $services = [
                 ['key' => 's1', 'icon' => '&#x1F4A1;', 'class' => '1'],
@@ -39,11 +39,12 @@ $pageDescription = t('services.page_subtitle');
             ];
             foreach ($services as $i => $s):
             ?>
-            <a href="#service-<?= $i + 1 ?>" class="masonry__card masonry__card--nav">
+            <a href="#service-<?= $i + 1 ?>" class="masonry__card service-card service-card--color-<?= $s['class'] ?> reveal reveal-up reveal-delay-<?= $i + 1 ?>">
                 <div class="service-card__icon service-card__icon--<?= $s['class'] ?>" aria-hidden="true">
                     <?= $s['icon'] ?>
                 </div>
-                <span class="masonry__card-title"><?= e(t('services.' . $s['key'] . '_title')) ?></span>
+                <h3 class="service-card__title"><?= e(t('services.' . $s['key'] . '_title')) ?></h3>
+                <p class="service-card__text"><?= e(t('services.' . $s['key'] . '_short')) ?></p>
             </a>
             <?php endforeach; ?>
         </div>
@@ -52,6 +53,9 @@ $pageDescription = t('services.page_subtitle');
         <div class="services-list-mobile reveal reveal-up">
             <?php foreach ($services as $i => $s): ?>
             <a href="#service-<?= $i + 1 ?>" class="services-list-mobile__item">
+                <div class="service-card__icon service-card__icon--<?= $s['class'] ?>" aria-hidden="true">
+                    <?= $s['icon'] ?>
+                </div>
                 <span class="services-list-mobile__title"><?= e(t('services.' . $s['key'] . '_title')) ?></span>
             </a>
             <?php endforeach; ?>

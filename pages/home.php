@@ -78,7 +78,7 @@ $pageDescription = t('site.description');
             ];
             foreach ($services as $i => $s):
             ?>
-            <div class="masonry__card service-card reveal reveal-up reveal-delay-<?= $i + 1 ?>">
+            <div class="masonry__card service-card service-card--color-<?= $s['class'] ?> reveal reveal-up reveal-delay-<?= $i + 1 ?>">
                 <div class="service-card__icon service-card__icon--<?= $s['class'] ?>" aria-hidden="true">
                     <?= $s['icon'] ?>
                 </div>

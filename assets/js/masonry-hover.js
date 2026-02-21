@@ -73,61 +73,7 @@
         ]
     };
 
-    /* --- Services page : cartes navigation (pas de description) --- */
-    /* Meme principe d'imbrication serree */
-    var LAYOUTS_NAV = {
-        restHeight: 320,
-        rest: [
-            { left: 0,   top: 0,   width: 228, height: 155 },
-            { left: 220, top: 12,  width: 295, height: 165 },
-            { left: 508, top: 3,   width: 240, height: 152 },
-            { left: 738, top: 15,  width: 250, height: 160 },
-            { left: 60,  top: 160, width: 320, height: 150 }
-        ],
-        activeHeights: [248, 248, 248, 248, 340],
-        active: [
-            /* Card 0 active */
-            [
-                { left: 0,   top: 0,   width: 350, height: 215 },
-                { left: 340, top: 5,   width: 185, height: 120 },
-                { left: 516, top: 0,   width: 178, height: 118 },
-                { left: 686, top: 8,   width: 182, height: 122 },
-                { left: 342, top: 118, width: 248, height: 120 }
-            ],
-            /* Card 1 active */
-            [
-                { left: 0,   top: 5,   width: 178, height: 118 },
-                { left: 168, top: 0,   width: 350, height: 215 },
-                { left: 508, top: 8,   width: 182, height: 118 },
-                { left: 682, top: 0,   width: 185, height: 122 },
-                { left: 0,   top: 118, width: 178, height: 120 }
-            ],
-            /* Card 2 active */
-            [
-                { left: 0,   top: 0,   width: 178, height: 115 },
-                { left: 168, top: 8,   width: 188, height: 122 },
-                { left: 348, top: 0,   width: 350, height: 215 },
-                { left: 690, top: 5,   width: 182, height: 120 },
-                { left: 0,   top: 110, width: 188, height: 125 }
-            ],
-            /* Card 3 active */
-            [
-                { left: 0,   top: 0,   width: 172, height: 115 },
-                { left: 162, top: 8,   width: 185, height: 118 },
-                { left: 340, top: 0,   width: 178, height: 115 },
-                { left: 510, top: 0,   width: 350, height: 215 },
-                { left: 0,   top: 110, width: 182, height: 122 }
-            ],
-            /* Card 4 active */
-            [
-                { left: 0,   top: 0,   width: 172, height: 115 },
-                { left: 162, top: 6,   width: 182, height: 118 },
-                { left: 336, top: 0,   width: 178, height: 115 },
-                { left: 506, top: 8,   width: 172, height: 118 },
-                { left: 130, top: 118, width: 350, height: 210 }
-            ]
-        ]
-    };
+    /* Toutes les mosaiques utilisent le meme layout (LAYOUTS_HOME) */
 
     /* =============================================
        MOTEUR DE LAYOUT
@@ -182,8 +128,7 @@
         var cards = container.querySelectorAll('.masonry__card');
         if (cards.length !== 5) return;
 
-        var isNav = container.classList.contains('masonry--nav');
-        var layouts = isNav ? LAYOUTS_NAV : LAYOUTS_HOME;
+        var layouts = LAYOUTS_HOME;
         var leaveTimer = null;
         var activeIndex = -1;
 

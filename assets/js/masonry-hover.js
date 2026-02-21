@@ -18,111 +18,113 @@
        ============================================= */
 
     /* --- Homepage : cartes avec description --- */
+    /* Imbrication serree, chevauchements legers aux bords */
     var LAYOUTS_HOME = {
-        restHeight: 440,
+        restHeight: 410,
         rest: [
-            { left: 0,   top: 0,   width: 240, height: 200 },
-            { left: 252, top: 15,  width: 320, height: 215 },
-            { left: 584, top: 0,   width: 250, height: 195 },
-            { left: 846, top: 20,  width: 250, height: 210 },
-            { left: 100, top: 228, width: 330, height: 200 }
+            { left: 0,   top: 0,   width: 255, height: 195 },
+            { left: 245, top: 20,  width: 310, height: 210 },
+            { left: 548, top: 5,   width: 265, height: 188 },
+            { left: 800, top: 25,  width: 260, height: 200 },
+            { left: 70,  top: 200, width: 340, height: 195 }
         ],
-        activeHeights: [300, 300, 300, 300, 448],
+        activeHeights: [310, 310, 310, 310, 440],
         active: [
-            /* Card 0 active — ancre a gauche */
+            /* Card 0 active — grande a gauche, petites imbriquees a droite */
             [
-                { left: 0,   top: 0,   width: 480, height: 290 },
-                { left: 492, top: 0,   width: 200, height: 140 },
-                { left: 704, top: 0,   width: 190, height: 140 },
-                { left: 904, top: 0,   width: 192, height: 140 },
-                { left: 492, top: 152, width: 290, height: 138 }
+                { left: 0,   top: 0,   width: 500, height: 300 },
+                { left: 488, top: 5,   width: 195, height: 142 },
+                { left: 672, top: 0,   width: 205, height: 148 },
+                { left: 868, top: 8,   width: 195, height: 138 },
+                { left: 500, top: 140, width: 280, height: 148 }
             ],
-            /* Card 1 active — centre */
+            /* Card 1 active — grande au centre, petites tassees autour */
             [
-                { left: 0,   top: 0,   width: 185, height: 145 },
-                { left: 197, top: 0,   width: 480, height: 290 },
-                { left: 689, top: 0,   width: 195, height: 140 },
-                { left: 896, top: 0,   width: 200, height: 150 },
-                { left: 0,   top: 157, width: 185, height: 133 }
+                { left: 0,   top: 5,   width: 190, height: 148 },
+                { left: 178, top: 0,   width: 500, height: 300 },
+                { left: 668, top: 8,   width: 200, height: 138 },
+                { left: 858, top: 0,   width: 205, height: 148 },
+                { left: 0,   top: 145, width: 188, height: 148 }
             ],
-            /* Card 2 active — droite du centre */
+            /* Card 2 active — grande droite-centre, cluster a gauche */
             [
-                { left: 0,   top: 0,   width: 190, height: 140 },
-                { left: 202, top: 0,   width: 200, height: 150 },
-                { left: 414, top: 0,   width: 480, height: 290 },
-                { left: 906, top: 0,   width: 190, height: 145 },
-                { left: 0,   top: 152, width: 200, height: 138 }
+                { left: 0,   top: 0,   width: 195, height: 145 },
+                { left: 185, top: 8,   width: 210, height: 148 },
+                { left: 385, top: 0,   width: 500, height: 300 },
+                { left: 875, top: 5,   width: 195, height: 145 },
+                { left: 0,   top: 138, width: 210, height: 152 }
             ],
-            /* Card 3 active — a droite */
+            /* Card 3 active — grande a droite, petites empilees a gauche */
+            [
+                { left: 0,   top: 0,   width: 195, height: 140 },
+                { left: 185, top: 8,   width: 205, height: 148 },
+                { left: 382, top: 0,   width: 198, height: 140 },
+                { left: 570, top: 0,   width: 500, height: 300 },
+                { left: 0,   top: 132, width: 210, height: 155 }
+            ],
+            /* Card 4 active — grande en bas, petites rangee du haut */
             [
                 { left: 0,   top: 0,   width: 185, height: 140 },
-                { left: 197, top: 0,   width: 200, height: 150 },
-                { left: 409, top: 0,   width: 195, height: 140 },
-                { left: 616, top: 0,   width: 480, height: 290 },
-                { left: 0,   top: 152, width: 200, height: 138 }
-            ],
-            /* Card 4 active — bas centre */
-            [
-                { left: 0,   top: 0,   width: 180, height: 140 },
-                { left: 192, top: 0,   width: 195, height: 145 },
-                { left: 399, top: 0,   width: 190, height: 140 },
-                { left: 601, top: 0,   width: 185, height: 145 },
-                { left: 200, top: 157, width: 480, height: 280 }
+                { left: 175, top: 8,   width: 205, height: 145 },
+                { left: 370, top: 0,   width: 198, height: 140 },
+                { left: 558, top: 6,   width: 195, height: 142 },
+                { left: 155, top: 142, width: 500, height: 288 }
             ]
         ]
     };
 
     /* --- Services page : cartes navigation (pas de description) --- */
+    /* Meme principe d'imbrication serree */
     var LAYOUTS_NAV = {
-        restHeight: 345,
+        restHeight: 320,
         rest: [
-            { left: 0,   top: 0,   width: 220, height: 160 },
-            { left: 232, top: 10,  width: 300, height: 170 },
-            { left: 544, top: 0,   width: 230, height: 155 },
-            { left: 786, top: 12,  width: 240, height: 165 },
-            { left: 80,  top: 180, width: 310, height: 155 }
+            { left: 0,   top: 0,   width: 228, height: 155 },
+            { left: 220, top: 12,  width: 295, height: 165 },
+            { left: 508, top: 3,   width: 240, height: 152 },
+            { left: 738, top: 15,  width: 250, height: 160 },
+            { left: 60,  top: 160, width: 320, height: 150 }
         ],
-        activeHeights: [260, 260, 260, 260, 355],
+        activeHeights: [248, 248, 248, 248, 340],
         active: [
             /* Card 0 active */
             [
-                { left: 0,   top: 0,   width: 340, height: 220 },
-                { left: 352, top: 0,   width: 180, height: 120 },
-                { left: 544, top: 0,   width: 170, height: 115 },
-                { left: 726, top: 0,   width: 175, height: 120 },
-                { left: 352, top: 132, width: 240, height: 118 }
+                { left: 0,   top: 0,   width: 350, height: 215 },
+                { left: 340, top: 5,   width: 185, height: 120 },
+                { left: 516, top: 0,   width: 178, height: 118 },
+                { left: 686, top: 8,   width: 182, height: 122 },
+                { left: 342, top: 118, width: 248, height: 120 }
             ],
             /* Card 1 active */
             [
-                { left: 0,   top: 0,   width: 170, height: 120 },
-                { left: 182, top: 0,   width: 340, height: 220 },
-                { left: 534, top: 0,   width: 175, height: 115 },
-                { left: 721, top: 0,   width: 180, height: 120 },
-                { left: 0,   top: 132, width: 170, height: 118 }
+                { left: 0,   top: 5,   width: 178, height: 118 },
+                { left: 168, top: 0,   width: 350, height: 215 },
+                { left: 508, top: 8,   width: 182, height: 118 },
+                { left: 682, top: 0,   width: 185, height: 122 },
+                { left: 0,   top: 118, width: 178, height: 120 }
             ],
             /* Card 2 active */
             [
-                { left: 0,   top: 0,   width: 170, height: 115 },
-                { left: 182, top: 0,   width: 180, height: 120 },
-                { left: 374, top: 0,   width: 340, height: 220 },
-                { left: 726, top: 0,   width: 175, height: 120 },
-                { left: 0,   top: 127, width: 180, height: 118 }
+                { left: 0,   top: 0,   width: 178, height: 115 },
+                { left: 168, top: 8,   width: 188, height: 122 },
+                { left: 348, top: 0,   width: 350, height: 215 },
+                { left: 690, top: 5,   width: 182, height: 120 },
+                { left: 0,   top: 110, width: 188, height: 125 }
             ],
             /* Card 3 active */
             [
-                { left: 0,   top: 0,   width: 165, height: 115 },
-                { left: 177, top: 0,   width: 180, height: 120 },
-                { left: 369, top: 0,   width: 170, height: 115 },
-                { left: 551, top: 0,   width: 340, height: 220 },
-                { left: 0,   top: 127, width: 175, height: 118 }
+                { left: 0,   top: 0,   width: 172, height: 115 },
+                { left: 162, top: 8,   width: 185, height: 118 },
+                { left: 340, top: 0,   width: 178, height: 115 },
+                { left: 510, top: 0,   width: 350, height: 215 },
+                { left: 0,   top: 110, width: 182, height: 122 }
             ],
             /* Card 4 active */
             [
-                { left: 0,   top: 0,   width: 165, height: 115 },
-                { left: 177, top: 0,   width: 175, height: 120 },
-                { left: 364, top: 0,   width: 170, height: 115 },
-                { left: 546, top: 0,   width: 165, height: 120 },
-                { left: 160, top: 132, width: 340, height: 210 }
+                { left: 0,   top: 0,   width: 172, height: 115 },
+                { left: 162, top: 6,   width: 182, height: 118 },
+                { left: 336, top: 0,   width: 178, height: 115 },
+                { left: 506, top: 8,   width: 172, height: 118 },
+                { left: 130, top: 118, width: 350, height: 210 }
             ]
         ]
     };

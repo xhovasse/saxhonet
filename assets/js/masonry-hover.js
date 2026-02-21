@@ -160,7 +160,7 @@
                         for (var k = 0; k < cards.length; k++) {
                             cards[k].classList.remove('masonry__card--active');
                         }
-                    }, 100);
+                    }, 200);
                 });
             })(j);
         }

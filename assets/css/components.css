@@ -457,19 +457,19 @@
 .masonry__card {
     overflow: hidden;
     transform: scale(1) translateZ(0);
-    filter: blur(0);
+    filter: blur(0) brightness(1) saturate(1);
     transition:
         left var(--transition-masonry),
         top var(--transition-masonry),
         width 800ms cubic-bezier(0.16, 1, 0.3, 1),
         height 800ms cubic-bezier(0.16, 1, 0.3, 1),
-        transform var(--transition-masonry),
-        filter var(--transition-masonry),
-        opacity 600ms ease,
+        transform 1000ms cubic-bezier(0.4, 0, 0.2, 1),
+        filter 1200ms cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 1000ms cubic-bezier(0.4, 0, 0.2, 1),
         box-shadow 400ms ease,
         border-color var(--transition-fast);
     z-index: 1;
-    will-change: left, top, width, height, transform, filter;
+    will-change: left, top, width, height, transform, filter, opacity;
 }
 
 /* Icone plus compacte dans le collage */

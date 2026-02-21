@@ -100,6 +100,22 @@
         return Math.sqrt(dx * dx + dy * dy);
     }
 
+    /* Niveaux de profondeur par rang de distance.
+       Plan 0 = carte active (nette, premier plan)
+       Plan 1 = carte la plus proche (leger flou)
+       Plan 2 = cartes intermediaires
+       Plan 3 = carte la plus eloignee (flou maximum) */
+    var DEPTH_LEVELS = [
+        /* Plan 0 — Active : nette */
+        { blur: 0,   scale: 1.03, opacity: 1,    brightness: 1,    saturate: 1   },
+        /* Plan 1 — Proche : leger retrait */
+        { blur: 1.0, scale: 0.97, opacity: 0.85, brightness: 0.92, saturate: 0.9 },
+        /* Plan 2 — Moyen : en retrait */
+        { blur: 2.5, scale: 0.93, opacity: 0.65, brightness: 0.80, saturate: 0.7 },
+        /* Plan 3 — Loin : arriere-plan */
+        { blur: 4.0, scale: 0.88, opacity: 0.45, brightness: 0.65, saturate: 0.5 }
+    ];
+
     function applyDepth(cards, layout, activeIndex) {
         if (activeIndex < 0) {
             /* Repos : tout net, pas de profondeur */
@@ -113,40 +129,43 @@
 
         var activeC = cardCenter(layout[activeIndex]);
 
-        /* Collecter les distances des cartes inactives */
-        var maxDist = 0;
-        var distances = [];
+        /* Collecter les indices et distances des cartes inactives */
+        var others = [];
         for (var j = 0; j < cards.length; j++) {
-            if (j === activeIndex) {
-                distances.push(0);
-            } else {
-                var d = dist(cardCenter(layout[j]), activeC);
-                distances.push(d);
-                if (d > maxDist) maxDist = d;
+            if (j !== activeIndex) {
+                others.push({
+                    index: j,
+                    dist: dist(cardCenter(layout[j]), activeC)
+                });
             }
         }
 
-        for (var k = 0; k < cards.length; k++) {
-            if (k === activeIndex) {
-                /* Nette — premier plan */
-                cards[k].style.transform = 'scale(1.04)';
-                cards[k].style.filter = 'blur(0)';
-                cards[k].style.opacity = '1';
+        /* Trier par distance croissante → rang = plan de profondeur */
+        others.sort(function (a, b) { return a.dist - b.dist; });
+
+        /* Assigner les plans : rang 0 → plan 1, rang 1-2 → plan 2, rang 3 → plan 3 */
+        var planMap = {};
+        for (var r = 0; r < others.length; r++) {
+            if (r === 0) {
+                planMap[others[r].index] = 1; /* le plus proche */
+            } else if (r === others.length - 1) {
+                planMap[others[r].index] = 3; /* le plus loin */
             } else {
-                /* ratio 0 (proche) → 1 (le plus loin) */
-                var ratio = maxDist > 0 ? distances[k] / maxDist : 0;
-
-                /* Flou gradue : 0.8px → 3.5px */
-                var blur = 0.8 + ratio * 2.7;
-                /* Scale gradue : 0.97 → 0.91 */
-                var sc = 0.97 - ratio * 0.06;
-                /* Opacite graduee : 0.80 → 0.50 */
-                var op = 0.80 - ratio * 0.30;
-
-                cards[k].style.transform = 'scale(' + sc.toFixed(3) + ')';
-                cards[k].style.filter = 'blur(' + blur.toFixed(1) + 'px)';
-                cards[k].style.opacity = op.toFixed(2);
+                planMap[others[r].index] = 2; /* intermediaire */
             }
+        }
+
+        /* Appliquer les styles par plan */
+        for (var k = 0; k < cards.length; k++) {
+            var plan = (k === activeIndex) ? 0 : planMap[k];
+            var lvl = DEPTH_LEVELS[plan];
+
+            cards[k].style.transform = 'scale(' + lvl.scale.toFixed(3) + ')';
+            cards[k].style.filter =
+                'blur(' + lvl.blur.toFixed(1) + 'px)' +
+                ' brightness(' + lvl.brightness.toFixed(2) + ')' +
+                ' saturate(' + lvl.saturate.toFixed(1) + ')';
+            cards[k].style.opacity = lvl.opacity.toFixed(2);
         }
     }
 
@@ -195,16 +214,24 @@
         }
     }
 
+    var DEFAULT_ACTIVE = 1; /* Carte active par defaut au chargement (0-indexed) */
+
     function setupContainer(container) {
         var cards = container.querySelectorAll('.masonry__card');
         if (cards.length !== 5) return;
 
         var layouts = LAYOUTS_HOME;
         var leaveTimer = null;
-        var activeIndex = -1;
+        var activeIndex = DEFAULT_ACTIVE;
 
-        /* Appliquer le layout rest au chargement */
-        if (!isMobile()) {
+        /* Au chargement : demarrer avec une carte en focus (profondeur active) */
+        if (!isMobile() && !prefersReducedMotion) {
+            container.classList.add('masonry--has-active');
+            applyLayout(container, cards, layouts, 'active', activeIndex);
+            for (var m = 0; m < cards.length; m++) {
+                cards[m].classList.toggle('masonry__card--active', m === activeIndex);
+            }
+        } else if (!isMobile()) {
             applyLayout(container, cards, layouts, 'rest', -1);
         }
 
@@ -225,11 +252,11 @@
                 cards[index].addEventListener('mouseleave', function () {
                     if (isMobile() || prefersReducedMotion) return;
                     leaveTimer = setTimeout(function () {
-                        activeIndex = -1;
-                        container.classList.remove('masonry--has-active');
-                        applyLayout(container, cards, layouts, 'rest', -1);
+                        /* Au lieu de revenir au repos, revenir a la carte par defaut */
+                        activeIndex = DEFAULT_ACTIVE;
+                        applyLayout(container, cards, layouts, 'active', activeIndex);
                         for (var k = 0; k < cards.length; k++) {
-                            cards[k].classList.remove('masonry__card--active');
+                            cards[k].classList.toggle('masonry__card--active', k === activeIndex);
                         }
                     }, 300);
                 });
@@ -244,11 +271,8 @@
                 if (isMobile()) {
                     resetToFlow(container, cards);
                 } else {
-                    applyLayout(
-                        container, cards, layouts,
-                        activeIndex >= 0 ? 'active' : 'rest',
-                        activeIndex
-                    );
+                    /* Toujours en mode actif (carte par defaut ou survolee) */
+                    applyLayout(container, cards, layouts, 'active', activeIndex);
                 }
             }, 200);
         });

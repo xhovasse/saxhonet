@@ -110,7 +110,7 @@
     }
 
     // --- Dessiner une ampoule ---
-    // Path simple : globe (arc) + col + culot
+    // Forme en poire : globe arrondi en haut, retrecissement vers le col, culot strie
     function drawBulb(b) {
         var s = b.scale;
         var sz = b.size * s;
@@ -141,76 +141,123 @@
         ctx.rotate(b.rot);
         ctx.scale(wx, wy);
 
-        // --- Globe de l'ampoule (cercle) ---
-        var globeR = sz * 0.38;
-        var globeY = -sz * 0.08;
+        // --- Dimensions de reference ---
+        var globeR = sz * 0.35;       // rayon du globe
+        var globeCY = -sz * 0.12;     // centre Y du globe (haut de l'ampoule)
+        var colW = globeR * 0.35;     // largeur du culot
+        var colTop = globeCY + globeR * 0.92;  // debut du col
+        var colBot = colTop + globeR * 0.55;   // bas du col / haut culot
 
+        // --- Contour de l'ampoule (forme poire) ---
+        // Un seul path continu : demi-cercle haut + courbes laterales + col
         ctx.beginPath();
-        ctx.arc(0, globeY, globeR, 0, Math.PI * 2);
+
+        // Sommet du globe (arc du haut, de gauche a droite)
+        ctx.arc(0, globeCY, globeR, -Math.PI * 0.85, -Math.PI * 0.15, false);
+
+        // Cote droit : courbe du globe vers le col (retrecissement)
+        ctx.bezierCurveTo(
+            globeR * 0.85, globeCY + globeR * 0.75,  // cp1 : encore large
+            colW * 1.6, colTop * 0.85,                // cp2 : commence a retrecir
+            colW, colTop                               // end : haut du col
+        );
+
+        // Col droit vers bas
+        ctx.lineTo(colW, colBot);
+
+        // Bas du col (horizontal)
+        ctx.lineTo(-colW, colBot);
+
+        // Col gauche remonte
+        ctx.lineTo(-colW, colTop);
+
+        // Cote gauche : courbe du col vers le globe
+        ctx.bezierCurveTo(
+            -colW * 1.6, colTop * 0.85,
+            -globeR * 0.85, globeCY + globeR * 0.75,
+            -globeR * Math.cos(Math.PI * 0.15), globeCY - globeR * Math.sin(Math.PI * 0.15)
+        );
+
         ctx.strokeStyle = rgba + alpha.toFixed(3) + ')';
         ctx.lineWidth = CONFIG.bulbLineWidth;
         ctx.stroke();
 
-        // --- Col (trapeze) ---
-        var colTop = globeY + globeR * 0.85;
-        var colBot = globeY + globeR * 1.4;
-        var colWTop = globeR * 0.55;
-        var colWBot = globeR * 0.38;
-
-        ctx.beginPath();
-        ctx.moveTo(-colWTop, colTop);
-        ctx.lineTo(-colWBot, colBot);
-        ctx.strokeStyle = rgba + alpha.toFixed(3) + ')';
-        ctx.lineWidth = CONFIG.bulbLineWidth;
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(colWTop, colTop);
-        ctx.lineTo(colWBot, colBot);
-        ctx.stroke();
-
-        // --- Culot (3 lignes horizontales) ---
-        var culotH = globeR * 0.3;
+        // --- Stries du culot (3 lignes horizontales dans le col) ---
+        var stripeAlpha = alpha * 0.55;
+        ctx.strokeStyle = rgba + stripeAlpha.toFixed(3) + ')';
+        ctx.lineWidth = CONFIG.bulbLineWidth * 0.5;
         for (var i = 0; i < 3; i++) {
-            var cy = colBot + culotH * (i / 3);
-            var cw = colWBot * (1 - i * 0.1);
+            var sy = colTop + (colBot - colTop) * ((i + 1) / 4);
             ctx.beginPath();
-            ctx.moveTo(-cw, cy);
-            ctx.lineTo(cw, cy);
-            ctx.strokeStyle = rgba + (alpha * 0.6).toFixed(3) + ')';
-            ctx.lineWidth = CONFIG.bulbLineWidth * 0.6;
+            ctx.moveTo(-colW, sy);
+            ctx.lineTo(colW, sy);
             ctx.stroke();
         }
 
-        // --- Pointe du culot ---
-        var tipY = colBot + culotH;
+        // --- Pointe du culot (petit V en bas) ---
+        var tipH = globeR * 0.15;
         ctx.beginPath();
-        ctx.moveTo(-colWBot * 0.4, colBot + culotH * 0.8);
-        ctx.lineTo(0, tipY);
-        ctx.lineTo(colWBot * 0.4, colBot + culotH * 0.8);
-        ctx.strokeStyle = rgba + (alpha * 0.5).toFixed(3) + ')';
-        ctx.lineWidth = CONFIG.bulbLineWidth * 0.6;
+        ctx.moveTo(-colW * 0.5, colBot);
+        ctx.lineTo(0, colBot + tipH);
+        ctx.lineTo(colW * 0.5, colBot);
+        ctx.strokeStyle = rgba + (alpha * 0.45).toFixed(3) + ')';
+        ctx.lineWidth = CONFIG.bulbLineWidth * 0.5;
         ctx.stroke();
 
-        // --- Filament (quand assez grand) ---
-        if (s > 0.25 && sz > 25) {
-            var fAlpha = alpha * 0.5 * Math.min(1, (s - 0.25) * 3);
-            var fW = globeR * 0.3;
-            var fH = globeR * 0.35;
-
-            ctx.beginPath();
-            ctx.moveTo(-fW * 0.5, globeY + globeR * 0.1);
-            ctx.quadraticCurveTo(-fW * 0.25, globeY - fH, 0, globeY);
-            ctx.quadraticCurveTo(fW * 0.25, globeY - fH, fW * 0.5, globeY + globeR * 0.1);
+        // --- Filament interieur (quand assez grand) ---
+        if (s > 0.2 && sz > 20) {
+            var fAlpha = alpha * 0.55 * Math.min(1, (s - 0.2) * 3);
             ctx.strokeStyle = rgba + fAlpha.toFixed(3) + ')';
             ctx.lineWidth = CONFIG.bulbLineWidth * 0.6;
+
+            // Support : 2 tiges verticales partant du col
+            var stemW = colW * 0.5;
+            var stemTop = globeCY + globeR * 0.1;
+            var stemBot = colTop;
+
+            ctx.beginPath();
+            ctx.moveTo(-stemW, stemBot);
+            ctx.lineTo(-stemW, stemTop);
+            ctx.moveTo(stemW, stemBot);
+            ctx.lineTo(stemW, stemTop);
             ctx.stroke();
 
-            // Tige
+            // Filament : zigzag / M entre les deux tiges
+            var filY = stemTop;
+            var filH = globeR * 0.3;
             ctx.beginPath();
-            ctx.moveTo(0, globeY);
-            ctx.lineTo(0, colTop);
+            ctx.moveTo(-stemW, filY);
+            ctx.quadraticCurveTo(-stemW * 0.5, filY - filH, 0, filY);
+            ctx.quadraticCurveTo(stemW * 0.5, filY + filH * 0.5, stemW, filY);
             ctx.stroke();
+        }
+
+        // --- Rayons lumineux (quand mature) ---
+        if (s > 0.4 && sz > 35) {
+            var rayAlpha = alpha * 0.35 * Math.min(1, (s - 0.4) * 2);
+            ctx.strokeStyle = rgba + rayAlpha.toFixed(3) + ')';
+            ctx.lineWidth = CONFIG.bulbLineWidth * 0.7;
+
+            var rayCount = 8;
+            var rayInner = globeR * 1.15;
+            var rayOuter = globeR * 1.4;
+
+            for (var ri = 0; ri < rayCount; ri++) {
+                // Repartir les rayons autour du haut du globe (arc de ~240 degres)
+                var rayAngle = -Math.PI * 0.9 + (Math.PI * 1.8) * ri / (rayCount - 1);
+                var rx1 = Math.cos(rayAngle) * rayInner;
+                var ry1 = globeCY + Math.sin(rayAngle) * rayInner;
+                var rx2 = Math.cos(rayAngle) * rayOuter;
+                var ry2 = globeCY + Math.sin(rayAngle) * rayOuter;
+
+                // Ne dessiner que les rayons au-dessus du col
+                if (ry1 < colTop - 2) {
+                    ctx.beginPath();
+                    ctx.moveTo(rx1, ry1);
+                    ctx.lineTo(rx2, ry2);
+                    ctx.stroke();
+                }
+            }
         }
 
         // --- Reflet irise (bulle de savon) quand mature ---
@@ -222,11 +269,10 @@
             }
             var nc = CONFIG.colors[(cIdx + 1) % CONFIG.colors.length];
 
-            // Arc de reflet sur le globe
             ctx.beginPath();
-            ctx.arc(0, globeY, globeR * 0.85, -Math.PI * 0.6, -Math.PI * 0.1);
+            ctx.arc(0, globeCY, globeR * 0.75, -Math.PI * 0.65, -Math.PI * 0.15);
             ctx.strokeStyle = 'rgba(' + nc.r + ',' + nc.g + ',' + nc.b + ',' + iAlpha.toFixed(3) + ')';
-            ctx.lineWidth = CONFIG.bulbLineWidth * 2.5;
+            ctx.lineWidth = CONFIG.bulbLineWidth * 2;
             ctx.stroke();
         }
 

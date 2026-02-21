@@ -194,11 +194,12 @@
         font-size: var(--fs-body);
     }
 
-    /* Resolution masonry — mobile : reset positionnement absolu */
+    /* Resolution masonry — mobile : reset positionnement absolu + profondeur */
     .masonry {
         position: static;
         height: auto !important;
         margin-bottom: var(--sp-xl);
+        perspective: none;
     }
 
     .masonry__card {
@@ -207,6 +208,8 @@
         height: auto !important;
         left: auto !important;
         top: auto !important;
+        transform: none !important;
+        filter: none !important;
     }
 
     .masonry .service-card {

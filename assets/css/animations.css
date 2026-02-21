@@ -273,19 +273,22 @@
         transform: none !important;
     }
 
-    /* Masonry hover : pas de transition, juste bordure */
+    /* Masonry hover : pas de transition, pas de profondeur */
     .masonry__card {
         transition: none;
+        filter: none !important;
     }
 
     .masonry--has-active .masonry__card--active {
         transform: none;
+        filter: none;
         box-shadow: var(--shadow-lg);
         border-color: var(--c-primary-light);
     }
 
     .masonry--has-active .masonry__card:not(.masonry__card--active) {
         transform: none;
+        filter: none;
         opacity: 1;
     }
 }

@@ -153,7 +153,7 @@ $hasExistingInterest = $stmtCheck->fetch() !== false;
                 <button type="button" class="btn btn--primary" data-interest-type="competence" data-project-id="<?= $project['id'] ?>">
                     <?= e(t('portfolio.contribute_skills')) ?>
                 </button>
-                <button type="button" class="btn btn--outline" data-interest-type="investment" data-project-id="<?= $project['id'] ?>">
+                <button type="button" class="btn btn--secondary" data-interest-type="investment" data-project-id="<?= $project['id'] ?>">
                     <?= e(t('portfolio.contribute_invest')) ?>
                 </button>
             </div>

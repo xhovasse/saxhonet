@@ -4,6 +4,17 @@
  */
 $pageCss = 'home.css';
 $pageDescription = t('site.description');
+
+// Portfolio preview — dynamic projects
+$db = getDB();
+$previewProjects = $db->query(
+    'SELECT name_fr, name_en, slug, domain, phase, pitch_fr, pitch_en, image
+     FROM projects WHERE is_visible = 1
+     ORDER BY display_order ASC, created_at DESC
+     LIMIT 3'
+)->fetchAll();
+$lang = $_SESSION['lang'] ?? 'fr';
+$isLogged = is_logged_in();
 ?>
 
 <!-- ==========================================
@@ -104,32 +115,58 @@ $pageDescription = t('site.description');
         </div>
 
         <div class="portfolio-preview__grid">
-            <?php
-            // 3 cartes de projet en mode teaser (floutees)
-            $previewDomains = [
-                ['domain' => 'health',           'phase' => 'prototype'],
-                ['domain' => 'circular_economy',  'phase' => 'study'],
-                ['domain' => 'energy',            'phase' => 'development'],
-            ];
-            foreach ($previewDomains as $j => $pv):
+            <?php if (!empty($previewProjects)):
+                foreach ($previewProjects as $j => $pv):
+                    $pvName  = $lang === 'fr' ? $pv['name_fr'] : ($pv['name_en'] ?? $pv['name_fr']);
+                    $pvPitch = $lang === 'fr' ? $pv['pitch_fr'] : ($pv['pitch_en'] ?? $pv['pitch_fr']);
             ?>
-            <div class="project-card--blurred reveal reveal-up reveal-delay-<?= $j + 1 ?>">
-                <div class="project-card__visible">
-                    <span class="badge badge--primary project-card__domain"><?= e(t('domains.' . $pv['domain'])) ?></span>
-                    <span class="badge badge--dark project-card__phase"><?= e(t('portfolio.phase_' . $pv['phase'])) ?></span>
+
+                <?php if ($isLogged): ?>
+                <!-- Member: preview card with real content -->
+                <a href="<?= SITE_URL ?>/project/<?= e($pv['slug']) ?>" class="project-card--blurred reveal reveal-up reveal-delay-<?= $j + 1 ?>" style="text-decoration:none;color:inherit;">
+                    <div class="project-card__visible">
+                        <span class="badge badge--primary project-card__domain"><?= e($pv['domain']) ?></span>
+                        <span class="badge badge--dark project-card__phase"><?= e(t('portfolio.phase_' . $pv['phase'])) ?></span>
+                    </div>
+                    <div style="filter:none;pointer-events:none;">
+                        <h3 style="font-family:var(--ff-display);font-size:var(--fs-lg);font-weight:var(--fw-semibold);margin-bottom:var(--sp-sm);"><?= e($pvName) ?></h3>
+                        <p style="font-size:var(--fs-small);line-height:var(--lh-relaxed);color:var(--c-text);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;"><?= e($pvPitch) ?></p>
+                    </div>
+                </a>
+
+                <?php else: ?>
+                <!-- Visitor: blurred card -->
+                <div class="project-card--blurred reveal reveal-up reveal-delay-<?= $j + 1 ?>">
+                    <div class="project-card__visible">
+                        <span class="badge badge--primary project-card__domain"><?= e($pv['domain']) ?></span>
+                        <span class="badge badge--dark project-card__phase"><?= e(t('portfolio.phase_' . $pv['phase'])) ?></span>
+                    </div>
+                    <div class="project-card__blurred-content" aria-hidden="true">
+                        <div class="placeholder-line"></div>
+                        <div class="placeholder-line"></div>
+                        <div class="placeholder-line"></div>
+                        <div class="placeholder-line"></div>
+                    </div>
+                    <div class="project-card__overlay">
+                        <p class="project-card__overlay-text"><?= e(t('portfolio.teaser_message')) ?></p>
+                        <a href="<?= SITE_URL ?>/register" class="btn btn--primary btn--sm"><?= e(t('portfolio.teaser_cta')) ?></a>
+                    </div>
                 </div>
-                <div class="project-card__blurred-content" aria-hidden="true">
-                    <div class="placeholder-line"></div>
-                    <div class="placeholder-line"></div>
-                    <div class="placeholder-line"></div>
-                    <div class="placeholder-line"></div>
+                <?php endif; ?>
+
+            <?php endforeach;
+            else:
+                // Fallback if no projects in DB yet
+                for ($j = 0; $j < 3; $j++): ?>
+                <div class="project-card--blurred reveal reveal-up reveal-delay-<?= $j + 1 ?>">
+                    <div class="project-card__blurred-content" aria-hidden="true">
+                        <div class="placeholder-line"></div>
+                        <div class="placeholder-line"></div>
+                        <div class="placeholder-line"></div>
+                        <div class="placeholder-line"></div>
+                    </div>
                 </div>
-                <div class="project-card__overlay">
-                    <p class="project-card__overlay-text"><?= e(t('portfolio.teaser_message')) ?></p>
-                    <a href="<?= SITE_URL ?>/register" class="btn btn--primary btn--sm"><?= e(t('portfolio.teaser_cta')) ?></a>
-                </div>
-            </div>
-            <?php endforeach; ?>
+            <?php endfor; endif; ?>
         </div>
 
         <div class="portfolio-preview__link reveal reveal-up">

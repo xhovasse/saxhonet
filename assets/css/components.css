@@ -458,10 +458,10 @@
     transition:
         left var(--transition-masonry),
         top var(--transition-masonry),
-        width 550ms cubic-bezier(0.25, 0.1, 0.25, 1),
-        height 550ms cubic-bezier(0.25, 0.1, 0.25, 1),
-        opacity 400ms ease,
-        box-shadow var(--transition-normal),
+        width 800ms cubic-bezier(0.16, 1, 0.3, 1),
+        height 800ms cubic-bezier(0.16, 1, 0.3, 1),
+        opacity 600ms ease,
+        box-shadow 400ms ease,
         border-color var(--transition-fast);
     z-index: 1;
     will-change: left, top, width, height;
@@ -486,8 +486,8 @@
     opacity: 0;
     max-height: 0;
     overflow: hidden;
-    transition: opacity 500ms ease,
-                max-height 500ms ease;
+    transition: opacity 700ms ease,
+                max-height 700ms ease;
     margin-top: 0;
 }
 

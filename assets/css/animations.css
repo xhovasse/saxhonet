@@ -274,21 +274,11 @@
     }
 
     /* Masonry hover : pas de transition, pas de profondeur */
+    /* Le JS verifie aussi prefersReducedMotion, ceci est un filet CSS */
     .masonry__card {
-        transition: none;
+        transition: none !important;
+        transform: none !important;
         filter: none !important;
-    }
-
-    .masonry--has-active .masonry__card--active {
-        transform: none;
-        filter: none;
-        box-shadow: var(--shadow-lg);
-        border-color: var(--c-primary-light);
-    }
-
-    .masonry--has-active .masonry__card:not(.masonry__card--active) {
-        transform: none;
-        filter: none;
-        opacity: 1;
+        opacity: 1 !important;
     }
 }

@@ -503,31 +503,24 @@
 }
 
 /* --- Profondeur de champ (depth of field) --- */
-/* Carte active : nette, au premier plan, zoom leger */
+/* Le JS (applyDepth) pilote transform, filter et opacity en inline
+   avec des valeurs graduees selon la distance geometrique.
+   Le CSS ne gere que z-index, box-shadow, border-color. */
 .masonry--has-active .masonry__card--active {
     z-index: 10;
-    transform: scale(1.03);
-    filter: blur(0);
     box-shadow: var(--shadow-xl);
     border-color: var(--c-primary-light);
 }
 
-/* Cartes inactives : en retrait, flou optique, opacite reduite */
-.masonry--has-active .masonry__card:not(.masonry__card--active) {
-    opacity: 0.75;
-    transform: scale(0.96);
-    filter: blur(1.5px);
-}
-
 /* Override le hover translateY(-6px) de .service-card dans le contexte masonry */
+/* Le JS gere transform/filter/opacity — on neutralise le hover par defaut */
 .masonry .service-card:hover {
-    transform: scale(1) translateZ(0);
+    transform: none;
     box-shadow: none;
     border-color: transparent;
 }
 
 .masonry--has-active .masonry__card--active.service-card:hover {
-    transform: scale(1.03);
     box-shadow: var(--shadow-xl);
     border-color: var(--c-primary-light);
 }

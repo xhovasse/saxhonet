@@ -85,6 +85,71 @@
         return window.innerWidth < MOBILE_BP;
     }
 
+    /* =============================================
+       PROFONDEUR DE CHAMP — niveaux gradues
+       Distance geometrique → blur + scale + opacite
+       ============================================= */
+
+    function cardCenter(pos) {
+        return { x: pos.left + pos.width / 2, y: pos.top + pos.height / 2 };
+    }
+
+    function dist(a, b) {
+        var dx = a.x - b.x;
+        var dy = a.y - b.y;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function applyDepth(cards, layout, activeIndex) {
+        if (activeIndex < 0) {
+            /* Repos : tout net, pas de profondeur */
+            for (var i = 0; i < cards.length; i++) {
+                cards[i].style.transform = '';
+                cards[i].style.filter = '';
+                cards[i].style.opacity = '';
+            }
+            return;
+        }
+
+        var activeC = cardCenter(layout[activeIndex]);
+
+        /* Collecter les distances des cartes inactives */
+        var maxDist = 0;
+        var distances = [];
+        for (var j = 0; j < cards.length; j++) {
+            if (j === activeIndex) {
+                distances.push(0);
+            } else {
+                var d = dist(cardCenter(layout[j]), activeC);
+                distances.push(d);
+                if (d > maxDist) maxDist = d;
+            }
+        }
+
+        for (var k = 0; k < cards.length; k++) {
+            if (k === activeIndex) {
+                /* Nette — premier plan */
+                cards[k].style.transform = 'scale(1.04)';
+                cards[k].style.filter = 'blur(0)';
+                cards[k].style.opacity = '1';
+            } else {
+                /* ratio 0 (proche) → 1 (le plus loin) */
+                var ratio = maxDist > 0 ? distances[k] / maxDist : 0;
+
+                /* Flou gradue : 0.8px → 3.5px */
+                var blur = 0.8 + ratio * 2.7;
+                /* Scale gradue : 0.97 → 0.91 */
+                var sc = 0.97 - ratio * 0.06;
+                /* Opacite graduee : 0.80 → 0.50 */
+                var op = 0.80 - ratio * 0.30;
+
+                cards[k].style.transform = 'scale(' + sc.toFixed(3) + ')';
+                cards[k].style.filter = 'blur(' + blur.toFixed(1) + 'px)';
+                cards[k].style.opacity = op.toFixed(2);
+            }
+        }
+    }
+
     function applyLayout(container, cards, layouts, state, activeIndex) {
         var containerWidth = container.offsetWidth;
         var scale = Math.min(containerWidth / BASE_W, 1);
@@ -109,6 +174,9 @@
             card.style.width = Math.round(pos.width * scale) + 'px';
             card.style.height = Math.round(pos.height * scale) + 'px';
         }
+
+        /* Profondeur de champ graduee */
+        applyDepth(cards, layout, activeIndex);
     }
 
     function resetToFlow(container, cards) {
@@ -120,6 +188,9 @@
             cards[i].style.top = '';
             cards[i].style.width = '';
             cards[i].style.height = '';
+            cards[i].style.transform = '';
+            cards[i].style.filter = '';
+            cards[i].style.opacity = '';
             cards[i].classList.remove('masonry__card--active');
         }
     }

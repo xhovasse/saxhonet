@@ -154,8 +154,33 @@
 
 /* --- Resolution Section --- */
 .resolution {
+    position: relative;
     padding: var(--sp-5xl) 0;
     background-color: var(--c-light);
+    overflow: hidden;
+}
+
+/* Canvas ampoules (fond anime) */
+.resolution__canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* Le contenu reste au-dessus du canvas mais laisse passer la souris */
+.resolution > .container {
+    position: relative;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Les elements interactifs dans le container restent cliquables */
+.resolution > .container * {
+    pointer-events: auto;
 }
 
 .resolution__header {

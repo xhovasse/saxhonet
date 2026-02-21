@@ -58,6 +58,9 @@ $pageDescription = t('site.description');
      MOUVEMENT 3 — L'ouverture (Resolution)
      ========================================== -->
 <section class="resolution section" id="services-preview">
+    <!-- Fond anime : ampoules qui eclosent -->
+    <canvas class="resolution__canvas" id="bulb-canvas" aria-hidden="true"></canvas>
+
     <div class="container">
         <div class="resolution__header reveal reveal-up">
             <h2 class="resolution__title"><?= e(t('home.resolution_title')) ?></h2>

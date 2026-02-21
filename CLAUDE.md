@@ -238,7 +238,8 @@ Saxho.net/                              <- Document root (= racine publique Host
 |   |   |-- app.js                      <- Core JS (header scroll, burger menu, nav-is-open)
 |   |   |-- animations.js               <- IntersectionObserver reveal (toutes pages)
 |   |   |-- typed.js                    <- Effet typing hero (home seulement)
-|   |   |-- neural.js                   <- Canvas neural interactif (home seulement)
+|   |   |-- neural.js                   <- Canvas neural interactif (home hero)
+|   |   |-- bulb-field.js               <- Animation ampoules-bulles (home resolution)
 |   |   |-- flow-field.js               <- Animation vagues (services)
 |   |   |-- contact-form.js             <- Validation + soumission AJAX + CSRF refresh
 |   |   +-- admin-blog.js               <- JS back-office blog
@@ -277,7 +278,7 @@ Saxho.net/                              <- Document root (= racine publique Host
 - **Code propre** : PHP 8+, BEM pour CSS, IIFE + var pour JS, separation logique/presentation
 - **Responsive** : mobile-first. Breakpoints : 480px / 768px / 1024px / 1440px
 - **Git** : commits clairs, branches par fonctionnalite
-- **Cache busting** : `?v=X.Y` sur tous les CSS/JS. Version actuelle : `?v=1.8`. Incrementer apres chaque modification.
+- **Cache busting** : `?v=X.Y` sur tous les CSS/JS. Version actuelle : `?v=2.1`. Incrementer apres chaque modification.
 
 > **IMPORTANT** : Voir `specs/dev-notes.md` pour les pieges connus, conventions detaillees et lecons apprises.
 

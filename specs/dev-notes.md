@@ -44,7 +44,7 @@ Sans cache busting, les modifications CSS/JS ne sont pas visibles apres deploiem
 2. Incrementer la version dans `index.php` (5 occurrences de `?v=`)
 3. Commit + deploy
 
-**Version actuelle** : `?v=1.8`
+**Version actuelle** : `?v=2.1`
 
 **Astuce** : Rechercher `?v=1.` dans les deux fichiers pour trouver toutes les occurrences.
 
@@ -262,7 +262,33 @@ valeurs initiales pour meilleure visibilite.
 **Principe** : Les vagues n'utilisent PAS l'opacite CSS (qui s'applique sur tout le canvas).
 L'opacite est controlee entierement en JS via `fillStyle` avec rgba.
 
-### 3.4 Stagger reveal
+### 3.4 Animation de fond — Bulb Field (ampoules-bulles)
+
+**Fichier** : `assets/js/bulb-field.js` (charge sur la homepage, section resolution/5 services)
+
+**Concept** : Des contours d'ampoules minimalistes naissent, grandissent comme des bulles de savon
+(deformation ondulante), puis eclatent en particules fines. Symbolise l'emergence des idees,
+leur maturation et leur eclosion.
+
+**Couleurs** : 3 couleurs en alternance cyclique :
+- Bleu profond (#1B3A9E / `--c-primary`)
+- Rose berry (#A63D6B / `--c-accent`)
+- Or doux (#D49B50)
+
+**Interaction souris** : Legere repulsion des bulbes + naissance de nouveaux bulbes au passage.
+
+**Effets visuels** :
+- Deformation type bulle de savon (wobble sinusoidal)
+- Reflet irise (gradient multicolore subtil sur le contour)
+- Filament interieur (dessin quand le bulbe est assez grand)
+- Particules d'eclosion (arcs + traits fins)
+- Flottement vers le haut (les idees montent)
+
+**Performance** : IntersectionObserver pour stopper l'animation hors viewport.
+
+**Canvas** : `#bulb-canvas` dans la section `.resolution` de `home.php`.
+
+### 3.5 Stagger reveal
 
 - Delays : 200ms / 450ms / 700ms / 950ms / 1200ms (classes `.reveal-delay-1` a `.reveal-delay-5`)
 - L'ecart de ~250ms entre chaque element rend l'arrivee progressive bien perceptible
@@ -295,7 +321,7 @@ variables.css  ->  reset.css  ->  layout.css  ->  components.css  ->  animations
 ### JS (index.php, fin du <body>)
 
 ```
-app.js  ->  animations.js  ->  [typed.js + neural.js si home]  ->  [$pageJs]
+app.js  ->  animations.js  ->  [typed.js + neural.js + bulb-field.js si home]  ->  [$pageJs]
 ```
 
 ### Fonts (preload dans head.php)

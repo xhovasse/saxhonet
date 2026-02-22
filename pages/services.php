@@ -31,7 +31,7 @@ $services = [
     ['key' => 's5', 'icon' => '&#x1F331;', 'class' => '5'],
 ];
 ?>
-<section class="section services-progression">
+<section class="section section--dark services-progression">
     <div class="container">
         <p class="services-progression__label reveal reveal-up"><?= e(t('services.progression_label')) ?></p>
 

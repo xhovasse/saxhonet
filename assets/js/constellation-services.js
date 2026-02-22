@@ -268,7 +268,7 @@
             ctx.beginPath();
             ctx.moveTo(p0.x, p0.y);
             ctx.lineTo(p1.x, p1.y);
-            ctx.strokeStyle = 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (0.15 * dimFactor).toFixed(3) + ')';
+            ctx.strokeStyle = 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (0.25 * dimFactor).toFixed(3) + ')';
             ctx.lineWidth = 1.5;
             ctx.stroke();
         }
@@ -325,7 +325,7 @@
 
             // Color and opacity
             var c = lerpColor(p.t);
-            var alpha = (0.2 + p.t * 0.6) * p.brightness;
+            var alpha = (0.3 + p.t * 0.6) * p.brightness;
 
             // Dim particles far from active node
             if (targetActive >= 0) {
@@ -372,7 +372,7 @@
             if (scale > 1.05 || dimFactor === 1) {
                 var haloR = r * 3;
                 var halo = ctx.createRadialGradient(np.x, np.y, r * 0.5, np.x, np.y, haloR);
-                halo.addColorStop(0, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (0.15 * dimFactor).toFixed(3) + ')');
+                halo.addColorStop(0, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (0.20 * dimFactor).toFixed(3) + ')');
                 halo.addColorStop(1, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0)');
                 ctx.beginPath();
                 ctx.arc(np.x, np.y, haloR, 0, Math.PI * 2);
@@ -393,7 +393,7 @@
                 ctx.beginPath();
                 var arcLen = Math.PI * (0.5 + ring * 0.3);
                 ctx.arc(0, 0, orbitR, 0, arcLen);
-                ctx.strokeStyle = 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (0.3 * dimFactor * finalScale).toFixed(3) + ')';
+                ctx.strokeStyle = 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (0.45 * dimFactor * finalScale).toFixed(3) + ')';
                 ctx.lineWidth = 1.2;
 
                 if (ring >= 1 && node.rings >= 2) {
@@ -419,7 +419,7 @@
             // Core circle
             ctx.beginPath();
             ctx.arc(np.x, np.y, r, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (0.85 * dimFactor).toFixed(3) + ')';
+            ctx.fillStyle = 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (0.95 * dimFactor).toFixed(3) + ')';
             ctx.fill();
 
             // Inner white highlight

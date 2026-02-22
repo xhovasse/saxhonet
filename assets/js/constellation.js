@@ -187,8 +187,10 @@
                 dir = 'left';
             }
 
-            // Vertically center label on node
-            var offsetY = np.y - labelH * 0.4;
+            // Vertically: left-side labels shift up, right-side labels shift down
+            // This avoids overlap along the ascending diagonal
+            var vShift = (i % 2 === 0) ? -labelH * 0.15 : labelH * 0.15;
+            var offsetY = np.y - labelH * 0.4 + vShift;
 
             // Clamp within bounds
             offsetX = Math.max(8, Math.min(w - labelW - 8, offsetX));

@@ -32,7 +32,8 @@
         "portfolio_link": "See all projects",
         "ecosystem_text": "Saxho leverages an ecosystem of expertise: project management, the specialty of our subsidiaries IXILA and PM\u00a0Side, is a powerful lever for driving innovation.",
         "cta_title": "Ready to turn your ideas into success?",
-        "cta_button": "Let's talk"
+        "cta_button": "Let's talk",
+        "climber_aria_label": "Illustration of a climber reaching for 5 holds representing our services"
     },
     "about": {
         "title": "About",

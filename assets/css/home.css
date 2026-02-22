@@ -206,6 +206,106 @@
     text-align: center;
 }
 
+/* --- Climber Scene (Interactive SVG) --- */
+.climber-scene {
+    position: relative;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto var(--sp-3xl);
+    aspect-ratio: 800 / 700;
+}
+
+.climber-scene__svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+/* Pose crossfade */
+.climber__pose {
+    transition: opacity 0.5s ease;
+}
+
+/* Holds */
+.climber__hold {
+    cursor: pointer;
+}
+
+.climber__hold-shape {
+    transition: filter 0.3s ease, transform 0.3s ease;
+    transform-origin: center;
+}
+
+.climber__hold-glow {
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+}
+
+.climber__hold--active .climber__hold-glow {
+    opacity: 0.35;
+}
+
+.climber__hold--active .climber__hold-shape {
+    filter: url(#hold-glow);
+}
+
+/* Dim inactive holds */
+.climber-scene--has-active .climber__hold:not(.climber__hold--active) .climber__hold-shape {
+    opacity: 0.35;
+    transition: opacity 0.3s ease;
+}
+
+/* Labels */
+.climber-label {
+    position: absolute;
+    max-width: 190px;
+    transition: opacity 0.3s ease;
+    cursor: pointer;
+}
+
+.climber-label__title {
+    font-family: var(--ff-display);
+    font-size: var(--fs-body);
+    font-weight: var(--fw-bold);
+    margin-bottom: 2px;
+    transition: color 0.3s ease;
+}
+
+.climber-label__text {
+    font-size: var(--fs-xs);
+    color: var(--c-medium);
+    line-height: var(--lh-relaxed);
+    transition: color 0.3s ease;
+}
+
+/* Title colors per service */
+.climber-label__title--1 { color: #6366F1; }
+.climber-label__title--2 { color: #0EA5E9; }
+.climber-label__title--3 { color: #10B981; }
+.climber-label__title--4 { color: #FF6B4A; }
+.climber-label__title--5 { color: #D4940A; }
+
+/* Label positions (percentage-based, relative to .climber-scene) */
+.climber-label--1 { top: 70%; left: 0; text-align: right; max-width: 160px; }
+.climber-label--2 { top: 50%; left: 2%; text-align: right; max-width: 170px; }
+.climber-label--3 { top: 33%; left: 1%; text-align: right; max-width: 180px; }
+.climber-label--4 { top: 20%; right: 2%; text-align: left; left: auto; }
+.climber-label--5 { top: 6%; right: 0; text-align: left; left: auto; max-width: 160px; }
+
+/* Active label highlight */
+.climber-label--active .climber-label__title {
+    color: var(--c-dark) !important;
+}
+
+.climber-label--active .climber-label__text {
+    color: var(--c-dark);
+}
+
+/* Dim inactive labels */
+.climber-scene--has-active .climber-label:not(.climber-label--active) {
+    opacity: 0.3;
+}
+
 /* --- Portfolio Preview --- */
 .portfolio-preview {
     padding: var(--sp-5xl) 0;
@@ -378,11 +478,35 @@
         font-size: var(--fs-body-lg);
     }
 
-    /* Masonry : grille 1 colonne sur mobile */
-    .masonry {
-        grid-template-columns: 1fr;
+    /* Climber : SVG masque, labels en cartes */
+    .climber-scene__svg {
+        display: none;
+    }
+
+    .climber-scene {
+        aspect-ratio: auto;
+        display: flex;
+        flex-direction: column;
         gap: var(--sp-md);
     }
+
+    .climber-label {
+        position: static !important;
+        transform: none !important;
+        text-align: left !important;
+        max-width: 100% !important;
+        padding: var(--sp-md) var(--sp-lg);
+        background: var(--c-white);
+        border-radius: var(--radius-md);
+        border-left: 4px solid var(--c-primary);
+        opacity: 1 !important;
+    }
+
+    .climber-label--1 { border-left-color: #6366F1; }
+    .climber-label--2 { border-left-color: #0EA5E9; }
+    .climber-label--3 { border-left-color: #10B981; }
+    .climber-label--4 { border-left-color: #FF6B4A; }
+    .climber-label--5 { border-left-color: #F5A623; }
 
     .portfolio-preview__grid {
         grid-template-columns: 1fr;

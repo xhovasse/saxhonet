@@ -280,4 +280,12 @@
         transform: none !important;
         opacity: 1 !important;
     }
+
+    /* Climber scene : pas de transitions */
+    .climber__pose,
+    .climber__hold-shape,
+    .climber__hold-glow,
+    .climber-label {
+        transition: none !important;
+    }
 }

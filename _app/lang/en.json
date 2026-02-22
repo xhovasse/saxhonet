@@ -105,7 +105,8 @@
         "detail_audience": "For whom",
         "cta": "Let's talk",
         "cta_final_title": "Ready to transform your ideas?",
-        "cta_final_text": "Whatever your level of maturity, there is support tailored to you."
+        "cta_final_text": "Whatever your level of maturity, there is support tailored to you.",
+        "constellation_aria_label": "Progressive path of 5 service levels"
     },
     "portfolio": {
         "title": "Portfolio",

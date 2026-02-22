@@ -282,7 +282,8 @@
     }
 
     /* Constellation : pas de transitions */
-    .constellation__label {
+    .constellation__label,
+    .constellation-svc__label {
         transition: none !important;
     }
 }

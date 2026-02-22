@@ -105,7 +105,8 @@
         "detail_audience": "Pour qui",
         "cta": "Parlons-en",
         "cta_final_title": "Pr\u00eat \u00e0 transformer vos id\u00e9es\u00a0?",
-        "cta_final_text": "Quel que soit votre niveau de maturit\u00e9, il existe un accompagnement adapt\u00e9."
+        "cta_final_text": "Quel que soit votre niveau de maturit\u00e9, il existe un accompagnement adapt\u00e9.",
+        "constellation_aria_label": "Parcours progressif des 5 niveaux de service"
     },
     "portfolio": {
         "title": "Portfolio",

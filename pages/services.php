@@ -3,17 +3,15 @@
  * Saxho.net — Page Services
  */
 $pageCss = 'services.css';
-$pageJs = 'flow-field.js';
+$pageJs = 'constellation-services.js';
 $pageDescription = t('services.page_subtitle');
 ?>
-
-<!-- Flow Field Canvas Background -->
-<div class="services-page" id="services-page">
-<canvas class="services-page__canvas" id="flow-canvas" aria-hidden="true"></canvas>
 
 <!-- ==========================================
      HERO — Services
      ========================================== -->
+<div class="services-page" id="services-page">
+
 <section class="page-hero page-hero--services">
     <div class="container">
         <h1 class="page-hero__title reveal reveal-up"><?= e(t('services.title')) ?></h1>
@@ -22,29 +20,32 @@ $pageDescription = t('services.page_subtitle');
 </section>
 
 <!-- ==========================================
-     MOSAIQUE DE SERVICES
+     CONSTELLATION SERVICES (Diagonal Line)
      ========================================== -->
+<?php
+$services = [
+    ['key' => 's1', 'icon' => '&#x1F4A1;', 'class' => '1'],
+    ['key' => 's2', 'icon' => '&#x1F91D;', 'class' => '2'],
+    ['key' => 's3', 'icon' => '&#x2699;',  'class' => '3'],
+    ['key' => 's4', 'icon' => '&#x1F680;', 'class' => '4'],
+    ['key' => 's5', 'icon' => '&#x1F331;', 'class' => '5'],
+];
+?>
 <section class="section services-progression">
     <div class="container">
         <p class="services-progression__label reveal reveal-up"><?= e(t('services.progression_label')) ?></p>
 
-        <div class="masonry reveal reveal-up" id="services-masonry">
-            <?php
-            $services = [
-                ['key' => 's1', 'icon' => '&#x1F4A1;', 'class' => '1'],
-                ['key' => 's2', 'icon' => '&#x1F91D;', 'class' => '2'],
-                ['key' => 's3', 'icon' => '&#x2699;',  'class' => '3'],
-                ['key' => 's4', 'icon' => '&#x1F680;', 'class' => '4'],
-                ['key' => 's5', 'icon' => '&#x1F331;', 'class' => '5'],
-            ];
-            foreach ($services as $i => $s):
-            ?>
-            <a href="#service-<?= $i + 1 ?>" class="masonry__card service-card service-card--color-<?= $s['class'] ?> reveal reveal-up reveal-delay-<?= $i + 1 ?>">
-                <div class="service-card__icon service-card__icon--<?= $s['class'] ?>" aria-hidden="true">
-                    <?= $s['icon'] ?>
+        <div class="constellation-svc reveal reveal-up" id="constellation-svc"
+             role="img" aria-label="<?= e(t('services.constellation_aria_label')) ?>">
+            <canvas class="constellation-svc__canvas" id="constellation-svc-canvas" aria-hidden="true"></canvas>
+
+            <?php foreach ($services as $i => $s): ?>
+            <a href="#service-<?= $i + 1 ?>" class="constellation-svc__label constellation-svc__label--<?= $i + 1 ?>" data-service="<?= $i + 1 ?>">
+                <span class="constellation-svc__num"><?= $i + 1 ?></span>
+                <div>
+                    <h3 class="constellation-svc__label-title constellation-svc__label-title--<?= $i + 1 ?>"><?= e(t('services.' . $s['key'] . '_title')) ?></h3>
+                    <p class="constellation-svc__label-text"><?= e(t('services.' . $s['key'] . '_short')) ?></p>
                 </div>
-                <h3 class="service-card__title"><?= e(t('services.' . $s['key'] . '_title')) ?></h3>
-                <p class="service-card__text"><?= e(t('services.' . $s['key'] . '_short')) ?></p>
             </a>
             <?php endforeach; ?>
         </div>

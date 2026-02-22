@@ -287,11 +287,11 @@
 
 /* Label positions (percentage-based, relative to .climber-scene)
    Holds are clustered — labels positioned around the cluster */
-.climber-label--1 { top: 62%; left: 0; text-align: right; max-width: 180px; }
-.climber-label--2 { top: 45%; right: 0; text-align: left; left: auto; max-width: 180px; }
-.climber-label--3 { top: 36%; left: 0; text-align: right; max-width: 180px; }
-.climber-label--4 { top: 12%; right: 0; text-align: left; left: auto; max-width: 180px; }
-.climber-label--5 { top: 4%; left: 0; text-align: right; max-width: 180px; }
+.climber-label--1 { top: 66%; left: 0; text-align: right; max-width: 180px; }
+.climber-label--2 { top: 48%; right: 0; text-align: left; left: auto; max-width: 180px; }
+.climber-label--3 { top: 38%; left: 0; text-align: right; max-width: 180px; }
+.climber-label--4 { top: 16%; right: 0; text-align: left; left: auto; max-width: 180px; }
+.climber-label--5 { top: 8%; left: 0; text-align: right; max-width: 180px; }
 
 /* Active label highlight */
 .climber-label--active .climber-label__title {

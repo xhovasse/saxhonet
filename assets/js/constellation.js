@@ -42,7 +42,7 @@
         orbitHoverSpeed: 1.8,
         haloRadius: 50,
 
-        pathPadding: 0.08,
+        pathPadding: 0.10,
 
         mouseGravity: 0.12,
         mouseRadius: 140,
@@ -60,11 +60,11 @@
 
     // Node definitions: t = position on curve, rings = orbital ring count
     var NODES = [
-        { t: 0.08, rings: 1, sizeBonus: 0 },
-        { t: 0.28, rings: 1, sizeBonus: 2 },
+        { t: 0.10, rings: 1, sizeBonus: 0 },
+        { t: 0.30, rings: 1, sizeBonus: 2 },
         { t: 0.50, rings: 2, sizeBonus: 4 },
-        { t: 0.72, rings: 2, sizeBonus: 6 },
-        { t: 0.92, rings: 3, sizeBonus: 8 }
+        { t: 0.70, rings: 2, sizeBonus: 6 },
+        { t: 0.90, rings: 3, sizeBonus: 8 }
     ];
 
     // --- State ---
@@ -145,16 +145,16 @@
         canvas.style.height = h + 'px';
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-        // Bezier: bottom-left to top-right, gentle S-curve
+        // Bezier: bottom-left to top-right, near-linear for even node spacing
         var pad = w * CONFIG.pathPadding;
-        bp0.x = pad;
-        bp0.y = h - pad * 0.5;
-        bp1.x = w * 0.25;
-        bp1.y = h * 0.75;
-        bp2.x = w * 0.75;
-        bp2.y = h * 0.25;
-        bp3.x = w - pad;
-        bp3.y = pad * 0.8;
+        bp0.x = pad + w * 0.02;
+        bp0.y = h - pad;
+        bp1.x = w * 0.33;
+        bp1.y = h * 0.66;
+        bp2.x = w * 0.66;
+        bp2.y = h * 0.33;
+        bp3.x = w - pad - w * 0.02;
+        bp3.y = pad;
 
         // Compute node positions
         nodePositions = [];
@@ -174,20 +174,21 @@
             var np = nodePositions[i];
             var labelW = labels[i].offsetWidth || 180;
             var labelH = labels[i].offsetHeight || 60;
-            var offsetX, textAlign;
+            var nodeR = (CONFIG.nodeBaseRadius + NODES[i].sizeBonus) * 2.5;
+            var gap = nodeR + 14; // space between node edge and label
+            var offsetX, dir;
 
-            // Alternate sides: odd (0,2,4) left, even (1,3) right
+            // Alternate sides: indices 0,2,4 → left of node; 1,3 → right
             if (i % 2 === 0) {
-                // Label to the left of the node
-                offsetX = np.x - labelW - 30;
-                textAlign = 'right';
+                offsetX = np.x - labelW - gap;
+                dir = 'right';
             } else {
-                // Label to the right of the node
-                offsetX = np.x + 30;
-                textAlign = 'left';
+                offsetX = np.x + gap;
+                dir = 'left';
             }
 
-            var offsetY = np.y - labelH * 0.5;
+            // Vertically center label on node
+            var offsetY = np.y - labelH * 0.4;
 
             // Clamp within bounds
             offsetX = Math.max(8, Math.min(w - labelW - 8, offsetX));
@@ -195,7 +196,7 @@
 
             labels[i].style.left = offsetX + 'px';
             labels[i].style.top = offsetY + 'px';
-            labels[i].style.textAlign = textAlign;
+            labels[i].style.textAlign = dir;
         }
     }
 

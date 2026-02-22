@@ -71,9 +71,7 @@ $services = [
 <section class="section service-detail <?= $i % 2 === 1 ? 'section--surface' : '' ?>" id="service-<?= $i + 1 ?>">
     <div class="container">
         <div class="service-detail__header reveal reveal-up">
-            <div class="service-detail__icon service-card__icon service-card__icon--<?= $s['class'] ?>" aria-hidden="true">
-                <?= $s['icon'] ?>
-            </div>
+            <canvas class="service-detail__planet" data-service-idx="<?= $i ?>" width="160" height="160" aria-hidden="true"></canvas>
             <div class="service-detail__title-group">
                 <h2 class="service-detail__title"><?= e(t('services.' . $s['key'] . '_title')) ?></h2>
                 <?php if ($s['key'] === 's4' || $s['key'] === 's5'): ?>

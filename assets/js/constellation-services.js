@@ -691,4 +691,237 @@
         }, 250);
     });
 
+    // =============================================
+    // Detail Planet Icons — animated mini-canvases
+    // =============================================
+    (function initDetailPlanets() {
+        var canvases = document.querySelectorAll('canvas.service-detail__planet');
+        if (!canvases.length) return;
+
+        // Config per service (progression: simple → complex)
+        var PLANET_CONFIGS = [
+            { rings: 1, ringTilt: 0.35, speed: 0.4,  moonCount: 1 },
+            { rings: 1, ringTilt: 0.40, speed: 0.35, moonCount: 1 },
+            { rings: 2, ringTilt: 0.30, speed: 0.3,  moonCount: 1 },
+            { rings: 2, ringTilt: 0.45, speed: 0.25, moonCount: 2 },
+            { rings: 3, ringTilt: 0.50, speed: 0.2,  moonCount: 2 }
+        ];
+
+        var planets = [];
+        var planetRaf = null;
+
+        // Collect planet canvases
+        for (var pi = 0; pi < canvases.length; pi++) {
+            var cvs = canvases[pi];
+            var idx = parseInt(cvs.getAttribute('data-service-idx'), 10);
+            if (isNaN(idx) || idx < 0 || idx >= CONFIG.colors.length) continue;
+
+            var pCtx = cvs.getContext('2d');
+            var pDpr = Math.min(window.devicePixelRatio || 1, 2);
+
+            // Canvas intrinsic size already set via HTML attributes (160×160)
+            // Set display size from CSS (80×80 or 64×64 mobile)
+            var displayW = cvs.offsetWidth || 80;
+            var displayH = cvs.offsetHeight || 80;
+            cvs.width = displayW * pDpr;
+            cvs.height = displayH * pDpr;
+            pCtx.setTransform(pDpr, 0, 0, pDpr, 0, 0);
+
+            planets.push({
+                canvas: cvs,
+                ctx: pCtx,
+                dpr: pDpr,
+                w: displayW,
+                h: displayH,
+                idx: idx,
+                cfg: PLANET_CONFIGS[idx] || PLANET_CONFIGS[0],
+                color: CONFIG.colors[idx],
+                visible: false
+            });
+        }
+
+        if (!planets.length) return;
+
+        // Reduced motion: draw static planet once and stop
+        if (prefersReduced) {
+            for (var si = 0; si < planets.length; si++) {
+                drawPlanetStatic(planets[si]);
+            }
+            return;
+        }
+
+        // IntersectionObserver per planet
+        if (window.IntersectionObserver) {
+            var planetObs = new IntersectionObserver(function (entries) {
+                for (var ei = 0; ei < entries.length; ei++) {
+                    var entry = entries[ei];
+                    // Find matching planet
+                    for (var pj = 0; pj < planets.length; pj++) {
+                        if (planets[pj].canvas === entry.target) {
+                            planets[pj].visible = entry.isIntersecting;
+                            break;
+                        }
+                    }
+                }
+                // Start animation if any visible
+                var anyVisible = false;
+                for (var av = 0; av < planets.length; av++) {
+                    if (planets[av].visible) { anyVisible = true; break; }
+                }
+                if (anyVisible && !planetRaf) {
+                    planetRaf = requestAnimationFrame(animatePlanets);
+                }
+            }, { threshold: 0.1 });
+
+            for (var oi = 0; oi < planets.length; oi++) {
+                planetObs.observe(planets[oi].canvas);
+            }
+        } else {
+            // Fallback: all visible
+            for (var fi = 0; fi < planets.length; fi++) {
+                planets[fi].visible = true;
+            }
+        }
+
+        // Start animation
+        if (!planetRaf) {
+            planetRaf = requestAnimationFrame(animatePlanets);
+        }
+
+        function animatePlanets() {
+            var anyVisible = false;
+            for (var i = 0; i < planets.length; i++) {
+                if (planets[i].visible) {
+                    anyVisible = true;
+                    drawPlanet(planets[i]);
+                }
+            }
+            if (anyVisible) {
+                planetRaf = requestAnimationFrame(animatePlanets);
+            } else {
+                planetRaf = null;
+            }
+        }
+
+        function drawPlanetStatic(p) {
+            var cx = p.w * 0.5;
+            var cy = p.h * 0.5;
+            var c = p.color;
+            var r = 10;
+
+            p.ctx.clearRect(0, 0, p.w, p.h);
+
+            // Halo
+            var halo = p.ctx.createRadialGradient(cx, cy, r * 0.5, cx, cy, r * 3);
+            halo.addColorStop(0, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0.15)');
+            halo.addColorStop(1, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0)');
+            p.ctx.beginPath();
+            p.ctx.arc(cx, cy, r * 3, 0, Math.PI * 2);
+            p.ctx.fillStyle = halo;
+            p.ctx.fill();
+
+            // Core
+            p.ctx.beginPath();
+            p.ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            p.ctx.fillStyle = 'rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0.9)';
+            p.ctx.fill();
+
+            // Highlight
+            p.ctx.beginPath();
+            p.ctx.arc(cx - r * 0.2, cy - r * 0.2, r * 0.4, 0, Math.PI * 2);
+            p.ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+            p.ctx.fill();
+        }
+
+        function drawPlanet(p) {
+            var cx = p.w * 0.5;
+            var cy = p.h * 0.5;
+            var c = p.color;
+            var cfg = p.cfg;
+
+            // Pulse
+            var pulse = 1 + Math.sin(animTime * 1.2 + p.idx * 1.5) * 0.06;
+            var r = 10 * pulse;
+
+            p.ctx.clearRect(0, 0, p.w, p.h);
+
+            // Halo (radial gradient)
+            var haloR = r * 3.2;
+            var halo = p.ctx.createRadialGradient(cx, cy, r * 0.5, cx, cy, haloR);
+            halo.addColorStop(0, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0.12)');
+            halo.addColorStop(1, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0)');
+            p.ctx.beginPath();
+            p.ctx.arc(cx, cy, haloR, 0, Math.PI * 2);
+            p.ctx.fillStyle = halo;
+            p.ctx.fill();
+
+            // Orbital rings (behind core for lower half, in front for upper)
+            for (var ring = 0; ring < cfg.rings; ring++) {
+                var orbitR = r * (2.2 + ring * 1.0);
+                var angle = animTime * cfg.speed * (ring % 2 === 0 ? 1 : -0.7) + ring * 0.8 + p.idx * 0.5;
+
+                p.ctx.save();
+                p.ctx.translate(cx, cy);
+                p.ctx.rotate(angle * 0.3 + p.idx * 0.7);
+                p.ctx.scale(1, cfg.ringTilt);
+
+                p.ctx.beginPath();
+                p.ctx.arc(0, 0, orbitR, 0, Math.PI * 2);
+                p.ctx.strokeStyle = 'rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0.25)';
+                p.ctx.lineWidth = ring >= 1 ? 0.8 : 1;
+
+                if (ring >= 1) {
+                    p.ctx.setLineDash([3, 5]);
+                } else {
+                    p.ctx.setLineDash([]);
+                }
+                p.ctx.stroke();
+                p.ctx.setLineDash([]);
+
+                p.ctx.restore();
+            }
+
+            // Satellites / moons
+            for (var mi = 0; mi < cfg.moonCount; mi++) {
+                var moonOrbitR = r * (3.0 + mi * 1.2);
+                var moonAngle = animTime * cfg.speed * 1.5 + mi * 2.3 + p.idx * 1.7;
+                var moonX = cx + Math.cos(moonAngle) * moonOrbitR;
+                var moonY = cy + Math.sin(moonAngle) * moonOrbitR * cfg.ringTilt;
+
+                p.ctx.beginPath();
+                p.ctx.arc(moonX, moonY, 1.5, 0, Math.PI * 2);
+                p.ctx.fillStyle = 'rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0.6)';
+                p.ctx.fill();
+            }
+
+            // Core circle
+            p.ctx.beginPath();
+            p.ctx.arc(cx, cy, r, 0, Math.PI * 2);
+            p.ctx.fillStyle = 'rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0.9)';
+            p.ctx.fill();
+
+            // Inner white highlight
+            p.ctx.beginPath();
+            p.ctx.arc(cx - r * 0.2, cy - r * 0.2, r * 0.4, 0, Math.PI * 2);
+            p.ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+            p.ctx.fill();
+        }
+
+        // Handle resize for planet canvases
+        window.addEventListener('resize', function () {
+            for (var ri = 0; ri < planets.length; ri++) {
+                var pp = planets[ri];
+                var dw = pp.canvas.offsetWidth || 80;
+                var dh = pp.canvas.offsetHeight || 80;
+                if (dw !== pp.w || dh !== pp.h) {
+                    pp.w = dw;
+                    pp.h = dh;
+                    pp.canvas.width = dw * pp.dpr;
+                    pp.canvas.height = dh * pp.dpr;
+                    pp.ctx.setTransform(pp.dpr, 0, 0, pp.dpr, 0, 0);
+                }
+            }
+        });
+    })();
+
 })();

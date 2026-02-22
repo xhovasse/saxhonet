@@ -169,7 +169,10 @@
     margin-bottom: var(--sp-2xl);
 }
 
-.service-detail__icon {
+/* --- Service detail planet icon (animated canvas) --- */
+.service-detail__planet {
+    width: 80px;
+    height: 80px;
     flex-shrink: 0;
 }
 
@@ -305,6 +308,11 @@
     .service-detail__grid {
         grid-template-columns: 1fr;
         gap: var(--sp-md);
+    }
+
+    .service-detail__planet {
+        width: 64px;
+        height: 64px;
     }
 
     .service-detail__header {

@@ -160,27 +160,10 @@
     overflow: hidden;
 }
 
-/* Canvas ampoules (fond anime) */
-.resolution__canvas {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 0;
-    pointer-events: none;
-}
-
-/* Le contenu reste au-dessus du canvas mais laisse passer la souris */
+/* Le contenu reste au-dessus */
 .resolution > .container {
     position: relative;
     z-index: 1;
-    pointer-events: none;
-}
-
-/* Les elements interactifs dans le container restent cliquables */
-.resolution > .container * {
-    pointer-events: auto;
 }
 
 .resolution__header {
@@ -206,105 +189,102 @@
     text-align: center;
 }
 
-/* --- Climber Scene (Interactive SVG) --- */
-.climber-scene {
+/* --- Constellation Path (Interactive Canvas) --- */
+.constellation {
     position: relative;
     width: 100%;
-    max-width: 900px;
+    max-width: 1000px;
     margin: 0 auto var(--sp-3xl);
-    aspect-ratio: 800 / 750;
+    aspect-ratio: 16 / 9;
 }
 
-.climber-scene__svg {
+.constellation__canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
-    display: block;
+    z-index: 0;
+    border-radius: var(--radius-md);
 }
 
-/* Pose crossfade */
-.climber__pose {
-    transition: opacity 0.5s ease;
-}
-
-/* Holds */
-.climber__hold {
-    cursor: pointer;
-}
-
-.climber__hold-shape {
-    transition: filter 0.3s ease, transform 0.3s ease;
-    transform-origin: center;
-}
-
-.climber__hold-glow {
-    transition: opacity 0.4s ease;
-    pointer-events: none;
-}
-
-.climber__hold--active .climber__hold-glow {
-    opacity: 0.35;
-}
-
-.climber__hold--active .climber__hold-shape {
-    filter: url(#hold-glow);
-}
-
-/* Dim inactive holds */
-.climber-scene--has-active .climber__hold:not(.climber__hold--active) .climber__hold-shape {
-    opacity: 0.35;
-    transition: opacity 0.3s ease;
-}
-
-/* Labels */
-.climber-label {
+/* Labels — positioned dynamically by JS */
+.constellation__label {
     position: absolute;
-    max-width: 190px;
-    transition: opacity 0.3s ease;
+    display: flex;
+    align-items: flex-start;
+    gap: var(--sp-sm);
+    max-width: 200px;
+    opacity: 0.75;
+    transition: opacity var(--transition-normal), transform var(--transition-normal);
     cursor: pointer;
+    z-index: 1;
 }
 
-.climber-label__title {
+.constellation__label:hover {
+    opacity: 1;
+}
+
+.constellation__num {
+    font-family: var(--ff-mono);
+    font-size: var(--fs-xs);
+    flex-shrink: 0;
+    line-height: 1.4;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-full);
+    border: 1px solid var(--c-muted);
+    color: var(--c-muted);
+    transition: all var(--transition-normal);
+}
+
+.constellation__label-title {
     font-family: var(--ff-display);
-    font-size: var(--fs-body);
+    font-size: var(--fs-small);
     font-weight: var(--fw-bold);
     margin-bottom: 2px;
-    transition: color 0.3s ease;
+    transition: color var(--transition-normal);
 }
 
-.climber-label__text {
+.constellation__label-text {
     font-size: var(--fs-xs);
     color: var(--c-medium);
     line-height: var(--lh-relaxed);
-    transition: color 0.3s ease;
+    transition: color var(--transition-normal);
 }
 
 /* Title colors per service */
-.climber-label__title--1 { color: #FF6B4A; }
-.climber-label__title--2 { color: #D4940A; }
-.climber-label__title--3 { color: #10B981; }
-.climber-label__title--4 { color: #0EA5E9; }
-.climber-label__title--5 { color: #6366F1; }
+.constellation__label-title--1 { color: #FF6B4A; }
+.constellation__label-title--2 { color: #D4940A; }
+.constellation__label-title--3 { color: #10B981; }
+.constellation__label-title--4 { color: #0EA5E9; }
+.constellation__label-title--5 { color: #6366F1; }
 
-/* Label positions (percentage-based, relative to .climber-scene)
-   Holds are clustered — labels positioned around the cluster */
-.climber-label--1 { top: 66%; left: 0; text-align: right; max-width: 180px; }
-.climber-label--2 { top: 48%; right: 0; text-align: left; left: auto; max-width: 180px; }
-.climber-label--3 { top: 38%; left: 0; text-align: right; max-width: 180px; }
-.climber-label--4 { top: 16%; right: 0; text-align: left; left: auto; max-width: 180px; }
-.climber-label--5 { top: 8%; left: 0; text-align: right; max-width: 180px; }
+/* Active label */
+.constellation__label--active {
+    opacity: 1;
+}
 
-/* Active label highlight */
-.climber-label--active .climber-label__title {
+.constellation__label--active .constellation__num {
+    background-color: var(--c-dark);
+    color: var(--c-white);
+    border-color: var(--c-dark);
+}
+
+.constellation__label--active .constellation__label-title {
     color: var(--c-dark) !important;
 }
 
-.climber-label--active .climber-label__text {
+.constellation__label--active .constellation__label-text {
     color: var(--c-dark);
 }
 
-/* Dim inactive labels */
-.climber-scene--has-active .climber-label:not(.climber-label--active) {
-    opacity: 0.3;
+/* Dim inactive labels when one is active */
+.constellation--has-active .constellation__label:not(.constellation__label--active) {
+    opacity: 0.25;
 }
 
 /* --- Portfolio Preview --- */
@@ -479,19 +459,19 @@
         font-size: var(--fs-body-lg);
     }
 
-    /* Climber : SVG masque, labels en cartes */
-    .climber-scene__svg {
+    /* Constellation : canvas masque, labels en cartes */
+    .constellation__canvas {
         display: none;
     }
 
-    .climber-scene {
+    .constellation {
         aspect-ratio: auto;
         display: flex;
         flex-direction: column;
         gap: var(--sp-md);
     }
 
-    .climber-label {
+    .constellation__label {
         position: static !important;
         transform: none !important;
         text-align: left !important;
@@ -503,11 +483,11 @@
         opacity: 1 !important;
     }
 
-    .climber-label--1 { border-left-color: #FF6B4A; }
-    .climber-label--2 { border-left-color: #F5A623; }
-    .climber-label--3 { border-left-color: #10B981; }
-    .climber-label--4 { border-left-color: #38BDF8; }
-    .climber-label--5 { border-left-color: #6366F1; }
+    .constellation__label--1 { border-left-color: #FF6B4A; }
+    .constellation__label--2 { border-left-color: #D4940A; }
+    .constellation__label--3 { border-left-color: #10B981; }
+    .constellation__label--4 { border-left-color: #0EA5E9; }
+    .constellation__label--5 { border-left-color: #6366F1; }
 
     .portfolio-preview__grid {
         grid-template-columns: 1fr;

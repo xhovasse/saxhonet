@@ -108,11 +108,11 @@
 
 /* Category-specific gradients */
 .blog-card[data-category="innovation"] .blog-card__placeholder {
-    background: linear-gradient(135deg, #1B3A9E 0%, #3A7DFF 40%, #A63D6B 100%);
+    background: linear-gradient(135deg, #1B3A9E 0%, #3A7DFF 40%, #D94F70 100%);
 }
 
 .blog-card[data-category="methodes"] .blog-card__placeholder {
-    background: linear-gradient(135deg, #FF6B4A 0%, #F5A623 100%);
+    background: linear-gradient(135deg, #D94F70 0%, #F5A623 100%);
 }
 
 .blog-card[data-category="retours-experience"] .blog-card__placeholder {
@@ -120,7 +120,7 @@
 }
 
 .blog-card[data-category="ecosysteme"] .blog-card__placeholder {
-    background: linear-gradient(135deg, #A63D6B 0%, #6366F1 100%);
+    background: linear-gradient(135deg, #D94F70 0%, #6366F1 100%);
 }
 
 /* --- Geometric shapes per category --- */
@@ -332,11 +332,11 @@
 
 /* Category-specific hero gradients (no cover image) */
 .page-hero--blog-article[data-category="innovation"] {
-    background: linear-gradient(135deg, #0D0D1A 0%, #1B3A9E 60%, #A63D6B 100%);
+    background: linear-gradient(135deg, #0D0D1A 0%, #1B3A9E 60%, #D94F70 100%);
 }
 
 .page-hero--blog-article[data-category="methodes"] {
-    background: linear-gradient(135deg, #0D0D1A 0%, #FF6B4A 60%, #F5A623 100%);
+    background: linear-gradient(135deg, #0D0D1A 0%, #D94F70 60%, #F5A623 100%);
 }
 
 .page-hero--blog-article[data-category="retours-experience"] {
@@ -344,7 +344,7 @@
 }
 
 .page-hero--blog-article[data-category="ecosysteme"] {
-    background: linear-gradient(135deg, #0D0D1A 0%, #A63D6B 60%, #6366F1 100%);
+    background: linear-gradient(135deg, #0D0D1A 0%, #D94F70 60%, #6366F1 100%);
 }
 
 /* Cover image as hero background */

@@ -192,7 +192,7 @@
 
 .site-header.is-scrolled .nav__link::after,
 .site-header.header--light .nav__link::after {
-    background-color: var(--c-primary);
+    background-color: var(--c-secondary);
 }
 
 /* Quand menu ouvert : forcer les couleurs blanches meme si is-scrolled/header--light

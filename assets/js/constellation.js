@@ -58,7 +58,7 @@
         leaveDelay: 350,
 
         colors: [
-            { r: 255, g: 107, b: 74  },  // #FF6B4A — orange
+            { r: 217, g: 79,  b: 112 },  // #D94F70 — rose
             { r: 212, g: 148, b: 10  },  // #D4940A — amber
             { r: 16,  g: 185, b: 129 },  // #10B981 — green
             { r: 14,  g: 165, b: 233 },  // #0EA5E9 — sky

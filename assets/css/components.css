@@ -191,7 +191,7 @@
 }
 
 .badge--secondary {
-    background-color: rgba(255, 107, 74, 0.1);
+    background-color: rgba(217, 79, 112, 0.1);
     color: var(--c-secondary);
 }
 
@@ -443,7 +443,7 @@
 .service-card--color-1 { background-color: #F0F0FF; }  /* indigo-tinted */
 .service-card--color-2 { background-color: #EBF8FF; }  /* sky-tinted */
 .service-card--color-3 { background-color: #ECFDF5; }  /* emerald-tinted */
-.service-card--color-4 { background-color: #FFF5F2; }  /* orange-tinted */
+.service-card--color-4 { background-color: #FFF0F3; }  /* rose-tinted */
 .service-card--color-5 { background-color: #FFFBEB; }  /* amber-tinted */
 
 /* --- Masonry — grille de cartes egales avec hover highlight --- */

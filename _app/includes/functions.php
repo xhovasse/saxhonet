@@ -349,7 +349,7 @@ function email_template(string $title, string $content, string $buttonUrl = '', 
     <body style="margin:0;padding:0;background:#F8F7F4;font-family:Arial,sans-serif;">
         <div style="max-width:560px;margin:40px auto;background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);">
             <div style="background:#0D0D1A;padding:24px 32px;text-align:center;">
-                <span style="font-size:24px;font-weight:600;color:#ffffff;letter-spacing:1px;">saxh<span style="color:#A63D6B;">o</span></span>
+                <span style="font-size:24px;font-weight:600;color:#ffffff;letter-spacing:1px;">saxh<span style="color:#D94F70;">o</span></span>
             </div>
             <div style="padding:40px 32px;">
                 <h1 style="margin:0 0 24px;font-size:22px;color:#0D0D1A;">' . $title . '</h1>

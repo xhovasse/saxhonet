@@ -56,7 +56,7 @@
         pulseBrightness: 0.6,    // Intensite globale des pulses (0-1)
         pulseColors: [
             { r: 58, g: 125, b: 255 },   // Bleu electrique
-            { r: 166, g: 61, b: 107 },    // Rose framboise (accent logo)
+            { r: 217, g: 79, b: 112 },    // Rose corail (accent logo #D94F70)
             { r: 245, g: 166, b: 35 },    // Or chaud
             { r: 140, g: 100, b: 255 },   // Violet
         ]

@@ -7,12 +7,12 @@
     --c-primary: #1B3A9E;
     --c-primary-light: #3A7DFF;
     --c-primary-dark: #122970;
-    --c-secondary: #FF6B4A;
-    --c-secondary-light: #FF8F75;
+    --c-secondary: #D94F70;
+    --c-secondary-light: #E2758E;
     --c-tertiary: #F5A623;
     --c-tertiary-light: #F7BD5A;
-    --c-accent: #A63D6B;
-    --c-accent-light: #C4547F;
+    --c-accent: #D94F70;
+    --c-accent-light: #E2758E;
     --c-dark: #0D0D1A;
     --c-dark-soft: #1A1A2E;
     --c-medium: #4A5568;
@@ -88,7 +88,7 @@
     --shadow-lg: 0 8px 30px rgba(13, 13, 26, 0.12);
     --shadow-xl: 0 16px 50px rgba(13, 13, 26, 0.15);
     --shadow-glow-primary: 0 0 30px rgba(27, 58, 158, 0.3);
-    --shadow-glow-secondary: 0 0 30px rgba(255, 107, 74, 0.3);
+    --shadow-glow-secondary: 0 0 30px rgba(217, 79, 112, 0.3);
 
     /* --- Transitions --- */
     --transition-fast: 150ms ease;

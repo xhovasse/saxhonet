@@ -692,35 +692,34 @@
     });
 
     // =============================================
-    // Detail Planet Icons — animated mini-canvases
+    // Detail Planet Icons + Background Orbital Fields
     // =============================================
     (function initDetailPlanets() {
-        var canvases = document.querySelectorAll('canvas.service-detail__planet');
-        if (!canvases.length) return;
+        var iconCanvases = document.querySelectorAll('canvas.service-detail__planet');
+        var bgCanvases = document.querySelectorAll('canvas.service-detail__bg');
+        if (!iconCanvases.length) return;
 
         // Config per service (progression: simple → complex)
         var PLANET_CONFIGS = [
-            { rings: 1, ringTilt: 0.35, speed: 0.4,  moonCount: 1 },
-            { rings: 1, ringTilt: 0.40, speed: 0.35, moonCount: 1 },
-            { rings: 2, ringTilt: 0.30, speed: 0.3,  moonCount: 1 },
-            { rings: 2, ringTilt: 0.45, speed: 0.25, moonCount: 2 },
-            { rings: 3, ringTilt: 0.50, speed: 0.2,  moonCount: 2 }
+            { rings: 1, ringTilt: 0.35, speed: 0.4,  moonCount: 1, bgRings: 3, bgParticles: 25 },
+            { rings: 1, ringTilt: 0.40, speed: 0.35, moonCount: 1, bgRings: 4, bgParticles: 30 },
+            { rings: 2, ringTilt: 0.30, speed: 0.3,  moonCount: 1, bgRings: 5, bgParticles: 35 },
+            { rings: 2, ringTilt: 0.45, speed: 0.25, moonCount: 2, bgRings: 6, bgParticles: 40 },
+            { rings: 3, ringTilt: 0.50, speed: 0.2,  moonCount: 2, bgRings: 8, bgParticles: 50 }
         ];
 
         var planets = [];
-        var planetRaf = null;
+        var backgrounds = [];
+        var detailRaf = null;
+        var pDpr = Math.min(window.devicePixelRatio || 1, 2);
 
-        // Collect planet canvases
-        for (var pi = 0; pi < canvases.length; pi++) {
-            var cvs = canvases[pi];
+        // --- Collect icon canvases ---
+        for (var pi = 0; pi < iconCanvases.length; pi++) {
+            var cvs = iconCanvases[pi];
             var idx = parseInt(cvs.getAttribute('data-service-idx'), 10);
             if (isNaN(idx) || idx < 0 || idx >= CONFIG.colors.length) continue;
 
             var pCtx = cvs.getContext('2d');
-            var pDpr = Math.min(window.devicePixelRatio || 1, 2);
-
-            // Canvas intrinsic size already set via HTML attributes (160×160)
-            // Set display size from CSS (80×80 or 64×64 mobile)
             var displayW = cvs.offsetWidth || 80;
             var displayH = cvs.offsetHeight || 80;
             cvs.width = displayW * pDpr;
@@ -730,19 +729,75 @@
             planets.push({
                 canvas: cvs,
                 ctx: pCtx,
-                dpr: pDpr,
                 w: displayW,
                 h: displayH,
                 idx: idx,
                 cfg: PLANET_CONFIGS[idx] || PLANET_CONFIGS[0],
-                color: CONFIG.colors[idx],
-                visible: false
+                color: CONFIG.colors[idx]
             });
         }
 
-        if (!planets.length) return;
+        // --- Collect background canvases + create orbital particles ---
+        for (var bi = 0; bi < bgCanvases.length; bi++) {
+            var bgCvs = bgCanvases[bi];
+            var bgIdx = parseInt(bgCvs.getAttribute('data-service-bg'), 10);
+            if (isNaN(bgIdx) || bgIdx < 0 || bgIdx >= CONFIG.colors.length) continue;
 
-        // Reduced motion: draw static planet once and stop
+            var bgCtx = bgCvs.getContext('2d');
+            var section = bgCvs.parentElement;
+            var sW = section.offsetWidth;
+            var sH = section.offsetHeight;
+            bgCvs.width = sW * pDpr;
+            bgCvs.height = sH * pDpr;
+            bgCtx.setTransform(pDpr, 0, 0, pDpr, 0, 0);
+
+            var cfg = PLANET_CONFIGS[bgIdx] || PLANET_CONFIGS[0];
+            var c = CONFIG.colors[bgIdx];
+
+            // Find the planet icon position relative to section
+            var planetIcon = section.querySelector('.service-detail__planet');
+            var originX = 80; // default
+            var originY = 80;
+            if (planetIcon) {
+                var secRect = section.getBoundingClientRect();
+                var iconRect = planetIcon.getBoundingClientRect();
+                originX = iconRect.left - secRect.left + iconRect.width * 0.5;
+                originY = iconRect.top - secRect.top + iconRect.height * 0.5;
+            }
+
+            // Create floating particles for this background
+            var bgParticles = [];
+            for (var pp = 0; pp < cfg.bgParticles; pp++) {
+                bgParticles.push({
+                    angle: Math.random() * Math.PI * 2,
+                    radius: 60 + Math.random() * Math.min(sW, sH) * 0.45,
+                    speed: 0.0003 + Math.random() * 0.0008,
+                    size: 1 + Math.random() * 2.5,
+                    brightness: 0.15 + Math.random() * 0.25,
+                    tiltFactor: 0.3 + Math.random() * 0.5,
+                    phaseOff: Math.random() * Math.PI * 2
+                });
+            }
+
+            backgrounds.push({
+                canvas: bgCvs,
+                ctx: bgCtx,
+                w: sW,
+                h: sH,
+                idx: bgIdx,
+                cfg: cfg,
+                color: c,
+                originX: originX,
+                originY: originY,
+                particles: bgParticles,
+                visible: false,
+                section: section
+            });
+        }
+
+        if (!planets.length && !backgrounds.length) return;
+
+        // Reduced motion: draw static icon only, no background animation
         if (prefersReduced) {
             for (var si = 0; si < planets.length; si++) {
                 drawPlanetStatic(planets[si]);
@@ -750,59 +805,159 @@
             return;
         }
 
-        // IntersectionObserver per planet
+        // IntersectionObserver on background canvases (they represent the section)
         if (window.IntersectionObserver) {
-            var planetObs = new IntersectionObserver(function (entries) {
+            var detailObs = new IntersectionObserver(function (entries) {
                 for (var ei = 0; ei < entries.length; ei++) {
-                    var entry = entries[ei];
-                    // Find matching planet
-                    for (var pj = 0; pj < planets.length; pj++) {
-                        if (planets[pj].canvas === entry.target) {
-                            planets[pj].visible = entry.isIntersecting;
+                    for (var bj = 0; bj < backgrounds.length; bj++) {
+                        if (backgrounds[bj].canvas === entries[ei].target) {
+                            backgrounds[bj].visible = entries[ei].isIntersecting;
                             break;
                         }
                     }
                 }
-                // Start animation if any visible
-                var anyVisible = false;
-                for (var av = 0; av < planets.length; av++) {
-                    if (planets[av].visible) { anyVisible = true; break; }
+                var anyVis = false;
+                for (var av = 0; av < backgrounds.length; av++) {
+                    if (backgrounds[av].visible) { anyVis = true; break; }
                 }
-                if (anyVisible && !planetRaf) {
-                    planetRaf = requestAnimationFrame(animatePlanets);
+                if (anyVis && !detailRaf) {
+                    detailRaf = requestAnimationFrame(animateDetails);
                 }
-            }, { threshold: 0.1 });
+            }, { threshold: 0.05 });
 
-            for (var oi = 0; oi < planets.length; oi++) {
-                planetObs.observe(planets[oi].canvas);
+            for (var oi = 0; oi < backgrounds.length; oi++) {
+                detailObs.observe(backgrounds[oi].canvas);
             }
         } else {
-            // Fallback: all visible
-            for (var fi = 0; fi < planets.length; fi++) {
-                planets[fi].visible = true;
+            for (var fi = 0; fi < backgrounds.length; fi++) {
+                backgrounds[fi].visible = true;
             }
         }
 
-        // Start animation
-        if (!planetRaf) {
-            planetRaf = requestAnimationFrame(animatePlanets);
+        if (!detailRaf) {
+            detailRaf = requestAnimationFrame(animateDetails);
         }
 
-        function animatePlanets() {
-            var anyVisible = false;
-            for (var i = 0; i < planets.length; i++) {
-                if (planets[i].visible) {
-                    anyVisible = true;
-                    drawPlanet(planets[i]);
+        // --- Animation loop for both icon + background ---
+        function animateDetails() {
+            var anyVis = false;
+            for (var i = 0; i < backgrounds.length; i++) {
+                if (backgrounds[i].visible) {
+                    anyVis = true;
+                    drawBackground(backgrounds[i]);
+                    // Draw the matching icon planet
+                    for (var j = 0; j < planets.length; j++) {
+                        if (planets[j].idx === backgrounds[i].idx) {
+                            drawPlanet(planets[j]);
+                            break;
+                        }
+                    }
                 }
             }
-            if (anyVisible) {
-                planetRaf = requestAnimationFrame(animatePlanets);
+            if (anyVis) {
+                detailRaf = requestAnimationFrame(animateDetails);
             } else {
-                planetRaf = null;
+                detailRaf = null;
             }
         }
 
+        // --- Draw background: wide orbits, floating particles, satellites ---
+        function drawBackground(bg) {
+            var bCtx = bg.ctx;
+            var c = bg.color;
+            var cfg = bg.cfg;
+            var ox = bg.originX;
+            var oy = bg.originY;
+
+            bCtx.clearRect(0, 0, bg.w, bg.h);
+
+            // Large halo around origin
+            var haloR = Math.min(bg.w, bg.h) * 0.4;
+            var halo = bCtx.createRadialGradient(ox, oy, 20, ox, oy, haloR);
+            halo.addColorStop(0, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0.06)');
+            halo.addColorStop(1, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0)');
+            bCtx.beginPath();
+            bCtx.arc(ox, oy, haloR, 0, Math.PI * 2);
+            bCtx.fillStyle = halo;
+            bCtx.fill();
+
+            // Wide orbital rings expanding from icon position
+            var maxOrbitR = Math.max(bg.w, bg.h) * 0.55;
+            var ringStep = maxOrbitR / (cfg.bgRings + 1);
+
+            for (var ring = 0; ring < cfg.bgRings; ring++) {
+                var orbitR = ringStep * (ring + 1);
+                var rotAngle = animTime * cfg.speed * 0.15 * (ring % 2 === 0 ? 1 : -1) + ring * 0.4 + bg.idx * 0.3;
+
+                bCtx.save();
+                bCtx.translate(ox, oy);
+                bCtx.rotate(rotAngle);
+                bCtx.scale(1, cfg.ringTilt + ring * 0.04);
+
+                bCtx.beginPath();
+                bCtx.arc(0, 0, orbitR, 0, Math.PI * 2);
+
+                // Outer rings more subtle
+                var ringAlpha = 0.06 - ring * 0.005;
+                if (ringAlpha < 0.015) ringAlpha = 0.015;
+                bCtx.strokeStyle = 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + ringAlpha.toFixed(4) + ')';
+                bCtx.lineWidth = ring < 2 ? 1 : 0.6;
+
+                if (ring >= 2) {
+                    bCtx.setLineDash([6, 10]);
+                } else {
+                    bCtx.setLineDash([]);
+                }
+                bCtx.stroke();
+                bCtx.setLineDash([]);
+
+                // Satellite dot on every other ring
+                if (ring % 2 === 0) {
+                    var satAngle = rotAngle + animTime * cfg.speed * 0.5 + ring * 1.3;
+                    var satX = Math.cos(satAngle) * orbitR;
+                    var satY = Math.sin(satAngle) * orbitR * (cfg.ringTilt + ring * 0.04);
+                    bCtx.restore();
+
+                    bCtx.beginPath();
+                    bCtx.arc(ox + satX, oy + satY, 1.5 + (ring < 2 ? 0.5 : 0), 0, Math.PI * 2);
+                    bCtx.fillStyle = 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + (0.12 + (ring < 2 ? 0.06 : 0)).toFixed(3) + ')';
+                    bCtx.fill();
+                } else {
+                    bCtx.restore();
+                }
+            }
+
+            // Floating particles along the orbits
+            for (var pi = 0; pi < bg.particles.length; pi++) {
+                var part = bg.particles[pi];
+                part.angle += part.speed;
+
+                var px = ox + Math.cos(part.angle + part.phaseOff) * part.radius;
+                var py = oy + Math.sin(part.angle + part.phaseOff) * part.radius * part.tiltFactor;
+
+                // Gentle wobble
+                var wobble = Math.sin(animTime * 0.8 + pi * 2.1) * 8;
+                px += wobble;
+                py += wobble * 0.5;
+
+                // Fade particles near edges
+                var edgeFade = 1;
+                if (px < 20) edgeFade = px / 20;
+                else if (px > bg.w - 20) edgeFade = (bg.w - px) / 20;
+                if (py < 20) edgeFade *= py / 20;
+                else if (py > bg.h - 20) edgeFade *= (bg.h - py) / 20;
+                edgeFade = Math.max(0, Math.min(1, edgeFade));
+
+                var alpha = part.brightness * edgeFade;
+
+                bCtx.beginPath();
+                bCtx.arc(px, py, part.size, 0, Math.PI * 2);
+                bCtx.fillStyle = 'rgba(' + c.r + ',' + c.g + ',' + c.b + ',' + alpha.toFixed(3) + ')';
+                bCtx.fill();
+            }
+        }
+
+        // --- Draw icon planet (compact, 80×80) ---
         function drawPlanetStatic(p) {
             var cx = p.w * 0.5;
             var cy = p.h * 0.5;
@@ -811,7 +966,6 @@
 
             p.ctx.clearRect(0, 0, p.w, p.h);
 
-            // Halo
             var halo = p.ctx.createRadialGradient(cx, cy, r * 0.5, cx, cy, r * 3);
             halo.addColorStop(0, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0.15)');
             halo.addColorStop(1, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0)');
@@ -820,13 +974,11 @@
             p.ctx.fillStyle = halo;
             p.ctx.fill();
 
-            // Core
             p.ctx.beginPath();
             p.ctx.arc(cx, cy, r, 0, Math.PI * 2);
             p.ctx.fillStyle = 'rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0.9)';
             p.ctx.fill();
 
-            // Highlight
             p.ctx.beginPath();
             p.ctx.arc(cx - r * 0.2, cy - r * 0.2, r * 0.4, 0, Math.PI * 2);
             p.ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
@@ -839,13 +991,12 @@
             var c = p.color;
             var cfg = p.cfg;
 
-            // Pulse
             var pulse = 1 + Math.sin(animTime * 1.2 + p.idx * 1.5) * 0.06;
             var r = 10 * pulse;
 
             p.ctx.clearRect(0, 0, p.w, p.h);
 
-            // Halo (radial gradient)
+            // Halo
             var haloR = r * 3.2;
             var halo = p.ctx.createRadialGradient(cx, cy, r * 0.5, cx, cy, haloR);
             halo.addColorStop(0, 'rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0.12)');
@@ -855,7 +1006,7 @@
             p.ctx.fillStyle = halo;
             p.ctx.fill();
 
-            // Orbital rings (behind core for lower half, in front for upper)
+            // Orbital rings on icon
             for (var ring = 0; ring < cfg.rings; ring++) {
                 var orbitR = r * (2.2 + ring * 1.0);
                 var angle = animTime * cfg.speed * (ring % 2 === 0 ? 1 : -0.7) + ring * 0.8 + p.idx * 0.5;
@@ -877,11 +1028,10 @@
                 }
                 p.ctx.stroke();
                 p.ctx.setLineDash([]);
-
                 p.ctx.restore();
             }
 
-            // Satellites / moons
+            // Satellites on icon
             for (var mi = 0; mi < cfg.moonCount; mi++) {
                 var moonOrbitR = r * (3.0 + mi * 1.2);
                 var moonAngle = animTime * cfg.speed * 1.5 + mi * 2.3 + p.idx * 1.7;
@@ -894,33 +1044,64 @@
                 p.ctx.fill();
             }
 
-            // Core circle
+            // Core
             p.ctx.beginPath();
             p.ctx.arc(cx, cy, r, 0, Math.PI * 2);
             p.ctx.fillStyle = 'rgba(' + c.r + ',' + c.g + ',' + c.b + ', 0.9)';
             p.ctx.fill();
 
-            // Inner white highlight
+            // Highlight
             p.ctx.beginPath();
             p.ctx.arc(cx - r * 0.2, cy - r * 0.2, r * 0.4, 0, Math.PI * 2);
             p.ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
             p.ctx.fill();
         }
 
-        // Handle resize for planet canvases
+        // --- Resize handler ---
+        var detailResizeTimer;
         window.addEventListener('resize', function () {
-            for (var ri = 0; ri < planets.length; ri++) {
-                var pp = planets[ri];
-                var dw = pp.canvas.offsetWidth || 80;
-                var dh = pp.canvas.offsetHeight || 80;
-                if (dw !== pp.w || dh !== pp.h) {
-                    pp.w = dw;
-                    pp.h = dh;
-                    pp.canvas.width = dw * pp.dpr;
-                    pp.canvas.height = dh * pp.dpr;
-                    pp.ctx.setTransform(pp.dpr, 0, 0, pp.dpr, 0, 0);
+            clearTimeout(detailResizeTimer);
+            detailResizeTimer = setTimeout(function () {
+                // Resize icon canvases
+                for (var ri = 0; ri < planets.length; ri++) {
+                    var pp = planets[ri];
+                    var dw = pp.canvas.offsetWidth || 80;
+                    var dh = pp.canvas.offsetHeight || 80;
+                    if (dw !== pp.w || dh !== pp.h) {
+                        pp.w = dw;
+                        pp.h = dh;
+                        pp.canvas.width = dw * pDpr;
+                        pp.canvas.height = dh * pDpr;
+                        pp.ctx.setTransform(pDpr, 0, 0, pDpr, 0, 0);
+                    }
                 }
-            }
+                // Resize background canvases
+                for (var rb = 0; rb < backgrounds.length; rb++) {
+                    var bg = backgrounds[rb];
+                    var sec = bg.section;
+                    var sW = sec.offsetWidth;
+                    var sH = sec.offsetHeight;
+                    if (sW !== bg.w || sH !== bg.h) {
+                        bg.w = sW;
+                        bg.h = sH;
+                        bg.canvas.width = sW * pDpr;
+                        bg.canvas.height = sH * pDpr;
+                        bg.ctx.setTransform(pDpr, 0, 0, pDpr, 0, 0);
+                    }
+                    // Recalculate origin from planet icon position
+                    var planetIcon = sec.querySelector('.service-detail__planet');
+                    if (planetIcon) {
+                        var secRect = sec.getBoundingClientRect();
+                        var iconRect = planetIcon.getBoundingClientRect();
+                        bg.originX = iconRect.left - secRect.left + iconRect.width * 0.5;
+                        bg.originY = iconRect.top - secRect.top + iconRect.height * 0.5;
+                    }
+                    // Redistribute particles for new dimensions
+                    for (var rp = 0; rp < bg.particles.length; rp++) {
+                        bg.particles[rp].radius = 60 + Math.random() * Math.min(sW, sH) * 0.45;
+                    }
+                }
+            }, 250);
         });
     })();
 

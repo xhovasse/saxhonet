@@ -162,6 +162,26 @@
 }
 
 /* --- Service Detail Sections --- */
+.service-detail {
+    overflow: hidden;
+}
+
+.service-detail > .container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Background orbital canvas — covers the entire section */
+.service-detail__bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
 .service-detail__header {
     display: flex;
     align-items: center;
@@ -174,6 +194,8 @@
     width: 80px;
     height: 80px;
     flex-shrink: 0;
+    position: relative;
+    z-index: 1;
 }
 
 .service-detail__title-group {

@@ -69,6 +69,7 @@ $services = [
      ========================================== -->
 <?php foreach ($services as $i => $s): ?>
 <section class="section service-detail <?= $i % 2 === 1 ? 'section--surface' : '' ?>" id="service-<?= $i + 1 ?>">
+    <canvas class="service-detail__bg" data-service-bg="<?= $i ?>" aria-hidden="true"></canvas>
     <div class="container">
         <div class="service-detail__header reveal reveal-up">
             <canvas class="service-detail__planet" data-service-idx="<?= $i ?>" width="160" height="160" aria-hidden="true"></canvas>

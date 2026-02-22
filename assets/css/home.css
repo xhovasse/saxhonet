@@ -212,7 +212,7 @@
     width: 100%;
     max-width: 900px;
     margin: 0 auto var(--sp-3xl);
-    aspect-ratio: 800 / 700;
+    aspect-ratio: 800 / 750;
 }
 
 .climber-scene__svg {
@@ -279,18 +279,19 @@
 }
 
 /* Title colors per service */
-.climber-label__title--1 { color: #6366F1; }
-.climber-label__title--2 { color: #0EA5E9; }
+.climber-label__title--1 { color: #FF6B4A; }
+.climber-label__title--2 { color: #D4940A; }
 .climber-label__title--3 { color: #10B981; }
-.climber-label__title--4 { color: #FF6B4A; }
-.climber-label__title--5 { color: #D4940A; }
+.climber-label__title--4 { color: #0EA5E9; }
+.climber-label__title--5 { color: #6366F1; }
 
-/* Label positions (percentage-based, relative to .climber-scene) */
-.climber-label--1 { top: 70%; left: 0; text-align: right; max-width: 160px; }
-.climber-label--2 { top: 50%; left: 2%; text-align: right; max-width: 170px; }
-.climber-label--3 { top: 33%; left: 1%; text-align: right; max-width: 180px; }
-.climber-label--4 { top: 20%; right: 2%; text-align: left; left: auto; }
-.climber-label--5 { top: 6%; right: 0; text-align: left; left: auto; max-width: 160px; }
+/* Label positions (percentage-based, relative to .climber-scene)
+   Holds are clustered — labels positioned around the cluster */
+.climber-label--1 { top: 62%; left: 0; text-align: right; max-width: 180px; }
+.climber-label--2 { top: 45%; right: 0; text-align: left; left: auto; max-width: 180px; }
+.climber-label--3 { top: 36%; left: 0; text-align: right; max-width: 180px; }
+.climber-label--4 { top: 12%; right: 0; text-align: left; left: auto; max-width: 180px; }
+.climber-label--5 { top: 4%; left: 0; text-align: right; max-width: 180px; }
 
 /* Active label highlight */
 .climber-label--active .climber-label__title {
@@ -502,11 +503,11 @@
         opacity: 1 !important;
     }
 
-    .climber-label--1 { border-left-color: #6366F1; }
-    .climber-label--2 { border-left-color: #0EA5E9; }
+    .climber-label--1 { border-left-color: #FF6B4A; }
+    .climber-label--2 { border-left-color: #F5A623; }
     .climber-label--3 { border-left-color: #10B981; }
-    .climber-label--4 { border-left-color: #FF6B4A; }
-    .climber-label--5 { border-left-color: #F5A623; }
+    .climber-label--4 { border-left-color: #38BDF8; }
+    .climber-label--5 { border-left-color: #6366F1; }
 
     .portfolio-preview__grid {
         grid-template-columns: 1fr;

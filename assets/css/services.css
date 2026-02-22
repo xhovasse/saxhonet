@@ -255,44 +255,6 @@
     line-height: var(--lh-relaxed);
 }
 
-/* --- Night theme (bleu nuit profond) --- */
-.services-progression--night {
-    background-color: var(--c-primary-dark);
-    color: var(--c-light);
-}
-
-.services-progression--night .services-progression__label {
-    color: rgba(255, 255, 255, 0.5);
-}
-
-.services-progression--night .constellation-svc__label-text {
-    color: rgba(255, 255, 255, 0.6);
-}
-
-.services-progression--night .constellation-svc__num {
-    border-color: rgba(255, 255, 255, 0.3);
-    color: rgba(255, 255, 255, 0.6);
-}
-
-/* Active state inversee : fond blanc, texte sombre */
-.services-progression--night .constellation-svc__label--active .constellation-svc__num {
-    background-color: var(--c-white);
-    color: var(--c-primary-dark);
-    border-color: var(--c-white);
-}
-
-.services-progression--night .constellation-svc__label--active .constellation-svc__label-title {
-    color: var(--c-white) !important;
-}
-
-.services-progression--night .constellation-svc__label--active .constellation-svc__label-text {
-    color: var(--c-white);
-}
-
-/* Dim inactive — plus subtil sur fond sombre */
-.services-progression--night .constellation-svc--has-active .constellation-svc__label:not(.constellation-svc__label--active) {
-    opacity: 0.2;
-}
 
 /* --- Responsive ---
    Ces regles sont ici (et non dans responsive.css) car services.css est charge

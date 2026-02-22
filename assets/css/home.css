@@ -459,35 +459,39 @@
         font-size: var(--fs-body-lg);
     }
 
-    /* Constellation : canvas masque, labels en cartes */
-    .constellation__canvas {
-        display: none;
-    }
-
+    /* Constellation : riviere verticale mobile */
     .constellation {
         aspect-ratio: auto;
-        display: flex;
-        flex-direction: column;
-        gap: var(--sp-md);
+        min-height: 520px;
+        max-width: 100%;
+        margin-bottom: var(--sp-xl);
+    }
+
+    .constellation__canvas {
+        display: block;
+        border-radius: 0;
     }
 
     .constellation__label {
-        position: static !important;
-        transform: none !important;
-        text-align: left !important;
-        max-width: 100% !important;
-        padding: var(--sp-md) var(--sp-lg);
-        background: var(--c-white);
-        border-radius: var(--radius-md);
-        border-left: 4px solid var(--c-primary);
-        opacity: 1 !important;
+        /* Positioned by JS (positionLabelsMobile) */
+        max-width: none !important;
+        gap: var(--sp-xs);
+        padding: var(--sp-xs) var(--sp-sm);
     }
 
-    .constellation__label--1 { border-left-color: #FF6B4A; }
-    .constellation__label--2 { border-left-color: #D4940A; }
-    .constellation__label--3 { border-left-color: #10B981; }
-    .constellation__label--4 { border-left-color: #0EA5E9; }
-    .constellation__label--5 { border-left-color: #6366F1; }
+    .constellation__label-text {
+        display: none; /* Hide descriptions on mobile to save space */
+    }
+
+    .constellation__label-title {
+        font-size: var(--fs-xs);
+    }
+
+    .constellation__num {
+        width: 16px;
+        height: 16px;
+        font-size: 0.65rem;
+    }
 
     .portfolio-preview__grid {
         grid-template-columns: 1fr;

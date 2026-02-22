@@ -3,6 +3,9 @@
  * Riviere de particules lumineuses le long d'une courbe ascendante,
  * 5 noeuds orbitaux representant les 5 niveaux de service.
  * "De l'idee au succes" — les idees se structurent a travers le chemin.
+ *
+ * Desktop : courbe de Bezier ascendante avec labels alternes.
+ * Mobile  : riviere verticale avec labels alternes gauche/droite.
  */
 (function () {
     'use strict';
@@ -25,17 +28,21 @@
     var raf = null;
     var w = 0, h = 0;
     var animTime = 0;
+    var isMobile = false;
 
     // --- Configuration ---
     var CONFIG = {
         particleCount: 180,
+        particleCountMobile: 80,
         particleSpeed: 0.0012,
         particleMinSize: 0.8,
         particleMaxSize: 2.8,
         riverWidthStart: 45,
         riverWidthEnd: 12,
+        riverWidthMobile: 20,
 
         nodeBaseRadius: 6,
+        nodeBaseRadiusMobile: 5,
         nodeHoverScale: 1.5,
         nodeScaleSpeed: 0.08,
         orbitBaseSpeed: 0.4,
@@ -43,6 +50,7 @@
         haloRadius: 50,
 
         pathPadding: 0.10,
+        pathPaddingMobile: 0.06,
 
         mouseGravity: 0.12,
         mouseRadius: 140,
@@ -76,11 +84,17 @@
     var nodePositions = []; // {x, y} for each node in px
     var nodeScales = [1, 1, 1, 1, 1];  // current animated scale
 
-    // Bezier control points (set on resize)
+    // Bezier control points (set on resize, desktop only)
     var bp0 = { x: 0, y: 0 };
     var bp1 = { x: 0, y: 0 };
     var bp2 = { x: 0, y: 0 };
     var bp3 = { x: 0, y: 0 };
+
+    // Mobile: straight line endpoints + cached tangent/perpendicular
+    var lineStart = { x: 0, y: 0 };
+    var lineEnd = { x: 0, y: 0 };
+    var cachedTangent = { x: 0, y: 0 };
+    var cachedPerp = { x: 0, y: 0 };
 
     // Label elements
     var labels = [];
@@ -89,7 +103,7 @@
         labels.push(lbl);
     }
 
-    // --- Bezier math ---
+    // --- Bezier math (desktop) ---
     function bezierPoint(t) {
         var u = 1 - t;
         var tt = t * t;
@@ -114,6 +128,29 @@
         return { x: -tangent.y, y: tangent.x };
     }
 
+    // --- Line math (mobile) ---
+    function linePoint(t) {
+        return {
+            x: lineStart.x + (lineEnd.x - lineStart.x) * t,
+            y: lineStart.y + (lineEnd.y - lineStart.y) * t
+        };
+    }
+
+    // --- Unified path helpers ---
+    function pathPoint(t) {
+        return isMobile ? linePoint(t) : bezierPoint(t);
+    }
+
+    function pathTangent(t) {
+        if (isMobile) return cachedTangent;
+        return bezierTangent(t);
+    }
+
+    function pathPerp(t) {
+        if (isMobile) return cachedPerp;
+        return perpendicular(bezierTangent(t));
+    }
+
     // --- Color interpolation ---
     function lerpColor(t) {
         // Map t (0-1) across the 5 colors
@@ -132,7 +169,7 @@
 
     // --- Resize ---
     function resize() {
-        if (window.innerWidth < MOBILE_BP) return;
+        isMobile = window.innerWidth < MOBILE_BP;
 
         var rect = scene.getBoundingClientRect();
         w = Math.floor(rect.width);
@@ -145,29 +182,51 @@
         canvas.style.height = h + 'px';
         ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-        // Bezier: bottom-left to top-right, near-linear for even node spacing
-        var pad = w * CONFIG.pathPadding;
-        bp0.x = pad + w * 0.02;
-        bp0.y = h - pad;
-        bp1.x = w * 0.33;
-        bp1.y = h * 0.66;
-        bp2.x = w * 0.66;
-        bp2.y = h * 0.33;
-        bp3.x = w - pad - w * 0.02;
-        bp3.y = pad;
+        if (isMobile) {
+            // Vertical line: top-center → bottom-center
+            var padY = h * CONFIG.pathPaddingMobile;
+            var cx = w * 0.5;
+            lineStart.x = cx;
+            lineStart.y = padY;
+            lineEnd.x = cx;
+            lineEnd.y = h - padY;
+
+            // Tangent and perpendicular for vertical line
+            var dx = lineEnd.x - lineStart.x;
+            var dy = lineEnd.y - lineStart.y;
+            var len = Math.sqrt(dx * dx + dy * dy) || 1;
+            cachedTangent.x = dx / len;
+            cachedTangent.y = dy / len;
+            cachedPerp.x = -cachedTangent.y;
+            cachedPerp.y = cachedTangent.x;
+        } else {
+            // Bezier: bottom-left to top-right, near-linear for even node spacing
+            var pad = w * CONFIG.pathPadding;
+            bp0.x = pad + w * 0.02;
+            bp0.y = h - pad;
+            bp1.x = w * 0.33;
+            bp1.y = h * 0.66;
+            bp2.x = w * 0.66;
+            bp2.y = h * 0.33;
+            bp3.x = w - pad - w * 0.02;
+            bp3.y = pad;
+        }
 
         // Compute node positions
         nodePositions = [];
         for (var n = 0; n < NODES.length; n++) {
-            nodePositions.push(bezierPoint(NODES[n].t));
+            nodePositions.push(pathPoint(NODES[n].t));
         }
 
         positionLabels();
     }
 
-    // --- Position HTML labels ---
+    // --- Position HTML labels (desktop) ---
     function positionLabels() {
-        if (window.innerWidth < MOBILE_BP) return;
+        if (isMobile) {
+            positionLabelsMobile();
+            return;
+        }
 
         for (var i = 0; i < NODES.length; i++) {
             if (!labels[i] || !nodePositions[i]) continue;
@@ -199,13 +258,43 @@
             labels[i].style.left = offsetX + 'px';
             labels[i].style.top = offsetY + 'px';
             labels[i].style.textAlign = dir;
+            labels[i].style.width = '';
+            labels[i].style.right = '';
+        }
+    }
+
+    // --- Position HTML labels (mobile) ---
+    function positionLabelsMobile() {
+        var centerX = w * 0.5;
+        var labelMargin = 28; // gap from center line
+
+        for (var i = 0; i < NODES.length; i++) {
+            if (!labels[i] || !nodePositions[i]) continue;
+            var np = nodePositions[i];
+            var labelH = labels[i].offsetHeight || 50;
+
+            // Alternate: even → left, odd → right
+            if (i % 2 === 0) {
+                labels[i].style.left = '8px';
+                labels[i].style.right = '';
+                labels[i].style.width = (centerX - labelMargin - 8) + 'px';
+                labels[i].style.textAlign = 'right';
+            } else {
+                labels[i].style.left = (centerX + labelMargin) + 'px';
+                labels[i].style.right = '';
+                labels[i].style.width = (centerX - labelMargin - 8) + 'px';
+                labels[i].style.textAlign = 'left';
+            }
+
+            labels[i].style.top = (np.y - labelH * 0.5) + 'px';
         }
     }
 
     // --- Create particles ---
     function createParticles() {
         particles = [];
-        for (var i = 0; i < CONFIG.particleCount; i++) {
+        var count = isMobile ? CONFIG.particleCountMobile : CONFIG.particleCount;
+        for (var i = 0; i < count; i++) {
             particles.push({
                 t: Math.random(),
                 speed: CONFIG.particleSpeed * (0.6 + Math.random() * 0.8),
@@ -241,13 +330,11 @@
     }
 
     function handleEnter(index) {
-        if (window.innerWidth < MOBILE_BP) return;
         clearTimeout(leaveTimer);
         activateNode(index);
     }
 
     function handleLeave() {
-        if (window.innerWidth < MOBILE_BP) return;
         clearTimeout(leaveTimer);
         leaveTimer = setTimeout(function () {
             activateNode(-1);
@@ -261,13 +348,13 @@
 
     // --- Drawing ---
     function drawPath() {
-        // Draw connecting gradient line along the Bezier
+        // Draw connecting gradient line along the path
         var steps = 80;
         for (var i = 0; i < steps; i++) {
             var t0 = i / steps;
             var t1 = (i + 1) / steps;
-            var p0 = bezierPoint(t0);
-            var p1 = bezierPoint(t1);
+            var p0 = pathPoint(t0);
+            var p1 = pathPoint(t1);
             var c = lerpColor((t0 + t1) * 0.5);
 
             var dimFactor = 1;
@@ -299,22 +386,23 @@
                 p.offset = (Math.random() - 0.5) * 2;
             }
 
-            // River width narrows along the path
-            var riverWidth = CONFIG.riverWidthStart + (CONFIG.riverWidthEnd - CONFIG.riverWidthStart) * p.t;
+            // River width narrows along the path (desktop) / constant (mobile)
+            var riverWidth = isMobile
+                ? CONFIG.riverWidthMobile
+                : CONFIG.riverWidthStart + (CONFIG.riverWidthEnd - CONFIG.riverWidthStart) * p.t;
 
             // Wobble
             var wobble = Math.sin(animTime * p.wobbleFreq + p.wobbleOff) * 0.3;
             var totalOffset = (p.offset + wobble) * riverWidth;
 
-            var pos = bezierPoint(p.t);
-            var tang = bezierTangent(p.t);
-            var perp = perpendicular(tang);
+            var pos = pathPoint(p.t);
+            var perp = pathPerp(p.t);
 
             var px = pos.x + perp.x * totalOffset;
             var py = pos.y + perp.y * totalOffset;
 
-            // Mouse gravity — subtle attraction
-            if (mouse.x > 0 && mouse.y > 0) {
+            // Mouse gravity — subtle attraction (desktop only)
+            if (!isMobile && mouse.x > 0 && mouse.y > 0) {
                 var mdx = mouse.x - px;
                 var mdy = mouse.y - py;
                 var mDist = Math.sqrt(mdx * mdx + mdy * mdy);
@@ -351,6 +439,7 @@
 
             // Size increases along path
             var size = p.size * (0.6 + p.t * 0.6);
+            if (isMobile) size *= 0.7;
 
             ctx.beginPath();
             ctx.arc(px, py, size, 0, Math.PI * 2);
@@ -375,7 +464,8 @@
             var pulse = 1 + Math.sin(animTime * 1.5 + i * 1.2) * 0.04;
             var finalScale = scale * pulse;
 
-            var baseR = CONFIG.nodeBaseRadius + node.sizeBonus;
+            var baseR = isMobile ? CONFIG.nodeBaseRadiusMobile : CONFIG.nodeBaseRadius;
+            baseR += node.sizeBonus * (isMobile ? 0.5 : 1);
             var r = baseR * finalScale;
 
             // Dim factor
@@ -398,7 +488,8 @@
 
             // Orbital rings
             var orbitSpeed = isActive ? CONFIG.orbitHoverSpeed : CONFIG.orbitBaseSpeed;
-            for (var ring = 0; ring < node.rings; ring++) {
+            var ringCount = isMobile ? Math.min(node.rings, 1) : node.rings;
+            for (var ring = 0; ring < ringCount; ring++) {
                 var orbitR = r * (2 + ring * 1.2);
                 var angle = animTime * orbitSpeed * (ring % 2 === 0 ? 1 : -0.7) + ring * 1.1;
 
@@ -464,7 +555,7 @@
 
     // --- Animation loop ---
     function animate() {
-        if (w < 1 || h < 1 || window.innerWidth < MOBILE_BP) {
+        if (w < 1 || h < 1) {
             raf = requestAnimationFrame(animate);
             return;
         }
@@ -479,9 +570,9 @@
         raf = requestAnimationFrame(animate);
     }
 
-    // --- Events: mouse on canvas ---
+    // --- Events: mouse on canvas (desktop only) ---
     scene.addEventListener('mousemove', function (e) {
-        if (window.innerWidth < MOBILE_BP) return;
+        if (isMobile) return;
         var rect = scene.getBoundingClientRect();
         mouse.x = e.clientX - rect.left;
         mouse.y = e.clientY - rect.top;
@@ -505,7 +596,7 @@
     });
 
     scene.addEventListener('click', function (e) {
-        if (window.innerWidth < MOBILE_BP) return;
+        if (isMobile) return;
         var rect = scene.getBoundingClientRect();
         var mx = e.clientX - rect.left;
         var my = e.clientY - rect.top;
@@ -526,7 +617,6 @@
 
     // --- Touch support ---
     scene.addEventListener('touchstart', function (e) {
-        if (window.innerWidth < MOBILE_BP) return;
         var touch = e.touches[0];
         var rect = scene.getBoundingClientRect();
         var mx = touch.clientX - rect.left;
@@ -538,7 +628,8 @@
         if (labelDiv) {
             var svc = parseInt(labelDiv.getAttribute('data-service'), 10);
             if (targetActive === svc - 1) {
-                activateNode(-1);
+                // Second tap on same label → navigate
+                handleClick();
             } else {
                 activateNode(svc - 1);
             }
@@ -549,7 +640,7 @@
         var hovered = getHoveredNode(mx, my);
         if (hovered >= 0) {
             if (targetActive === hovered) {
-                activateNode(-1);
+                handleClick();
             } else {
                 activateNode(hovered);
             }
@@ -575,7 +666,6 @@
 
     // --- Init ---
     function init() {
-        if (window.innerWidth < MOBILE_BP) return;
         resize();
         createParticles();
         if (!raf) {
@@ -589,8 +679,10 @@
     window.addEventListener('resize', function () {
         clearTimeout(resizeTimer);
         resizeTimer = setTimeout(function () {
+            var wasMobile = isMobile;
             resize();
-            if (particles.length === 0) {
+            // Recreate particles if switching between mobile/desktop
+            if (wasMobile !== isMobile || particles.length === 0) {
                 createParticles();
             }
         }, 250);
